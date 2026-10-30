@@ -1,0 +1,6 @@
+[
+  {"rule_id":"R-COPYRIGHT-MISSING","version":1,"field":"copyright_status","operator":"missing","value":null,"severity":"needs_info","message":"缺少版权状态，请补查授权资料"},
+  {"rule_id":"R-COPYRIGHT-DENIED","version":1,"field":"copyright_status","operator":"equals","value":"unauthorized","severity":"blocked","message":"未授权素材不得进入排期"},
+  {"rule_id":"R-COVER-MISSING","version":1,"field":"cover_ref","operator":"missing","value":null,"severity":"needs_info","message":"示例业务规则要求提供封面引用"},
+  {"rule_id":"R-CAPTION-REVIEW","version":1,"field":"caption","operator":"contains","value":"最强","severity":"needs_review","message":"示例品牌规则要求人工核实该表述依据"}
+]
