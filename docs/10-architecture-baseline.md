@@ -1,8 +1,10 @@
 # 项目架构与实施基线
 
-状态：2026-10-30 完成方案定稿，尚未实现、接入模型或进行业务测试。本文统一前期讨论中的实施选择；项目要求原文见 [原始要求](08-project-requirements-original.md)，业务验收见 [需求矩阵](01-requirements.md)。本文与前期暂定方案不一致时以本文为准。
+状态：2026-10-30 完成方案定稿；契约与存储后来已有阶段一验证，完整模型循环及业务验收以 [实际阶段记录](16-implementation-progress.md) 为准。本文统一实施选择；项目要求原文见 [原始要求](08-project-requirements-original.md)，业务验收见 [需求矩阵](01-requirements.md)。本文与前期暂定方案不一致时以本文为准。
 
 模块函数、JSON 格式、事务步骤和验收映射已细化至 [开发实现参考](13-implementation-reference.md)。详细开发按该文档执行；其细化约定优先于本文早期概述。
+
+Agent 运行层的提示、请求数据、上下文/记忆、工具接入、循环伪代码、故障处理及实施检查点见 [Agent 开发流程规范](17-agent-development-spec.md)，不改变既有确认、幂等和草稿边界。
 
 ## 1. 产品定位与使用者
 
@@ -33,7 +35,7 @@
 | 质量 | Ruff | 格式化和必要静态检查，行长 100 |
 | 环境与依赖 | venv + pip、pyproject.toml + requirements.lock | 实现时解析并锁定全部精确依赖，然后验证干净安装 |
 
-以上是技术选型，尚不是安装验证结论。实现阶段锁定具体补丁版本和传递依赖；当前不编造依赖锁文件。
+以上是技术选择，不代表完整模型链路兼容性结论。阶段一已有实际 requirements.lock 与安装记录；干净安装及完整 Agent 验证仍需对应证据。
 不引入 Web 前端、HTTP 服务、向量库、Redis、ORM 或多 Agent。业务只有四类工具和小型状态，不需要额外 Runtime 框架。
 
 资料依据：[DeepSeek 接口入口](https://api-docs.deepseek.com/)、[工具调用协议](https://api-docs.deepseek.com/guides/tool_calls/)、[HTTPX 超时](https://www.python-httpx.org/advanced/timeouts/)、[Python 3.13 sqlite3](https://docs.python.org/3.13/library/sqlite3.html)。

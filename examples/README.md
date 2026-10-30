@@ -18,3 +18,7 @@ Mock 记录只说明工程流程可执行，不支持真实模型能力结论。
 
 若模型不可用，保留错误事实并记录缺失证据，不用 Mock 冒充真实路径。
 评估文档只引用真实存在且已审查的文件。
+
+## Agent 规范的设计检查
+
+[design_checks/agent-development.txt](design_checks/agent-development.txt) 记录开发规范及关联文档的实际静态检查：JSON 示例、Markdown 链接/锚点、表格、代码块与示例自一致性。它不裁定规范与代码的取舍、不运行 Agent/CLI、不调用模型，也不能替代六类业务证据。契约/存储已有离线阶段记录见 [实现进度](../docs/16-implementation-progress.md)，与本次设计检查分开报告。

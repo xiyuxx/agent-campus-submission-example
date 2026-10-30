@@ -1,0 +1,29 @@
+Agent development specification: documentation checks only
+Executed at: 2026-10-30T17:37:41+08:00
+Scope: explicitly listed documentation files; no application imports or implementation conformance verdict.
+Checks: balanced fences, JSON parsing, Python syntax parsing (not execution), table widths,
+local file links and heading anchors, example invariants, chapter/acceptance coverage, whitespace.
+External pages: official sources manually browsed; external link count below is references only.
+Business tests, Agent/CLI execution, DeepSeek calls: NOT RUN in this documentation task.
+No success rate, runtime quality or code/spec authority decision is inferred.
+Result: PASS
+{"example_invariants": 15, "external_links": 37, "json_examples": 14, "local_links": 78, "markdown_files": 13, "python_blocks": 3, "tables": 55}
+
+Checked paths:
+README.md
+docs/01-requirements.md
+docs/02-solution.md
+docs/03-evaluation.md
+docs/04-ai-usage.md
+docs/05-retrospective.md
+docs/10-architecture-baseline.md
+docs/11-product-experience.md
+docs/12-runtime-decision.md
+docs/13-implementation-reference.md
+docs/15-database-design.md
+docs/17-agent-development-spec.md
+examples/README.md
+
+Document SHA-256 at check time:
+docs/17-agent-development-spec.md: c7fd519026fd31c79f3ae0e7d3a91175acdf1b52a9a834a6bd7d7a758136653b
+docs/13-implementation-reference.md: 7323db930ad12f9f01ebf9b3dee7100f157536c7ddeda1bd9aedefcdba88581a

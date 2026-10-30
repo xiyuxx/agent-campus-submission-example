@@ -1,10 +1,12 @@
-# 开发实现参考 v1.2
+# 开发实现参考 v1.3
 
-状态：设计完成，业务代码未实现。本文将已确认的 CLI、技术栈和业务要求落实为模块、接口、数据格式及验收规则。本文是后续开发的详细依据；与早期设计冲突时以本文为准，原始题目要求和用户后续明确指令优先。不得把本文的示例视为实际运行记录。
+状态：业务设计完成；契约与存储已有阶段一实现和离线验证，后续模块完成状态以 [实际阶段记录](16-implementation-progress.md) 为准。本文将已确认的 CLI、技术栈和业务要求落实为模块、接口、数据格式及验收规则。本文是后续开发的详细依据；与早期设计冲突时以本文为准，原始题目要求和用户后续明确指令优先。不得把本文的示例视为实际运行记录。
 
 2026-10-30 v1.1 修订：确定字段与规则的职责、候选范围、自身草稿排除、重评估与原要求变更的区别、确认边界及结束条件。
 
 2026-10-30 v1.2 修订：用户选择完整快照导入与草稿证据快照，细化为 [数据库设计](15-database-design.md) 和 [DDL 设计附件](15-database-schema.sql)。本次仅设计及结构检查，不实现业务代码、类型或工具；第 9 章和关联验收同步细化，业务行为沿用本文。
+
+2026-10-30 v1.3 修订：新增 [Agent 开发流程规范](17-agent-development-spec.md)，细化内部消息/上下文、HTTP 适配、工具配对、结束校验、预算、记忆、故障、分阶段实施与验收。新增运行层设计待实现和验证，不修改现有业务输入、确认、幂等或数据库契约；本次不实现 Agent 功能。
 
 相关材料：[项目要求原文](08-project-requirements-original.md)、[需求与验收](01-requirements.md)、[总体架构](10-architecture-baseline.md)、[运行方式取舍](12-runtime-decision.md)。
 
@@ -230,7 +232,7 @@ Agent 先 read_material basic，仅获得基本资料；选择 supplement 后才
 
 首版只实现 missing/equals/contains；字段和运算符白名单，不执行 eval。missing 包括 null、空白文本；未知状态字符串视为字段校验错误，不能视为已授权。匹配规则合并：blocked > needs_info > needs_review > passed。未知规则、错误字段和非法配置在 seed 时拒绝，不降级为通过。示例不是法律或平台政策结论。
 
-上面的四条规则组成首版随项目交付的默认合成规则集，实际 data/rules.json、演示和验收 fixture 按此落实；本章只是设计，尚未生成数据文件。默认规则不要求 license_ref 必填；若业务确需该字段，可显式导入对应 missing 规则并重新评估，不能由模型临时增加。
+上面的四条规则组成首版随项目交付的默认合成规则集，阶段一已提供 data/rules.json；演示和验收 fixture 按此落实。示例不代表实际 Agent 运行。默认规则不要求 license_ref 必填；若业务确需该字段，可显式导入对应 missing 规则并重新评估，不能由模型临时增加。
 规则 field 白名单与上表八个可补查业务字段一致；rule_id 为非空标识，允许新增符合契约的规则 ID，不把示例 ID 当作封闭白名单。“未知规则”指不支持的规则结构或运算，不指新增 ID。missing 的 value 必须为 null；equals 的 value 必须是对应字段的合法非空值；contains 仅用于自由文本字段，value 必须为非空文本，按字面大小写敏感匹配；equals/contains 遇到未知字段值不命中，需要 missing 规则表达该字段必需性。severity 仅允许 needs_info/needs_review/blocked，version 为正整数。
 seed 校验整个规则集，拒绝空规则集、重复 ID、错误字段或非法类型；显式导入的有效非空规则集是该版本的审核依据，程序不偷偷补上另一套规则。只有实际成功执行该规则集且无规则命中，才派生 passed。
 
@@ -254,6 +256,8 @@ seed 校验整个规则集，拒绝空规则集、重复 ID、错误字段或非
 requested、alternatives 查询、旧方案核查、保存和确认采用相同冲突范围：排除当前 request_id + material_id 对应的当前草稿自身，计入 schedule 和其他 active 草稿。不能按 material_id 排除所有草稿；同素材在另一请求下的有效草稿仍算其他占用。stale/rejected 草稿和历史修订不占容量。
 
 ## 5. 运行上下文和事实传递
+
+字段生命周期、模型可见投影、消息配对和跨进程恢复边界进一步遵循 [Agent 开发流程规范第 6–10、16 章](17-agent-development-spec.md#6-itemcontext事实来源与失效规则)。
 
 ItemContext 由程序持有，至少包含 run_id、request_id、当前 material_id、不可变原要求、预算/截止时间、observations 映射、已读取有效素材、最新规则检查、候选查询、保存尝试和已有草稿修订。
 起始模型消息提供原请求及该逻辑键的已有 draft_id、revision、validity、当前确认摘要；无草稿时 expected_revision=0。这是程序提供的持久化状态，不代替本轮素材读取、规则检查或时段观察。REVISION_CONFLICT 返回当前修订与状态供模型重新判断，不能靠猜测修订号覆盖。
@@ -300,6 +304,8 @@ alternatives 返回候选来源（explicit/default/none）、完整合法候选�
 规则命中包含 rule_id、severity、field、observed_value、source_id、message；工具返回不把媒体文件、密钥或无限长文本送进模型。
 
 ## 7. 模型循环和结束协议
+
+可直接参照的控制流、纠错上限和完成核对见 [Agent 开发流程规范第 13–15 章](17-agent-development-spec.md#13-循环实现算法与控制流约束)。预算上限不授权增加模型或工具调用；新增运行层限制均需实际测试后才可声明完成。
 
 模型适配器输出 ModelTurn，其一为工具调用列表（保留提供方 call_id），其二为经过校验的 FinalProposal。
 工具调用的 assistant 消息与每个 role=tool、tool_call_id 对应结果必须正确加入历史。多个调用串行执行；每个均校验当前状态，预算不足的未执行项也获得明确拒绝观察，不伪造执行。
@@ -478,7 +484,7 @@ review 展示精确标题、平台账号、日期时区、风险、原要求和�
 | demo [--mode mock/live] | 默认 Mock，使用独立数据目录和稳定请求，重复运行可观察幂等 |
 | review --db PATH | 数字菜单，调用同一 confirm 服务 |
 
-所有命令尚未实现。退出码：0=completed 或成功查询，2=输入/配置错误，3=needs_input，4=blocked，5=incomplete，1=failed。演示说明包含非零业务状态的含义，不能把待确认误当崩溃。参数显式给 mode；demo 默认 mock；Mock 不需要密钥。
+上表是 CLI 契约，实际入口完成与验证情况以阶段记录为准，不能因有命令设计就声明已经可运行。退出码：0=completed 或成功查询，2=输入/配置错误，3=needs_input，4=blocked，5=incomplete，1=failed。演示说明包含非零业务状态的含义，不能把待确认误当崩溃。参数显式给 mode；demo 默认 mock；Mock 不需要密钥。
 进度和说明走 stderr，机器结果走 stdout。输出目录生成 input.json、output.json、summary.md、trace.jsonl、run.json；没有伪造运行日志的静态填充步骤。
 
 ## 13. Trace 和证据契约
@@ -490,6 +496,8 @@ run.json 记录开始结束、命令的非敏感参数、源码 commit 或内容
 资料、模型或工具不可用时如实产生错误证据；Mock 与 live 文件明确区分。
 
 ## 14. 验收、实现顺序与设计理由
+
+逐阶段产出、检查和提交顺序，以及六个必验场景的精确夹具/断言见 [Agent 开发流程规范第 19–22 章](17-agent-development-spec.md#21-可以逐项执行的开发阶段与退出条件)。本章业务验收不能由文档静态检查替代。
 
 | 用例 | 必须验证的行为 | 主要层 |
 | --- | --- | --- |
