@@ -1,0 +1,42 @@
+Database design DDL checks; not Agent or business acceptance evidence.
+Command: python scripts/check_database_design.py
+Started UTC: 2026-10-30T09:00:35.528901+00:00
+Python: 3.13.12
+SQLite: 3.51.1
+Base commit (working tree changes included): 3fafb0f1d5a0c129dbf9409ec6a854fd1d1d348d
+SHA256 docs/15-database-schema.sql: 278db619697ecddc9965f96c5be78bfe838b0e2e897d2fedfc6ce0d93fb95e93
+SHA256 scripts/check_database_design.py: a4a8020f6c65dc5e98673d902670159704ac4dcdb15b5968aaa6828902f88c27
+Exit code: 0
+
+STDOUT:
+SQLite 3.51.1; DDL design checks only
+
+STDERR:
+test_active_capacity_and_stale_release (__main__.DesignSchemaChecks.test_active_capacity_and_stale_release) ... ok
+test_active_conflict_query_uses_partial_index (__main__.DesignSchemaChecks.test_active_conflict_query_uses_partial_index) ... ok
+test_business_unknown_is_nullable_but_enum_is_checked (__main__.DesignSchemaChecks.test_business_unknown_is_nullable_but_enum_is_checked) ... ok
+test_confirmation_references_exact_history (__main__.DesignSchemaChecks.test_confirmation_references_exact_history) ... ok
+test_cross_table_capacity_requires_repository (__main__.DesignSchemaChecks.test_cross_table_capacity_requires_repository) ... ok
+test_current_pointer_requires_history_at_commit (__main__.DesignSchemaChecks.test_current_pointer_requires_history_at_commit) ... ok
+test_default_candidates_and_empty_candidates_are_distinct (__main__.DesignSchemaChecks.test_default_candidates_and_empty_candidates_are_distinct) ... ok
+test_deferred_pointer_allows_atomic_create (__main__.DesignSchemaChecks.test_deferred_pointer_allows_atomic_create) ... ok
+test_distinct_account_can_share_time (__main__.DesignSchemaChecks.test_distinct_account_can_share_time) ... ok
+test_draft_must_belong_to_request_item (__main__.DesignSchemaChecks.test_draft_must_belong_to_request_item) ... ok
+test_event_cannot_use_another_draft_confirmation (__main__.DesignSchemaChecks.test_event_cannot_use_another_draft_confirmation) ... ok
+test_immediate_transaction_excludes_second_writer (__main__.DesignSchemaChecks.test_immediate_transaction_excludes_second_writer) ... ok
+test_import_revision_pair_is_checked (__main__.DesignSchemaChecks.test_import_revision_pair_is_checked) ... ok
+test_logical_key_remains_unique_for_inactive_drafts (__main__.DesignSchemaChecks.test_logical_key_remains_unique_for_inactive_drafts) ... ok
+test_rejected_draft_does_not_occupy_slot (__main__.DesignSchemaChecks.test_rejected_draft_does_not_occupy_slot) ... ok
+test_revision_keeps_old_confirmation_and_snapshot (__main__.DesignSchemaChecks.test_revision_keeps_old_confirmation_and_snapshot) ... ok
+test_schedule_can_reference_external_material (__main__.DesignSchemaChecks.test_schedule_can_reference_external_material) ... ok
+test_strict_type_rejects_noninteger_version (__main__.DesignSchemaChecks.test_strict_type_rejects_noninteger_version) ... ok
+test_thirteen_tables_and_integrity (__main__.DesignSchemaChecks.test_thirteen_tables_and_integrity) ... ok
+test_unknown_material_request_allowed_but_draft_rejected (__main__.DesignSchemaChecks.test_unknown_material_request_allowed_but_draft_rejected) ... ok
+test_write_receipt_is_unique_and_rollback_is_atomic (__main__.DesignSchemaChecks.test_write_receipt_is_unique_and_rollback_is_atomic) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.273s
+
+OK
+
+Static document checks: 10 Markdown files, 47 local links/anchors, 31 tables, 9 JSON blocks; errors=0.

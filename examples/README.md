@@ -1,6 +1,6 @@
 # 运行证据约定
 
-当前没有执行记录。下面是目标结构，不是已经生成的证据：
+当前没有业务执行记录。数据库设计的实际结构检查记录单独存放于 [design_checks/database-design.txt](design_checks/database-design.txt)，不属于 Agent、Mock/live 或六类业务运行证据。下面是目标结构，不是已经生成的业务证据：
 
 ```text
 examples/

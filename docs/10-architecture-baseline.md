@@ -171,7 +171,7 @@ query_slots 提供快照，save_draft 在 SQLite 写事务内重新读取版本�
 ## 9. 数据存储
 
 合成 JSON 用 seed 命令导入 SQLite；运行期可信数据读同一数据库。规则内容可存 JSON，但规则元数据含版本。
-建议表：catalog_meta、materials、supplements、rules、schedule、allowed_slots、requests、drafts、draft_history、confirmations。drafts 有上述唯一键；当前有效建议时段有对应唯一约束，历史不占用。
+具体结构见 [数据库设计](15-database-design.md)：catalog_meta、materials、supplements、rules、schedule、allowed_slots、catalog_imports、requests、request_items、drafts、draft_history、confirmations、draft_events 共 13 表。完整快照更新当前目录，历史证据和明确用户决定独立保留。drafts 有上述唯一键；当前有效建议时段有对应唯一约束，历史不占用。设计 DDL 检查不等于业务实现或验收。
 用 BEGIN IMMEDIATE 保护本地冲突校验和保存；schedule 的修改也必须走同一事务边界。JSON fixture 变更通过显式重新导入更新版本，不自动读取文件变化覆盖运行数据库。
 Trace 保存在独立 run 目录；数据库是草稿成功与否的事实来源，Trace 不是事务提交成功的替代证据。
 

@@ -1,8 +1,10 @@
-# 开发实现参考 v1.1
+# 开发实现参考 v1.2
 
 状态：设计完成，业务代码未实现。本文将已确认的 CLI、技术栈和业务要求落实为模块、接口、数据格式及验收规则。本文是后续开发的详细依据；与早期设计冲突时以本文为准，原始题目要求和用户后续明确指令优先。不得把本文的示例视为实际运行记录。
 
-2026-10-30 修订：确定字段与规则的职责、候选范围、自身草稿排除、重评估与原要求变更的区别、确认边界及结束条件，作为后续数据库流程设计和开发的业务基线。本次不实现业务代码，也不重设第 9 章的数据库结构；后续数据库设计需承载本文确定的业务行为、历史和验收断言。
+2026-10-30 v1.1 修订：确定字段与规则的职责、候选范围、自身草稿排除、重评估与原要求变更的区别、确认边界及结束条件。
+
+2026-10-30 v1.2 修订：用户选择完整快照导入与草稿证据快照，细化为 [数据库设计](15-database-design.md) 和 [DDL 设计附件](15-database-schema.sql)。本次仅设计及结构检查，不实现业务代码、类型或工具；第 9 章和关联验收同步细化，业务行为沿用本文。
 
 相关材料：[项目要求原文](08-project-requirements-original.md)、[需求与验收](01-requirements.md)、[总体架构](10-architecture-baseline.md)、[运行方式取舍](12-runtime-decision.md)。
 
@@ -387,20 +389,25 @@ summary.md 使用固定中文模板按这些字段渲染，避免模型自由文
 
 | 表 | 关键字段及约束 |
 | --- | --- |
-| catalog_meta | 单行 revision、合成源数据摘要 |
-| materials | material_id 主键、material_version、data_json |
-| supplements | material_id 主键、supplement_version、data_json |
-| rules | rule_id 主键、version、data_json |
-| schedule | entry_id 主键、platform、account_id、at_utc；三者唯一 |
-| allowed_slots | platform、account_id、at_utc 联合主键 |
-| requests | request_id 主键、canonical_input_json、input_sha256 |
-| drafts | draft_id 主键、request_id、material_id、revision、validity、platform、account_id、at_utc、catalog_revision、semantic_sha256、payload_json、updated_at |
-| draft_history | draft_id + revision 联合主键，保存每一版 payload 与失效原因 |
-| confirmations | operation_id 主键、draft_id、revision、decisions_json、decided_at |
+| catalog_imports | 导入主键、前后目录版本、applied/noop、文件摘要/数量、变更摘要；不归档完整目录 |
+| catalog_meta | 单行 revision、当前 applied 导入引用、合成源数据摘要与 schedule_version |
+| materials | material_id 主键、material_version、平台账号、八个可空业务字段、is_current、内容摘要和导入来源 |
+| supplements | material_id 主键/外键、supplement_version、来源、fields_json、is_current 与内容摘要 |
+| rules | rule_id 主键、version、字段/运算/值/风险/说明、is_current 与内容摘要 |
+| schedule | entry_id 主键、platform、account_id、at_utc 三者唯一；素材为外部引用，不要求本地存在 |
+| allowed_slots | platform、account_id、at_utc 联合主键，仅表示当前默认候选 |
+| requests | request_id 主键、首次原始表达、canonical_input_json、input_sha256；不可变 |
+| request_items | request_id + material_id 联合主键，原时间/时区/constraint 与可空候选数组；不强制素材已存在 |
+| drafts | 稳定 draft_id、逻辑唯一键、当前修订/有效性/建议时刻与摘要；当前指针延迟外键到 history |
+| draft_history | draft_id + revision 联合主键、内部 storage_write_id 唯一、实际资料/规则/时段与确认定义的不可变快照 |
+| confirmations | operation_id 主键、具体修订外键、完整规范输入/摘要、实际决定、原回执与入口/时间 |
+| draft_events | 草稿修订外键、创建/修订/失效/接受/拒绝、原因、导入或确认引用；仅追加 |
 
-drafts 上 UNIQUE(request_id, material_id)。有效时段用部分唯一索引 UNIQUE(platform, account_id, at_utc) WHERE validity='active' AND at_utc IS NOT NULL。此索引只约束草稿；与 schedule 的交叉冲突必须在事务中检查。
+drafts 上 UNIQUE(request_id, material_id)。已保存方案 at_utc 非空，有效时段用部分唯一索引 UNIQUE(platform, account_id, at_utc) WHERE validity='active'。此索引只约束草稿；与 schedule 的交叉冲突必须在事务中检查。stale/rejected 的旧时刻仅供审计，输出仍不显示为当前建议。payload 统一存 history，drafts 不再重复保存另一份 JSON。
 所有 SQL 使用参数绑定，所有业务写入通过同一 Repository。事务显式 BEGIN IMMEDIATE / COMMIT / ROLLBACK，busy 等待不超过 2 秒；不在数据库事务中等待模型或网络。
-seed 默认仅初始化空库；更新资料需要显式 --update，以一个事务变更目录并递增 catalog_revision，保留草稿历史、标记受旧版本影响的有效草稿为 stale、释放本地规划容量。不得静默清库；demo 使用隔离路径。
+seed 默认仅初始化空库；更新资料需要显式 --update。四个文件组成单一完整目录，缺文件失败、明确空排期合法、空规则非法。实际变化以一个事务更新资料、递增 catalog_revision，保留请求和全部草稿历史；首版保守地将所有基于旧目录的 active 草稿标 stale 并记原因，释放本地规划容量。rejected 不改状态，缺席素材/补充/规则停用，旧排期/默认候选替换。相同规范内容只记 noop，不增版本、不失效。不得静默清库；demo 使用隔离路径。
+
+详细字段、主外键、索引、连接、写事务、迁移与恢复见 [数据库设计](15-database-design.md)。业务目录版本不同于 PRAGMA user_version。数据库外键每连接显式开启；真正草稿必须引用合法请求项及已知素材。所有入库时间统一为固定六位微秒 UTC TEXT，超出可无损表达精度的输入拒绝，不能静默截断。
 
 ## 10. 幂等、旧方案与保存步骤
 
@@ -428,9 +435,9 @@ rejected 是当前逻辑请求的终止决定；同 request_id 重跑仍可产�
 2. 核对 catalog_revision 和有效素材/规则快照，不一致返回 STALE_EVIDENCE，模型需重新读取和检查。
 3. 核查最新规则状态、运行身份字段、明确的原时间要求、已观察可用的原时刻或合法候选、账号。业务必填性只由导入规则产生；阻断或关键缺项返回 PRECONDITION_FAILED，已拒绝方案返回 DRAFT_REJECTED。
 4. 在同一写事务内检查 schedule 和其他 active drafts，排除当前 draft_id；发现冲突返回 SLOT_CONFLICT，不落库新方案。
-5. 比较语义摘要：material_version、有效资料摘要、规则命中及版本、原要求、建议时段和方案要求确认的事项定义。事项定义按用户决定之前的方案计算，不使用已过滤掉接受项的 pending_items；用户接受本身不改变方案语义。排除措辞、观察 ID、时间戳、模型说明和用户决定状态，避免随机文案或确认操作导致假修订。
+5. 比较语义摘要：material_version、有效资料摘要、完整适用规则定义/版本及命中、原要求、建议时段和方案要求确认的事项定义。事项定义按用户决定之前的方案计算，不使用已过滤掉接受项的 pending_items；用户接受本身不改变方案语义。排除措辞、观察 ID、时间戳、模型说明和用户决定状态，避免随机文案或确认操作导致假修订。
 6. 已有 active 草稿与版本/证据都相同则 reused，不增修订、不清除有效确认；否则更新同一 draft_id、revision+1，记录历史并失效旧确认；新建从 revision=1 开始。
-7. COMMIT 后返回 saved/updated/reused 及 ID；事务异常回滚并返回 failed。提交结果不明时用独立连接按逻辑键和预期语义摘要核对；仍无法确定则 unknown。
+7. COMMIT 后返回 saved/updated/reused 及 ID；事务异常且已知回滚时返回 failed。新建/修订将程序生成的 storage_write_id 与 history 同事务写入；提交结果不明时用独立连接按写入凭据、逻辑键、预期修订与语义摘要核对，另查当前有效性。仅有同语义行不能证明本次写入发生；仍无法确定则 unknown，不盲重试。
 
 已有草稿重新评估时，应用服务先验证旧快照和占用：旧方案不再成立则用短事务标 stale 并记录原因；这是事实维护，不为模型选择替代方案。如果资料未变且旧方案有效，保持有效，不因启动 run 而释放其槽位。
 旧方案有效、新建议保存失败时保留旧方案但报告本次失败；旧方案已经 stale 时不得把旧 ID 当成当前有效保存成功。新方案与失效方案语义相同时仍需重新校验并以新修订激活，不能直接 reused。
@@ -448,7 +455,7 @@ expected_revision 不匹配返回 REVISION_CONFLICT，避免并发覆盖。首�
 }
 ```
 
-confirm 服务在事务内检查当前修订、有效性、资料版本、规则和时段，再接受明确的待确认项。operation_id 重放同样内容复用结果，不同内容拒绝。
+confirm 服务先在事务内检查 operation_id 重放：同样完整规范内容复用原回执，不同内容拒绝；重放不重新执行决定，并另行展示当前草稿状态。首次操作再检查当前修订、有效性、资料版本、规则和时段，接受明确的待确认项。
 accept 只解决当前列出的可确认项；blocked 和 missing 项不允许接受为通过。所有可确认项接受后 confirmation_status=confirmed，尚有未决可确认项则为 pending。reject 使方案 rejected、释放本地规划槽位；skip 不写入。
 accept/reject 仅适用于当前 active 修订中尚未解决的 kind=confirm 项；一个可确认项被 reject 即拒绝整份方案，不表示只删除该风险或取消该待办。全部已确认、无待确认项、stale 或 rejected 的草稿不能借此入口撤回或重新批准。
 同次输入每个 item_id 只允许一个决定，重复项、未知项、input 项或同时包含 accept 与 reject 时整体拒绝且不部分写入；可只接受部分待确认项，其余保持 pending。全部 skip 不写操作记录、确认或状态变化；包含 accept 和 skip 时仅记录实际接受项，skip 不形成确认事实。operation_id 的已写入请求按完整规范化输入核对重放，不能借同 ID 改决定。
@@ -509,6 +516,8 @@ run.json 记录开始结束、命令的非敏感参数、源码 commit 或内容
 | B05/B07 | requested、alternatives、保存及确认均排除自身，计入同素材其他请求草稿；同方案重跑 ID/修订不变、当前确认保留；新增占用后原草稿 stale，新方案修订同一 ID、旧确认失效；无替代时不展示旧时刻为有效建议 |
 | B08 | 缺项、扩大候选范围不能 accept；部分接受仍 pending、全接受后 confirmed；reject 仅作用于当前待确认方案并释放容量；全部 skip 无写入，混合 accept/reject 或非法项整体拒绝；rejected 重跑不能恢复；无待确认项或已确认方案不支持撤回 |
 | B09/边界 | 修改请求空字段或候选范围需新 ID，同 ID 拒绝；资料补齐后原请求可重评估；新 ID 不隐式替代旧草稿或排除其占用；省略/null 候选摘要相同，[] 不同；items 顺序不改变规范摘要及执行顺序 |
+
+数据库细化补充计划：完整目录缺文件整体失败、空排期合法、空规则非法；相同内容 noop；缺席资料停用且历史 FK 保留；当前草稿缺历史不能提交；时间精度不截断。B06/B08 增加写入凭据核对、旧确认回执与当前有效性分离、实际证据和状态事件原子提交的断言。完整映射见数据库设计第 12 章，均未执行业务测试。
 
 ### 本次定稿的原因与后续设计约束
 
