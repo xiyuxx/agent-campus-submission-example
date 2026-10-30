@@ -319,6 +319,92 @@ class Repository:
             "changes": changes,
         }
 
+    def preview_catalog_snapshot(self, catalog: Catalog) -> dict:
+        canonical = catalog.canonical()
+        previous = 0
+        changed = True
+        existing = {
+            name: {} for name in ("materials", "supplements", "rules", "schedule", "allowed_slots")
+        }
+        active = []
+        if self.path.exists():
+            connection = self._connect()
+            try:
+                version = connection.execute("PRAGMA user_version").fetchone()[0]
+                if version not in (0, 1):
+                    raise BusinessError("SCHEMA_VERSION", "不支持该数据库版本")
+                if version == 1:
+                    connection.execute("BEGIN")
+                    meta = connection.execute(
+                        "SELECT * FROM catalog_meta WHERE singleton_id=1"
+                    ).fetchone()
+                    previous = meta["revision"] if meta else 0
+                    changed = not meta or meta["source_sha256"] != digest(canonical)
+                    for table, key in (
+                        ("materials", "material_id"),
+                        ("supplements", "material_id"),
+                        ("rules", "rule_id"),
+                    ):
+                        existing[table] = {
+                            x[key]: x["content_sha256"]
+                            for x in connection.execute(
+                                f"SELECT {key},content_sha256 FROM {table} WHERE is_current=1"
+                            )
+                        }
+                    for table in ("schedule", "allowed_slots"):
+                        for row in connection.execute(f"SELECT * FROM {table}"):
+                            value = {k: v for k, v in dict(row).items() if k != "import_id"}
+                            value["at"] = value.pop("at_utc")
+                            key = (
+                                value["entry_id"]
+                                if table == "schedule"
+                                else dumps([value["platform"], value["account_id"], value["at"]])
+                            )
+                            existing[table][key] = digest(value)
+                    active = (
+                        [
+                            x[0]
+                            for x in connection.execute(
+                                "SELECT draft_id FROM drafts WHERE validity='active'"
+                            )
+                        ]
+                        if changed
+                        else []
+                    )
+            finally:
+                if connection.in_transaction:
+                    connection.execute("ROLLBACK")
+                connection.close()
+        incoming = {
+            name: {x[key]: digest(x) for x in canonical[name]}
+            for name, key in (
+                ("materials", "material_id"),
+                ("supplements", "material_id"),
+                ("rules", "rule_id"),
+            )
+        }
+        incoming["schedule"] = {x["entry_id"]: digest(x) for x in canonical["schedule"]["entries"]}
+        incoming["allowed_slots"] = {
+            dumps([x["platform"], x["account_id"], x["at"]]): digest(x)
+            for x in canonical["schedule"]["allowed_slots"]
+        }
+        changes = {}
+        for table, new in incoming.items():
+            old = existing[table]
+            changes[table] = {
+                "added": sorted(new.keys() - old.keys()),
+                "removed": sorted(old.keys() - new.keys()),
+                "modified": sorted(k for k in new.keys() & old.keys() if new[k] != old[k]),
+            }
+        changes["staled_drafts"] = active
+        return {
+            "dry_run": True,
+            "previous_revision": previous,
+            "catalog_revision": previous + int(changed),
+            "changed": bool(changed),
+            "changes": changes,
+        }
+
     @staticmethod
     def _upsert(connection, table: str, key: str, columns: list[str], values: list) -> None:
         # All identifiers originate in validated contracts and this module's constants.
@@ -639,6 +725,7 @@ class Repository:
     ) -> dict:
         write_id = new_id("WRITE")
         status = "saved"
+        committed = False
         try:
             with self.transaction(write=True) as connection:
                 meta = self._meta(connection)
@@ -806,26 +893,67 @@ class Repository:
                     raise BusinessError(
                         "SAVE_FAILED", "显式注入的提交前失败，事务已回滚", retryable=once
                     )
+            committed = True
             if self.fault in ("receipt_lost", "receipt_unknown"):
-                resolved = self.resolve_save_outcome(write_id, request.request_id, item.material_id)
+                resolved = self.resolve_save_outcome(
+                    write_id,
+                    request.request_id,
+                    item.material_id,
+                    expected_revision=revision,
+                    semantic_sha256=semantic,
+                )
                 return {"save_status": status, "draft": resolved, "receipt_recovered": True}
             return {
                 "save_status": status,
                 "draft": self.current_draft(request.request_id, item.material_id),
             }
+        except BusinessError as exc:
+            if exc.code != "COMMIT_UNKNOWN":
+                raise
+            resolved = self.resolve_save_outcome(
+                write_id,
+                request.request_id,
+                item.material_id,
+                expected_revision=revision,
+                semantic_sha256=semantic,
+            )
+            return {"save_status": status, "draft": resolved, "receipt_recovered": True}
         except sqlite3.Error as exc:
+            if committed:
+                resolved = self.resolve_save_outcome(
+                    write_id,
+                    request.request_id,
+                    item.material_id,
+                    expected_revision=revision,
+                    semantic_sha256=semantic,
+                )
+                return {"save_status": status, "draft": resolved, "receipt_recovered": True}
             raise self.database_error(exc) from exc
 
-    def resolve_save_outcome(self, write_id: str, request_id: str, material_id: str) -> dict:
+    def resolve_save_outcome(
+        self,
+        write_id: str,
+        request_id: str,
+        material_id: str,
+        *,
+        expected_revision: int,
+        semantic_sha256: str,
+    ) -> dict:
         if self.fault == "receipt_unknown":
             raise BusinessError("SAVE_UNKNOWN", "回执丢失且核对失败，提交结果未知")
         try:
             with self.transaction() as connection:
                 proof = connection.execute(
-                    "SELECT draft_id FROM draft_history WHERE storage_write_id=?", (write_id,)
+                    "SELECT * FROM draft_history WHERE storage_write_id=?", (write_id,)
                 ).fetchone()
                 current = self._draft(connection, request_id, material_id)
-                if proof and current and proof[0] == current["draft_id"]:
+                if (
+                    proof
+                    and current
+                    and proof["draft_id"] == current["draft_id"]
+                    and proof["revision"] == expected_revision
+                    and proof["semantic_sha256"] == semantic_sha256
+                ):
                     return self._inspect(connection, current)
         except sqlite3.Error as exc:
             raise BusinessError("SAVE_UNKNOWN", "无法读取提交凭据，保存结果未知") from exc

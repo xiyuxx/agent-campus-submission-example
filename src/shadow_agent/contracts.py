@@ -338,8 +338,6 @@ class MaterialSnapshot(Contract):
             {
                 "material": self.material.model_dump(mode="json"),
                 "sources": self.sources,
-                "supplement_version": self.supplement_version,
-                "supplemented": self.supplemented,
             }
         )
 

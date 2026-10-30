@@ -1,0 +1,5 @@
+[
+  {"material_id":"M01","material_version":2,"platform":"douyin","account_id":"brand_main","source_asset_id":"VIDEO-001","title":"新品功能介绍","type":"video","media_ref":"synthetic://video/M01-v2.mp4","caption":"支持字幕功能","cover_ref":"synthetic://cover/M01-v2.jpg","copyright_status":null,"license_ref":null},
+  {"material_id":"M02","material_version":1,"platform":"douyin","account_id":"brand_main","title":"门店花絮","type":"video","caption":"门店日常","cover_ref":null,"copyright_status":null},
+  {"material_id":"M03","material_version":1,"platform":"douyin","account_id":"brand_main","title":"未授权示例","type":"image","caption":"合成测试素材","cover_ref":"synthetic://cover/M03.jpg","copyright_status":"unauthorized"}
+]
