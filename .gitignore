@@ -1,0 +1,29 @@
+# Python 和开发环境
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+runtime/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# 密钥和本地配置
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# 临时产物；经审查的评估证据放在 examples/ 下并提交
+tmp/
+.tmp/
+.DS_Store
+Thumbs.db
