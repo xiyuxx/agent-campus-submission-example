@@ -154,3 +154,60 @@ def test_output_failure_updates_exit_code_without_repeating_save(repo, job, tmp_
     assert metadata["exit_code"] == 1
     assert metadata["evidence_error"]
     assert len(repo.inspect_draft(result.items[0].draft.id)["history"]) == 1
+
+
+def test_refreshing_observation_ids_does_not_reset_retry_limit(repo, job, monkeypatch):
+    from shadow_agent.common import BusinessError
+
+    ctx = context(repo, job)
+    for name, args in [
+        ("read_material", {"detail": "basic"}),
+        ("read_material", {"detail": "supplement"}),
+        ("check_rules", {}),
+    ]:
+        execute(name, {"material_id": "M01", **args}, ctx)
+    attempts = 0
+
+    def busy(*args, **kwargs):
+        nonlocal attempts
+        attempts += 1
+        raise BusinessError("DATABASE_BUSY", "synthetic busy", retryable=True)
+
+    monkeypatch.setattr(repo, "save_draft", busy)
+    for index in range(3):
+        slots = execute("query_slots", {"material_id": "M01", "query": "alternatives"}, ctx)
+        result = execute(
+            "save_draft",
+            {
+                "material_id": "M01",
+                "suggested_at": "2026-11-03T19:00:00+08:00",
+                "expected_revision": 0,
+                "review_observation_id": ctx.review_id,
+                "slot_observation_id": slots.observation_id,
+                "reason_summary": f"retry {index}",
+            },
+            ctx,
+        )
+    assert attempts == 2
+    assert result.code == "RETRY_LIMIT"
+
+
+def test_late_model_response_cannot_complete_after_deadline(repo, job):
+    from shadow_agent.agent import run_item
+    from shadow_agent.contracts import FinalProposal
+    from shadow_agent.models.base import ModelTurn
+    from shadow_agent.result import assemble_result
+
+    job.items[0].publish_requirement.timezone = None
+    ctx = context(repo, job)
+
+    class LateModel:
+        async def next_action(self, messages, schemas):
+            ctx.budget.clock = lambda: ctx.budget.deadline + 1
+            proposal = FinalProposal(action="needs_input", reason_summary="缺时区", evidence_ids=[])
+            return ModelTurn(
+                {"role": "assistant", "content": proposal.model_dump_json()}, proposal=proposal
+            )
+
+    asyncio.run(run_item(ctx, LateModel()))
+    assert assemble_result(ctx).task_status == "incomplete"

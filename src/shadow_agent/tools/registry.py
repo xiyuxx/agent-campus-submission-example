@@ -38,6 +38,23 @@ def schemas() -> list[dict]:
     ]
 
 
+def retry_key(name, args, ctx) -> str:
+    value = args.model_dump(
+        mode="json",
+        exclude={
+            "reason_summary",
+            "review_observation_id",
+            "slot_observation_id",
+        },
+    )
+    if isinstance(args, SaveArgs):
+        value["suggested_at"] = utc(args.suggested_at)
+    value["basis"] = (
+        (ctx.snapshot.catalog_revision, ctx.snapshot.facts_hash()) if ctx.snapshot else None
+    )
+    return name + ":" + json.dumps(value, sort_keys=True)
+
+
 def execute(
     name: str, raw_arguments, context: ItemContext, *, call_id: str | None = None
 ) -> ToolResult:
@@ -49,6 +66,14 @@ def execute(
     try:
         if ctx.forced_status:
             raise BusinessError("NOT_EXECUTED", "本项已终止，此调用未执行")
+        if (
+            ctx.technical_error
+            and not ctx.technical_error.get("retryable", False)
+            and ctx.technical_error["code"]
+            in ("READ_FAILED", "QUERY_FAILED", "SAVE_FAILED", "DATABASE_ERROR")
+        ):
+            ctx.forced_status = "failed"
+            raise BusinessError("NOT_EXECUTED", "此前不可继续的技术失败尚未解决，禁止后续副作用")
         ctx.budget.tool_attempt()
         attempted = True
         if name not in ARGUMENTS:
@@ -60,11 +85,7 @@ def execute(
         args = ARGUMENTS[name].model_validate(raw_arguments)
         if args.material_id != ctx.material_id:
             raise BusinessError("OUT_OF_SCOPE", "工具只能处理当前素材")
-        key = (
-            name
-            + ":"
-            + json.dumps(args.model_dump(mode="json", exclude={"reason_summary"}), sort_keys=True)
-        )
+        key = retry_key(name, args, ctx)
         if ctx.retry_counts.get(key, 0) > 1:
             raise BusinessError("RETRY_LIMIT", "该临时失败最多额外重试一次")
         ctx.budget.ensure()
@@ -176,13 +197,7 @@ def execute(
     except (BusinessError, sqlite3.Error) as exc:
         error = ctx.repo.database_error(exc) if isinstance(exc, sqlite3.Error) else exc
         if error.retryable and attempted:
-            key = (
-                name
-                + ":"
-                + json.dumps(
-                    args.model_dump(mode="json", exclude={"reason_summary"}), sort_keys=True
-                )
-            )
+            key = retry_key(name, args, ctx)
             ctx.retry_counts[key] = ctx.retry_counts.get(key, 0) + 1
         result = ToolResult(
             observation_id=observation_id,
@@ -219,6 +234,11 @@ def execute(
             ctx.technical_error = error.as_dict()
         if error.code == "BUDGET_EXHAUSTED":
             ctx.forced_status = "incomplete"
+    except OSError:
+        if name == "save_draft" and attempted and ctx.save_status == "not_attempted":
+            ctx.save_status = "failed"
+            ctx.save_error = {"code": "EVIDENCE_ERROR", "message": "证据预检失败，保存未执行"}
+        raise
     ctx.observations[observation_id] = result
     if call_id is not None:
         ctx.observation_calls[observation_id] = call_id

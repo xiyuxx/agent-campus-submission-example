@@ -111,6 +111,7 @@ async def run_item(ctx: ItemContext, model) -> None:
             except TimeoutError as exc:
                 raise BusinessError("MODEL_TIMEOUT", "模型整轮请求超时", retryable=True) from exc
             retries = 0
+            ctx.budget.ensure()
             validate_turn(turn, messages)
             ctx.provider_records.append(turn.metadata)
             ctx.consumed.update(ctx.observations)
@@ -142,7 +143,10 @@ async def run_item(ctx: ItemContext, model) -> None:
                 raise BusinessError("MODEL_PROTOCOL", "模型既未调用工具也未提供结束请求")
             try:
                 validate_finish(ctx, turn.proposal)
+                ctx.budget.ensure()
             except BusinessError as error:
+                if error.code == "BUDGET_EXHAUSTED":
+                    raise
                 ctx.trace.emit(
                     "error", material_id=ctx.material_id, budget=ctx.budget, error=error.as_dict()
                 )
@@ -170,6 +174,11 @@ async def run_item(ctx: ItemContext, model) -> None:
                 feedback(error)
             elif error.retryable and retries < 1:
                 retries += 1
+                if ctx.budget.remaining() <= 0.5:
+                    ctx.forced_status = "incomplete"
+                    ctx.technical_error = error.as_dict()
+                else:
+                    await asyncio.sleep(0.5)
             else:
                 ctx.forced_status = "failed"
                 ctx.technical_error = error.as_dict()
