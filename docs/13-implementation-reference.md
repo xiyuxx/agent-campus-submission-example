@@ -1,6 +1,8 @@
-# 开发实现参考 v1
+# 开发实现参考 v1.1
 
 状态：设计完成，业务代码未实现。本文将已确认的 CLI、技术栈和业务要求落实为模块、接口、数据格式及验收规则。本文是后续开发的详细依据；与早期设计冲突时以本文为准，原始题目要求和用户后续明确指令优先。不得把本文的示例视为实际运行记录。
+
+2026-10-30 修订：确定字段与规则的职责、候选范围、自身草稿排除、重评估与原要求变更的区别、确认边界及结束条件，作为后续数据库流程设计和开发的业务基线。本次不实现业务代码，也不重设第 9 章的数据库结构；后续数据库设计需承载本文确定的业务行为、历史和验收断言。
 
 相关材料：[项目要求原文](08-project-requirements-original.md)、[需求与验收](01-requirements.md)、[总体架构](10-architecture-baseline.md)、[运行方式取舍](12-runtime-decision.md)。
 
@@ -116,7 +118,18 @@ dependencies 显式注入配置、Repository、Model、Clock、TraceSink；不�
 ```
 
 platform/account_id/version 从可信素材读取，不让用户请求和模型各填一套相互矛盾的值。requested_at、timezone、constraint 允许 null 以覆盖信息不足，影响执行时必须澄清；非空值必须合法并一致。首版要求偏移与 IANA 时区匹配，环境缺时区数据时安装 tzdata 并锁定版本。
-candidate_times 是用户允许查询建议的范围，不是已经授权改变时间。未提供候选列表时，候选取数据中对应账号的同日 allowed_slots，不自动跨日扩展；候选仍没有则询问用户。
+上述三项任一未知时，不猜测日期、时区或 hard/soft，不查询时段或保存草稿；模型仍可读取素材和检查规则，结束时列出具体缺项。constraint 的合法非空值为 hard/soft；两者都不授权自动改期。
+
+时间范围按下表唯一解释，不以默认候选集合限制用户明确指定的时间：
+
+| 输入 | 查询与保存边界 |
+| --- | --- |
+| requested_at | 原始要求，requested 查询只检查此时刻；即使不在 allowed_slots 或 candidate_times 内也可查询，观察为可用后可保存 |
+| candidate_times 为非空列表 | alternatives 只查询此列表，按 UTC 去重；无需与 allowed_slots 取交集，用户明确列出次日等跨日时间时允许查询 |
+| candidate_times 省略或为 null | 使用该平台、账号的 allowed_slots，按请求 timezone 换算后筛选与 requested_at 同一自然日；不自动跨日扩展 |
+| candidate_times 为 [] | 用户未提供替代空间，alternatives 返回空候选，不回退到 allowed_slots；原要求仍可查询和保存 |
+
+candidate_times 仅允许查询和建议，不代表已经接受改期。所有非空时间均需合法且偏移与请求 timezone 在该日期的偏移一致，跨日候选也按各自日期校验。模型不能通过工具参数添加候选；没有替代空间或候选全部占用时，明确请求用户调整要求或候选范围。所有偏离原时刻的建议，无论 hard/soft、是否来自用户候选，都产生 change_time 待确认项；同一 UTC 时刻的不同表示不算改期。
 mode、db、output、模型配置属于 CLI/运行配置，不参与原始业务请求摘要。items 不得重复 material_id。
 
 ### 4.2 素材 materials.json（数组）
@@ -142,6 +155,18 @@ mode、db、output、模型配置属于 CLI/运行配置，不参与原始业务
 
 synthetic:// 仅用于表示虚构资产，不自动下载或宣称真实文件存在。项目验证的是该元数据的业务流程。
 
+字段分为运行身份与可缺失业务事实，必填性不从 JSON 示例推断：
+
+| 字段 | 类型及校验 | 缺失处理与补查权限 |
+| --- | --- | --- |
+| material_id、platform、account_id | 非空字符串 | seed 缺失、null 或空白即格式错误；supplement 不得修改 |
+| material_version | 正整数 | seed 缺失或非法即格式错误；supplement 不得修改 |
+| source_asset_id、title、media_ref、caption、cover_ref、license_ref | 字符串或 null | 可省略并规范化为 null；空白文本按未知处理；允许补查 |
+| type | video/image/text 或 null | 可省略并规范化为 null；非法非空值拒绝导入；允许补查 |
+| copyright_status | authorized/unauthorized 或 null | 可省略并规范化为 null；未知用 null，其他非空状态拒绝导入；允许补查 |
+
+业务字段未知不等于整个文件格式错误；是否造成 needs_info 由当前导入规则决定。保存校验运行身份、明确的原时间要求和规则结论，不再另藏一份业务必填清单。例如 license_ref=null 本身不禁止保存；仅在导入的规则明确要求它时返回缺项。规则检查没有执行成功时仍不能报告 passed。
+
 supplements.json 存可补查字段和来源：
 
 ```json
@@ -155,7 +180,8 @@ supplements.json 存可补查字段和来源：
 ]
 ```
 
-Agent 先 read_material basic，仅获得基本资料；选择 supplement 后才能把补充事实纳入本次有效素材快照。补充只允许填补白名单字段的未知值；与已知值冲突返回 DATA_CONFLICT，不静默覆盖。模型不能通过工具参数提交自己编造的元数据。
+Agent 先 read_material basic，仅获得基本资料；选择 supplement 后才能把补充事实纳入本次有效素材快照。补查白名单仅为上表允许补查的八个字段，不含身份、平台账号或版本。fields 中的值沿用素材字段类型，supplement_version 为正整数、source_id 为非空来源标识；非法配置在 seed 时拒绝。
+补充只填补未知值；与已知值相同则保留原值与来源，与已知值冲突返回 DATA_CONFLICT，本次不合并任何补充字段，不静默覆盖。模型不能通过工具参数提交自己编造的元数据。basic 返回各业务字段的来源引用，supplement 返回已补齐、仍未知和冲突项，规则命中引用实际被使用的字段来源。
 
 ### 4.3 规则 rules.json（数组）
 
@@ -180,6 +206,15 @@ Agent 先 read_material basic，仅获得基本资料；选择 supplement 后才
     "message": "未授权素材不得进入排期"
   },
   {
+    "rule_id": "R-COVER-MISSING",
+    "version": 1,
+    "field": "cover_ref",
+    "operator": "missing",
+    "value": null,
+    "severity": "needs_info",
+    "message": "示例业务规则要求提供封面引用"
+  },
+  {
     "rule_id": "R-CAPTION-REVIEW",
     "version": 1,
     "field": "caption",
@@ -192,6 +227,10 @@ Agent 先 read_material basic，仅获得基本资料；选择 supplement 后才
 ```
 
 首版只实现 missing/equals/contains；字段和运算符白名单，不执行 eval。missing 包括 null、空白文本；未知状态字符串视为字段校验错误，不能视为已授权。匹配规则合并：blocked > needs_info > needs_review > passed。未知规则、错误字段和非法配置在 seed 时拒绝，不降级为通过。示例不是法律或平台政策结论。
+
+上面的四条规则组成首版随项目交付的默认合成规则集，实际 data/rules.json、演示和验收 fixture 按此落实；本章只是设计，尚未生成数据文件。默认规则不要求 license_ref 必填；若业务确需该字段，可显式导入对应 missing 规则并重新评估，不能由模型临时增加。
+规则 field 白名单与上表八个可补查业务字段一致；rule_id 为非空标识，允许新增符合契约的规则 ID，不把示例 ID 当作封闭白名单。“未知规则”指不支持的规则结构或运算，不指新增 ID。missing 的 value 必须为 null；equals 的 value 必须是对应字段的合法非空值；contains 仅用于自由文本字段，value 必须为非空文本，按字面大小写敏感匹配；equals/contains 遇到未知字段值不命中，需要 missing 规则表达该字段必需性。severity 仅允许 needs_info/needs_review/blocked，version 为正整数。
+seed 校验整个规则集，拒绝空规则集、重复 ID、错误字段或非法类型；显式导入的有效非空规则集是该版本的审核依据，程序不偷偷补上另一套规则。只有实际成功执行该规则集且无规则命中，才派生 passed。
 
 ### 4.4 排期 schedule.json
 
@@ -209,10 +248,13 @@ Agent 先 read_material basic，仅获得基本资料；选择 supplement 后才
 ```
 
 只检查同平台、同账号、同一个精确离散时刻；不把视频播放时长当成发布时间区间。不同时区的同一时刻按 UTC 判等；查询结果列明冲突来自 schedule 还是 draft。
+保留字段名 allowed_slots，其唯一含义是默认候选集合，不是所有可发布时间的白名单；没有对应默认候选时，原要求和显式候选仍可按第 4.1 节检查。没有接入的时段禁发规则不自行推断。
+requested、alternatives 查询、旧方案核查、保存和确认采用相同冲突范围：排除当前 request_id + material_id 对应的当前草稿自身，计入 schedule 和其他 active 草稿。不能按 material_id 排除所有草稿；同素材在另一请求下的有效草稿仍算其他占用。stale/rejected 草稿和历史修订不占容量。
 
 ## 5. 运行上下文和事实传递
 
 ItemContext 由程序持有，至少包含 run_id、request_id、当前 material_id、不可变原要求、预算/截止时间、observations 映射、已读取有效素材、最新规则检查、候选查询、保存尝试和已有草稿修订。
+起始模型消息提供原请求及该逻辑键的已有 draft_id、revision、validity、当前确认摘要；无草稿时 expected_revision=0。这是程序提供的持久化状态，不代替本轮素材读取、规则检查或时段观察。REVISION_CONFLICT 返回当前修订与状态供模型重新判断，不能靠猜测修订号覆盖。
 模型只在当前素材范围内调用工具；请求范围外的素材 ID、伪造观察引用或其他用户确认被拒绝。全部模型文字与素材文本视为不可信数据，不能直接更新 context 的事实字段。
 
 采用一个保守的 catalog_revision：资料、规则或已有排期实际变化时递增；同内容重新 seed 不递增。观察与草稿记录该版本和有效素材摘要。任何资料版本变化都要求刷新相关检查，可能造成额外复查，但能减少首版版本判断复杂度。
@@ -224,12 +266,12 @@ ItemContext 由程序持有，至少包含 run_id、request_id、当前 material
 
 | 工具 | 参数 | 前置条件 |
 | --- | --- | --- |
-| read_material | material_id, detail: basic/supplement | 当前请求作用域内 |
+| read_material | material_id, detail: basic/supplement | 当前请求作用域内；supplement 需先读取 basic |
 | check_rules | material_id | 至少读取 basic；检查本轮有效快照 |
 | query_slots | material_id, query: requested/alternatives | 已取得平台账号；原时间等必要信息明确 |
-| save_draft | material_id, suggested_at, expected_revision, review_observation_id, slot_observation_id | 最新检查非 blocked/needs_info，候选曾被观察且可用 |
+| save_draft | material_id, suggested_at, expected_revision, review_observation_id, slot_observation_id | 最新检查非 blocked/needs_info，原时间要求明确，拟保存时刻为已观察可用的原时刻或合法候选；当前草稿未 rejected |
 
-查候选只在合法候选集合内，模型不能通过参数扩展到任意账号和日期。save_draft 不接受 review_status、confirmation_status、request_id、draft_id 这些由程序决定的字段。
+查候选只在第 4.1 节确定的集合内；用户显式列出的跨日候选可查，模型不能自行添加账号、日期或时刻。save_draft 不接受 review_status、confirmation_status、request_id、draft_id 这些由程序决定的字段。
 
 统一 ToolResult 示例：
 
@@ -252,6 +294,7 @@ ItemContext 由程序持有，至少包含 run_id、request_id、当前 material
 
 时段占用是成功查询到的业务事实，故 ok=true；未知工具、错误参数、保存冲突等动作未完成为 ok=false。工具实际异常也转换成错误观察并记录。不能把失败返回包装为空成功结果。
 requested 查询只返回原时段；alternatives 查询才返回候选与各自占用，便于观察冲突后模型是否主动补查。
+alternatives 返回候选来源（explicit/default/none）、完整合法候选的可用性和冲突引用；空集合也是成功查询，不伪装成工具失败。原时刻不自动加入 alternatives；只有其本身属于候选集合时才出现。当前草稿自身的排除由程序上下文确定，模型无权指定忽略其他占用。
 规则命中包含 rule_id、severity、field、observed_value、source_id、message；工具返回不把媒体文件、密钥或无限长文本送进模型。
 
 ## 7. 模型循环和结束协议
@@ -266,7 +309,7 @@ FinalProposal 只请求 finish/needs_input/block，并提交简短说明和观�
 {
   "action": "needs_input",
   "reason_summary": "原时段已占用，已找到替代时段，需要用户确认",
-  "evidence_ids": ["OBS-003", "OBS-004", "OBS-005"]
+  "evidence_ids": ["OBS-003", "OBS-004", "OBS-005", "OBS-006"]
 }
 ```
 
@@ -274,6 +317,21 @@ FinalProposal 只请求 finish/needs_input/block，并提交简短说明和观�
 资料不足、明确阻断或预算耗尽时可结束且保存未尝试。预算耗尽由程序强制停止，不再调用模型请求最后总结。
 正常已保存后仍至少给模型一次消费保存结果并结束的机会；最后一轮没有预算则如实 incomplete，保留真实保存结果。
 失败保存后模型可以在 retryable 且有预算时重试，否则结束。确定性的业务阻断不自动重试。
+
+validate_finish 按可信状态校验结束，不仅检查模型 action 字符串：
+
+| 已有事实 | 合法结束与必须输出 |
+| --- | --- |
+| 原时间、时区或 constraint 未知，或规则检查得到 needs_info 且仍有缺项 | needs_input；列出字段及补充位置，不保存新方案；已有工具与补查结果保留 |
+| 规则检查得到 blocked | block，结果 blocked；列出规则和事实，不保存新方案，不提供“接受阻断”选项 |
+| 原时段冲突，且本轮 alternatives 已证明合法候选为空或全部占用 | needs_input；suggested_at=null，待办为调整原要求或候选范围；尚未调用保存时 save_status=not_attempted，已调用则保留真实操作状态，不伪造草稿 |
+| 规则允许、时间要求明确，已观察到可用原时段或候选 | 先由模型调用 save_draft 并消费保存观察；无未决项则 finish/completed，有改期或软风险待确认则 needs_input |
+| 保存发生技术失败且模型选择停止，或保存结果仍无法核实 | 可 finish，分别派生 failed 或 incomplete；保留 failed/unknown 保存状态及此前成功检查，不包装为业务待确认 |
+| 当前逻辑键已有 rejected 草稿 | 不得保存或自动恢复；可 needs_input，列出需用户以新 request_id 发起独立请求，不提供重新接受旧修订的选项 |
+
+资料缺失时可先补查再结束，也可基于真实缺项请求用户补充，不强迫固定工具顺序；B02 的补查分支仍需真实验证。原时段冲突而尚未查询 alternatives 时，不能无依据断言“没有可用时段”；候选全占用必须有本轮查询证据。查询失败不能当成全占用，按错误及预算规则处理。
+找到可保存方案时，仅输出“请用户确认”而没有保存的结束请求无效；程序返回缺少步骤供模型纠正，不代为保存。以上常规结束仍受技术错误和预算优先级约束，预算耗尽强制 incomplete。
+保存时发现新增占用的 SLOT_CONFLICT、过期观察或修订冲突属于业务/并发拒绝，不自动等同于不可继续的技术失败。模型可在预算内刷新观察并调整；最终证据证明无可用时段则可 needs_input。实际调用 save_draft 且被明确拒绝或失败时，本次 save_status=failed，不能为配合结束状态改成 not_attempted；后来成功保存则按最后核实结果报告，并在 Trace 保留前次失败。unknown 未核实前不得作为“无草稿”结束。
 
 ## 8. 输出格式与状态
 
@@ -318,8 +376,10 @@ save_status 是本次操作结果，draft.validity 是持久化对象状态，�
 | save_status | not_attempted / saved / reused / updated / failed / unknown；由存储动作核实 |
 | task_status | completed / needs_input / blocked / incomplete / failed |
 
-pending_items 从缺项、可裁量风险和时间变化产生，稳定 ID 如 missing:license_ref、risk:R-CAPTION-REVIEW、change_time。补资料不是接受风险，不能用一次“同意”补造版权事实。
+pending_items 从缺项、可裁量风险、时间变化、无可用时段或已拒绝方案产生。kind 为 input/confirm；缺项使用 missing:<field>，无可用时段使用 schedule:expand_range，已拒绝后重跑使用 request:new_request，均为 input；风险 risk:<rule_id> 和 change_time 为 confirm。只有 confirm 项可被 accept/reject，补资料或扩大范围不能用一次“同意”代替。
+confirmation_status 按方案要求确认的事项定义及当前有效决定派生：当前草稿被拒绝时 rejected；方案原本无需任何可确认事项时 not_required，即使仍有 input 项；需要确认且尚有未决项时 pending，全部被当前有效决定接受后 confirmed。不能因为已接受事项从 pending_items 移除，就把 confirmed 改成 not_required。没有时段时没有 change_time 项，不能展示成“接受一个尚不存在的建议”。
 单项终态优先级：不可继续的技术错误 failed；预算或协议未完成 incomplete；明确规则阻断 blocked；缺项或待确认 needs_input；有效草稿已保存/复用且无未决事项才 completed。
+无可用时段和已拒绝后需新请求也归 needs_input。提交结果无法核实属于 incomplete，保存发生不可继续的技术失败且停止属于 failed；同一运行中重试后核实保存成功，则按最终核实状态派生，不因已恢复的错误永久标 failed。当前 suggested_at 只呈现有效方案；旧 stale/rejected 草稿仅保留 ID、修订、validity 和历史，不能作为当前建议。其 save_status 仍描述本次动作，例如未尝试保存即 not_attempted。
 批任务的 task_status 按 failed > incomplete > blocked > needs_input > completed 聚合，必须保留所有 items 独立结果。确认过的有效软风险可保持 review_status=needs_review，同时 pending 已解决、任务 completed；不把人工接受风险改写成原规则 passed。
 summary.md 使用固定中文模板按这些字段渲染，避免模型自由文案虚报“已发布”。stdout 返回结果 JSON，交互摘要与进度走 stderr；review 是专用交互入口。
 
@@ -347,15 +407,28 @@ seed 默认仅初始化空库；更新资料需要显式 --update，以一个事
 ### 请求登记
 
 canonical 输入排除 run_id、mode、路径等运行字段，items 按 material_id 排序、候选时间按 UTC 去重排序、JSON 排序键序列化，再计算 SHA-256。
+candidate_times 省略与 null 规范化为同一默认范围，[] 保持独立语义；时间按同一 UTC 表示参与摘要，timezone 和 constraint 保留。输入 items 的排列不表达优先级，执行也按 material_id 排序，以免同一摘要因输入顺序不同而改变抢槽顺序；不承诺批次最优。
 同 request_id 且摘要不同返回 INPUT_CONFLICT；相同摘要每次都重评估当前资料。幂等是同请求一份草稿，不是跳过观察。
+
+### 重评估、补资料与改变原要求
+
+| 用户操作 | 首版处理 |
+| --- | --- |
+| 修改素材、补充资料、审核规则或已有排期 | seed --update 显式导入后，原始请求未变则使用同 request_id 重评估；补资料不通过确认接口写入 |
+| 补齐原请求中的 null 时间/时区/constraint，或改变原时间、hard/soft、候选范围、素材集合 | 原始请求已变，使用新 request_id；同 ID 提交仍为 INPUT_CONFLICT |
+| 接受具体替代时间或软风险 | 使用 confirm/review 决定当前草稿的明确待确认项，原请求及其摘要保持不变 |
+| 使用新 request_id 提交同素材 | 独立请求，不自动撤销、修改或关联替代旧草稿；旧有效草稿作为其他占用正常计入 |
+
+首版不提供原始请求就地编辑、自动替换旧请求、已确认方案撤回或通用草稿取消入口。新 ID 不能被描述为“已替换旧方案”。若旧方案仍有待确认项，用户可按第 11 章明确拒绝该方案后另建请求；没有待确认项或已经确认的有效草稿不属于此拒绝入口的适用对象。这一限制在 review 和 README 中明示，不通过改库或制造版本变化模拟用户撤回。
+rejected 是当前逻辑请求的终止决定；同 request_id 重跑仍可产生新的读取与审核观察，但 save_draft 返回 DRAFT_REJECTED，不增修订、不恢复容量、不清除拒绝记录，结束为 needs_input 并提示新请求。资料或排期更新不得把 rejected 改成可自动激活的 stale。
 
 ### 保存事务
 
 1. 核对请求身份、当前草稿 revision（新建为 0）、观察归属和引用真实性。
 2. 核对 catalog_revision 和有效素材/规则快照，不一致返回 STALE_EVIDENCE，模型需重新读取和检查。
-3. 核查最新规则状态、必需字段、候选范围、账号和时间。阻断或关键缺项返回 PRECONDITION_FAILED。
+3. 核查最新规则状态、运行身份字段、明确的原时间要求、已观察可用的原时刻或合法候选、账号。业务必填性只由导入规则产生；阻断或关键缺项返回 PRECONDITION_FAILED，已拒绝方案返回 DRAFT_REJECTED。
 4. 在同一写事务内检查 schedule 和其他 active drafts，排除当前 draft_id；发现冲突返回 SLOT_CONFLICT，不落库新方案。
-5. 比较语义摘要：material_version、有效资料摘要、规则命中及版本、原要求、建议时段和待确认项。排除措辞、观察 ID、时间戳和模型说明，避免随机文案导致假修订。
+5. 比较语义摘要：material_version、有效资料摘要、规则命中及版本、原要求、建议时段和方案要求确认的事项定义。事项定义按用户决定之前的方案计算，不使用已过滤掉接受项的 pending_items；用户接受本身不改变方案语义。排除措辞、观察 ID、时间戳、模型说明和用户决定状态，避免随机文案或确认操作导致假修订。
 6. 已有 active 草稿与版本/证据都相同则 reused，不增修订、不清除有效确认；否则更新同一 draft_id、revision+1，记录历史并失效旧确认；新建从 revision=1 开始。
 7. COMMIT 后返回 saved/updated/reused 及 ID；事务异常回滚并返回 failed。提交结果不明时用独立连接按逻辑键和预期语义摘要核对；仍无法确定则 unknown。
 
@@ -376,8 +449,11 @@ expected_revision 不匹配返回 REVISION_CONFLICT，避免并发覆盖。首�
 ```
 
 confirm 服务在事务内检查当前修订、有效性、资料版本、规则和时段，再接受明确的待确认项。operation_id 重放同样内容复用结果，不同内容拒绝。
-accept 只解决当前列出的可确认项；blocked 和 missing 项不允许接受为通过。所有项接受后 confirmation_status=confirmed，未解决项仍为 pending。reject 使方案 rejected、释放本地规划槽位；skip 不写入。
+accept 只解决当前列出的可确认项；blocked 和 missing 项不允许接受为通过。所有可确认项接受后 confirmation_status=confirmed，尚有未决可确认项则为 pending。reject 使方案 rejected、释放本地规划槽位；skip 不写入。
+accept/reject 仅适用于当前 active 修订中尚未解决的 kind=confirm 项；一个可确认项被 reject 即拒绝整份方案，不表示只删除该风险或取消该待办。全部已确认、无待确认项、stale 或 rejected 的草稿不能借此入口撤回或重新批准。
+同次输入每个 item_id 只允许一个决定，重复项、未知项、input 项或同时包含 accept 与 reject 时整体拒绝且不部分写入；可只接受部分待确认项，其余保持 pending。全部 skip 不写操作记录、确认或状态变化；包含 accept 和 skip 时仅记录实际接受项，skip 不形成确认事实。operation_id 的已写入请求按完整规范化输入核对重放，不能借同 ID 改决定。
 确认不修改方案内容 revision，而写独立审批记录；方案后来变化时这些记录保留历史，但不再作为当前确认依据。
+同语义有效草稿重跑并 reused 时，保留对当前修订的有效接受记录；不能重新生成 change_time/risk 待办使用户重复确认。方案修订后，旧记录只作为历史，不再消除新修订的待办。
 review 展示精确标题、平台账号、日期时区、风险、原要求和建议，提供数字菜单；默认 skip，不从自然语言猜测用户同意。用户确认服务不调用模型。
 
 ## 12. 限制、故障和 CLI 契约
@@ -420,6 +496,25 @@ run.json 记录开始结束、命令的非敏感参数、源码 commit 或内容
 | B08 确认 | 修订不匹配拒绝，正确确认接受，阻断不可接受，skip 不写入 | 服务/CLI |
 | B09 标识冲突 | 同请求不同输入拒绝，不覆盖或多建草稿 | 服务/数据库 |
 | 边界 | 非法参数、未知工具、伪造观察、过期资料、同时抢槽、预算耗尽、回执丢失后核对 | 单元/集成 |
+
+以下为业务基线补充验收，均为计划断言，尚未实现或执行；归入既有 B01–B09 及边界测试，不以新增用例编号冒充原题要求：
+
+| 归属 | 补充断言 |
+| --- | --- |
+| B01/B02/B03 | 非法身份字段与非法版权状态在导入时拒绝；合法业务未知值可导入；默认规则缺版权/缺封面为 needs_info、未授权为 blocked、指定文案为 needs_review；无命中才 passed；默认规则下 license_ref=null 不额外阻止保存，显式新增其 missing 规则后返回缺项 |
+| B02/边界 | supplement 先 basic；只能补八个白名单字段；相同值不覆盖来源、冲突整次不合并；其他字段未知不因出现在示例中而自动成为必填；空规则集、错误运算和值拒绝导入 |
+| B01/B04 | 原时间或显式候选不在 allowed_slots 仍可检查；显式跨日候选可查；省略/null 使用请求时区同日默认候选，[] 不回退；等价 UTC 时刻去重且不产生假改期；soft 改期仍需确认 |
+| B04/边界 | 原时段占用且候选为空/全占用，必须有查询证据，输出 needs_input、suggested_at=null、schedule:expand_range，无新草稿；此前未保存时 not_attempted，保存抢槽被拒绝后则保留 failed；查询失败不能伪装成全占用，未查候选不能断言无解，unknown 不能改写为无草稿 |
+| B04/边界 | 已有可保存方案却未保存即请求用户确认，结束被拒绝且程序不代为保存；保存成功需回传模型，预算耗尽仍 incomplete |
+| B05/B07 | requested、alternatives、保存及确认均排除自身，计入同素材其他请求草稿；同方案重跑 ID/修订不变、当前确认保留；新增占用后原草稿 stale，新方案修订同一 ID、旧确认失效；无替代时不展示旧时刻为有效建议 |
+| B08 | 缺项、扩大候选范围不能 accept；部分接受仍 pending、全接受后 confirmed；reject 仅作用于当前待确认方案并释放容量；全部 skip 无写入，混合 accept/reject 或非法项整体拒绝；rejected 重跑不能恢复；无待确认项或已确认方案不支持撤回 |
+| B09/边界 | 修改请求空字段或候选范围需新 ID，同 ID 拒绝；资料补齐后原请求可重评估；新 ID 不隐式替代旧草稿或排除其占用；省略/null 候选摘要相同，[] 不同；items 顺序不改变规范摘要及执行顺序 |
+
+### 本次定稿的原因与后续设计约束
+
+原题直接要求冲突调整、明确确认、重复提交与真实保存，因此自身排除、动态重评估、无可用时段时请求调整范围都属于其必要细化。字段必填性遵循导入规则，防止从示例推导额外要求；默认候选与用户明确时间分开，避免把配置习惯误当硬限制。
+同类产品参照：Buffer 区分默认队列时段与自定义精确时间，并允许预设草稿时间而不自动发布；Planable 支持审批后锁定，修改前先撤销批准。本项目据此采用默认候选与指定时间分离、草稿与批准分离、确认绑定方案修订的设计。来源：[Buffer 排期机制](https://support.buffer.com/en-us/articles/setting-up-your-timezones-and-posting-schedules-P4iSag90Fl)、[Buffer 草稿](https://support.buffer.com/articles/saving-and-scheduling-draft-posts-CBLXg1yFXp)、[Planable 审批](https://planable.io/guides/content-approvals-in-planable/)。这些资料只作为产品设计参照，不证明其内部使用本文的事务或幂等实现，也不引入真实发布与企业审批权限。
+后续数据库开发流程设计可以细化表结构、索引、迁移和事务组织，但必须满足上述输入、状态、冲突、修订、确认和结束行为，不因存储实现方便而改变业务流程。具体实现问题据实记录并修复，不能把本次文档检查当成这些断言已经通过。
 
 按以下顺序实现，每步可独立验证：
 
