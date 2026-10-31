@@ -129,6 +129,24 @@ async def run_request(
             }
             result = assemble_result(ctx)
         results.append(result)
+    # Later items may import data or revise the plan of an earlier item.
+    # Reassemble from current local state without replaying any business tools.
+    for index, ctx in enumerate(contexts):
+        refreshed = assemble_result(ctx)
+        if refreshed != results[index] and not evidence_failed:
+            try:
+                trace.emit(
+                    "final",
+                    material_id=ctx.material_id,
+                    budget=ctx.budget,
+                    reason="batch_final_recheck",
+                    result=refreshed.model_dump(mode="json"),
+                )
+            except OSError:
+                evidence_failed = True
+                refreshed.task_status = "failed"
+                refreshed.error = {"code": "EVIDENCE_ERROR", "message": "最终复核事件写入失败"}
+        results[index] = refreshed
     result = RequestResult(
         run_id=run_id,
         request_id=request.request_id,

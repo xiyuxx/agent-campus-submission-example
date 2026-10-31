@@ -4,10 +4,8 @@ import json
 import sqlite3
 from collections.abc import Callable
 from contextlib import contextmanager
-from datetime import datetime, time, timedelta
 from importlib.resources import files
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 from .common import BusinessError, digest, dumps, new_id, now, utc
 from .contracts import (
@@ -548,6 +546,31 @@ class Repository:
             )
         ]
 
+    @staticmethod
+    def _candidate_times(connection, item: RequestItem, snapshot: MaterialSnapshot):
+        explicit = item.publish_requirement.candidate_times
+        if explicit is not None:
+            times = sorted({utc(t) for t in explicit})
+            return times, "explicit" if times else "none"
+        times = [
+            row[0]
+            for row in connection.execute(
+                "SELECT at_utc FROM allowed_slots WHERE platform=? AND account_id=? "
+                "ORDER BY at_utc",
+                (snapshot.material.platform, snapshot.material.account_id),
+            )
+        ]
+        return times, "default"
+
+    def runtime_state(self, request_id: str, material_id: str) -> dict:
+        """Read a consistent catalog/plan snapshot for local binding, not model input."""
+        with self.transaction() as connection:
+            draft = self._draft(connection, request_id, material_id)
+            return {
+                "catalog_revision": self._meta(connection)["revision"],
+                "draft": self._inspect(connection, draft) if draft else None,
+            }
+
     def query_occupancy(
         self, request_id: str, item: RequestItem, snapshot: MaterialSnapshot, query: str
     ) -> SlotObservation:
@@ -564,25 +587,12 @@ class Repository:
             self_id = draft["draft_id"] if draft else None
             if query == "requested":
                 times, source = [utc(requirement.requested_at)], "requested"
-            elif requirement.candidate_times is not None:
-                times = sorted({utc(t) for t in requirement.candidate_times})
-                source = "explicit" if times else "none"
             else:
-                zone = ZoneInfo(requirement.timezone)
-                date = requirement.requested_at.astimezone(zone).date()
-                start = utc(datetime.combine(date, time.min, zone))
-                end = utc(datetime.combine(date + timedelta(days=1), time.min, zone))
-                times = [
-                    row[0]
-                    for row in connection.execute(
-                        "SELECT at_utc FROM allowed_slots WHERE platform=? AND account_id=? "
-                        "AND at_utc>=? AND at_utc<? ORDER BY at_utc",
-                        (snapshot.material.platform, snapshot.material.account_id, start, end),
-                    )
-                ]
-                source = "default"
-            slots = []
-            for at in times:
+                if query != "alternatives":
+                    raise BusinessError("INVALID_QUERY", "不支持的本地时段查询")
+                times, source = self._candidate_times(connection, item, snapshot)
+
+            def inspect(at):
                 conflicts = self._occupancy(
                     connection,
                     snapshot.material.platform,
@@ -590,9 +600,30 @@ class Repository:
                     at,
                     self_id,
                 )
-                slots.append({"at": at, "available": not conflicts, "conflicts": conflicts})
+                return {"at": at, "available": not conflicts, "conflicts": conflicts}
+
+            checked, slots = [], []
+            if query == "requested":
+                slots = [inspect(times[0])]
+                checked = list(slots)
+            else:
+                original = utc(requirement.requested_at)
+                for direction, candidates in (
+                    ("before", reversed([at for at in times if at < original])),
+                    ("after", [at for at in times if at > original]),
+                ):
+                    for at in candidates:
+                        slot = {**inspect(at), "direction": direction}
+                        checked.append(slot)
+                        if slot["available"]:
+                            slots.append(slot)
+                            break
             return SlotObservation(
-                catalog_revision=meta["revision"], query=query, source=source, slots=slots
+                catalog_revision=meta["revision"],
+                query=query,
+                source=source,
+                slots=slots,
+                checked_slots=checked,
             )
 
     def _stale(self, connection, draft, reason, *, import_id=None, run_id=None) -> None:
@@ -722,6 +753,7 @@ class Repository:
         *,
         evidence_ids: list[str],
         run_id: str,
+        slot_evidence: list[SlotObservation] | None = None,
     ) -> dict:
         write_id = new_id("WRITE")
         status = "saved"
@@ -768,20 +800,7 @@ class Repository:
                 if suggested_at != utc(requirement.requested_at):
                     if slot.query != "alternatives":
                         raise BusinessError("PRECONDITION_FAILED", "改期必须观察合法替代候选")
-                    if requirement.candidate_times is not None:
-                        permitted = {utc(x) for x in requirement.candidate_times}
-                    else:
-                        zone = ZoneInfo(requirement.timezone)
-                        permitted = {
-                            x[0]
-                            for x in connection.execute(
-                                "SELECT at_utc FROM allowed_slots "
-                                "WHERE platform=? AND account_id=?",
-                                (snapshot.material.platform, snapshot.material.account_id),
-                            )
-                            if datetime.fromisoformat(x[0]).astimezone(zone).date()
-                            == requirement.requested_at.astimezone(zone).date()
-                        }
+                    permitted, _ = self._candidate_times(connection, item, actual)
                     if suggested_at not in permitted:
                         raise BusinessError("PRECONDITION_FAILED", "模型不能扩大候选范围")
                 if self._occupancy(
@@ -811,6 +830,7 @@ class Repository:
                     "snapshot": snapshot.model_dump(mode="json"),
                     "review": review.model_dump(mode="json"),
                     "slot_observation": slot.model_dump(),
+                    "slot_observations": [x.model_dump() for x in (slot_evidence or [slot])],
                     "save_conflicts": [],
                     "suggested_at": suggested_at,
                     "confirmation_items": definitions,

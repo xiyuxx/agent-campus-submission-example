@@ -5,10 +5,11 @@ import sqlite3
 
 from pydantic import ValidationError
 
-from ..common import BusinessError, new_id, utc
+from ..common import BusinessError, dumps, new_id, utc
 from ..config import ResourceLimits
 from ..context import ItemContext
 from ..contracts import FACT_FIELDS, MaterialArgs, ReadArgs, SaveArgs, SlotArgs, ToolResult
+from ..model_view import tool_view
 
 ARGUMENTS = {
     "read_material": ReadArgs,
@@ -19,8 +20,8 @@ ARGUMENTS = {
 DESCRIPTIONS = {
     "read_material": "读取当前素材 basic；先 basic 后可选 supplement。补充仅填未知，不改身份。",
     "check_rules": "检查本轮已读取的有效素材，返回规则证据；读资料变化后必须重新检查。",
-    "query_slots": "requested 查原要求；alternatives 查合法候选。不能扩大范围，冲突也是成功查询。",
-    "save_draft": "保存或修订草稿，需引用最新规则与可用时段观察；改期自动产生待确认项，绝不发布。",
+    "query_slots": "requested 查原要求；nearest 找前后两侧各一个最近空闲预设节点，允许跨日。",
+    "save_draft": "保存当前素材的建议时间；程序绑定真实依据和版本，改期待确认，绝不发布。",
 }
 
 
@@ -41,11 +42,7 @@ def schemas() -> list[dict]:
 def retry_key(name, args, ctx) -> str:
     value = args.model_dump(
         mode="json",
-        exclude={
-            "reason_summary",
-            "review_observation_id",
-            "slot_observation_id",
-        },
+        exclude={"reason_summary"},
     )
     if isinstance(args, SaveArgs):
         value["suggested_at"] = utc(args.suggested_at)
@@ -76,6 +73,8 @@ def execute(
             raise BusinessError("NOT_EXECUTED", "此前不可继续的技术失败尚未解决，禁止后续副作用")
         ctx.budget.tool_attempt()
         attempted = True
+        if name == "save_draft" and ctx.save_status == "unknown":
+            raise BusinessError("SAVE_UNKNOWN", "此前提交尚未核实，禁止盲目重试保存")
         if name not in ARGUMENTS:
             raise BusinessError("UNKNOWN_TOOL", "未知工具，禁止执行")
         if isinstance(raw_arguments, str):
@@ -83,8 +82,6 @@ def execute(
                 raise BusinessError("INVALID_ARGUMENTS", "工具参数超出 8 KiB；没有执行")
             raw_arguments = json.loads(raw_arguments)
         args = ARGUMENTS[name].model_validate(raw_arguments)
-        if args.material_id != ctx.material_id:
-            raise BusinessError("OUT_OF_SCOPE", "工具只能处理当前素材")
         key = retry_key(name, args, ctx)
         if ctx.retry_counts.get(key, 0) > 1:
             raise BusinessError("RETRY_LIMIT", "该临时失败最多额外重试一次")
@@ -99,9 +96,11 @@ def execute(
                     raise BusinessError("PRECONDITION_FAILED", "supplement 之前必须先读取 basic")
                 executed = True
                 snapshot = ctx.repo.read_supplement(ctx.snapshot)
+            if not ctx.snapshot or ctx.snapshot.facts_hash() != snapshot.facts_hash():
+                ctx.review, ctx.review_id = None, None
+            if not ctx.snapshot or ctx.snapshot.catalog_revision != snapshot.catalog_revision:
+                ctx.slots.clear()
             ctx.snapshot = snapshot
-            ctx.review, ctx.review_id = None, None
-            ctx.slots.clear()
             data = snapshot.model_dump(mode="json")
             data["detail"] = args.detail
             data["missing_fields"] = [
@@ -118,9 +117,18 @@ def execute(
         elif name == "query_slots":
             if not ctx.snapshot:
                 raise BusinessError("PRECONDITION_FAILED", "查询前必须读取可信平台账号")
+            if args.query == "nearest":
+                original = [(key, x) for key, x in ctx.slots.items() if x.query == "requested"]
+                if not original or original[-1][0] not in ctx.consumed:
+                    raise BusinessError("PRECONDITION_FAILED", "先查询原时间并消费其冲突结果")
+                if any(x["available"] for x in original[-1][1].slots):
+                    raise BusinessError("PRECONDITION_FAILED", "原时间可用，应优先保留原要求")
             executed = True
             slots = ctx.repo.query_occupancy(
-                ctx.request.request_id, ctx.item, ctx.snapshot, args.query
+                ctx.request.request_id,
+                ctx.item,
+                ctx.snapshot,
+                "requested" if args.query == "requested" else "alternatives",
             )
             ctx.slots[observation_id] = slots
             data = slots.model_dump()
@@ -128,12 +136,26 @@ def execute(
                 "SLOT_CONFLICT" if any(not x["available"] for x in slots.slots) else "SLOTS_QUERIED"
             )
         else:
-            if ctx.save_status == "unknown":
-                raise BusinessError("SAVE_UNKNOWN", "此前提交尚未核实，禁止盲目重试保存")
-            if not ctx.review or args.review_observation_id != ctx.review_id:
-                raise BusinessError("PRECONDITION_FAILED", "必须引用本轮最新真实规则检查观察")
-            if args.slot_observation_id not in ctx.slots:
-                raise BusinessError("PRECONDITION_FAILED", "必须引用本轮真实时段查询观察")
+            if not ctx.review or ctx.review_id not in ctx.consumed:
+                raise BusinessError("PRECONDITION_FAILED", "需要已回传的当前规则检查结果")
+            suggested = utc(args.suggested_at)
+            query = (
+                (
+                    "requested"
+                    if suggested == utc(ctx.item.publish_requirement.requested_at)
+                    else "alternatives"
+                )
+                if ctx.item.publish_requirement.requested_at
+                else None
+            )
+            candidates = [(key, value) for key, value in ctx.slots.items() if value.query == query]
+            if not candidates:
+                raise BusinessError("PRECONDITION_FAILED", "需要本轮真实时段查询结果")
+            slot_id, slot = candidates[-1]
+            if slot_id not in ctx.consumed or suggested not in {
+                x["at"] for x in slot.slots if x["available"]
+            }:
+                raise BusinessError("PRECONDITION_FAILED", "建议必须来自最新已回传的可用时段结果")
             ctx.trace.check_writable()
             executed = True
             ctx.repo.revalidate_current_draft(
@@ -145,15 +167,22 @@ def execute(
                 ctx.item,
                 ctx.snapshot,
                 ctx.review,
-                ctx.slots[args.slot_observation_id],
-                utc(args.suggested_at),
-                args.expected_revision,
-                evidence_ids=[args.review_observation_id, args.slot_observation_id],
+                slot,
+                suggested,
+                ctx.turn_revision,
+                evidence_ids=[ctx.review_id, *ctx.slots],
                 run_id=ctx.run_id,
+                slot_evidence=list(ctx.slots.values()),
             )
             ctx.save_status, ctx.save_error = saved["save_status"], None
             ctx.save_observation_id = observation_id
             draft = saved["draft"]
+            ctx.draft_state = draft
+            ctx.expected_revision = draft["revision"]
+            ctx.save_receipt = {
+                key: draft[key]
+                for key in ("draft_id", "revision", "catalog_revision", "semantic_sha256")
+            }
             data = {
                 "save_status": saved["save_status"],
                 "draft_id": draft["draft_id"],
@@ -161,9 +190,7 @@ def execute(
                 "validity": draft["validity"],
                 "suggested_at": draft["at_utc"],
                 "confirmation_status": draft["confirmation_status"],
-                "pending_items": [
-                    {"id": x["id"], "kind": x["kind"]} for x in draft["pending_items"][:20]
-                ],
+                "pending_items": [dict(x) for x in draft["pending_items"][:20]],
                 "pending_total_count": len(draft["pending_items"]),
                 "pending_summary_truncated": len(draft["pending_items"]) > 20,
                 "receipt_recovered": saved.get("receipt_recovered", False),
@@ -177,7 +204,10 @@ def execute(
             catalog_revision=ctx.snapshot.catalog_revision if ctx.snapshot else None,
             data={**data, "executed": executed},
         )
-        if len(result.model_dump_json().encode()) > ResourceLimits().tool_result_bytes:
+        if (
+            len(dumps(tool_view(result, ctx.item.publish_requirement.timezone)).encode())
+            > ResourceLimits().tool_result_bytes
+        ):
             if name != "save_draft":
                 ctx.snapshot, ctx.review, ctx.review_id, ctx.slots = previous
             ctx.forced_status = "incomplete"
@@ -191,7 +221,7 @@ def execute(
             code="INVALID_ARGUMENTS",
             data={"message": "工具参数不符合 Schema；没有执行业务动作", "executed": executed},
         )
-        if name == "save_draft":
+        if name == "save_draft" and ctx.save_status != "unknown":
             ctx.save_status = "failed"
             ctx.save_error = {"code": result.code, "message": result.data["message"]}
     except (BusinessError, sqlite3.Error) as exc:
@@ -207,9 +237,13 @@ def execute(
             retryable=error.retryable,
             data={"message": error.message, "executed": executed},
         )
+        if error.code == "REVISION_CONFLICT":
+            ctx.refresh_draft()
+            result.data["current_draft"] = ctx.draft_state
         if (
             name == "save_draft"
             and attempted
+            and ctx.save_status != "unknown"
             and not (
                 error.code == "OBSERVATION_TOO_LARGE"
                 and ctx.save_status in ("saved", "updated", "reused")

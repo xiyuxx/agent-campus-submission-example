@@ -65,7 +65,7 @@ def test_invalid_provider_turn_never_partially_executes(repo, job, tmp_path, var
     message = {"role": "assistant", "content": None, "tool_calls": calls}
     finish = "length" if variant == "truncated" else "tool_calls"
     if variant == "mixed":
-        message["content"] = '{"action":"finish","reason_summary":"bad","evidence_ids":[]}'
+        message["content"] = '{"action":"finish","reason_summary":"bad"}'
     if variant == "reasoning":
         message["reasoning_content"] = "DO-NOT-STORE"
 
@@ -165,7 +165,7 @@ def test_refreshing_observation_ids_does_not_reset_retry_limit(repo, job, monkey
         ("read_material", {"detail": "supplement"}),
         ("check_rules", {}),
     ]:
-        execute(name, {"material_id": "M01", **args}, ctx)
+        execute(name, {**args}, ctx)
     attempts = 0
 
     def busy(*args, **kwargs):
@@ -174,18 +174,14 @@ def test_refreshing_observation_ids_does_not_reset_retry_limit(repo, job, monkey
         raise BusinessError("DATABASE_BUSY", "synthetic busy", retryable=True)
 
     monkeypatch.setattr(repo, "save_draft", busy)
+    assert execute("query_slots", {"query": "requested"}, ctx).ok
+    ctx.consumed.update(ctx.observations)
     for index in range(3):
-        slots = execute("query_slots", {"material_id": "M01", "query": "alternatives"}, ctx)
+        execute("query_slots", {"query": "nearest"}, ctx)
+        ctx.consumed.update(ctx.observations)  # Simulate delivering the actual observations.
         result = execute(
             "save_draft",
-            {
-                "material_id": "M01",
-                "suggested_at": "2026-11-03T19:00:00+08:00",
-                "expected_revision": 0,
-                "review_observation_id": ctx.review_id,
-                "slot_observation_id": slots.observation_id,
-                "reason_summary": f"retry {index}",
-            },
+            {"suggested_at": "2026-11-03T19:00:00+08:00", "reason_summary": f"retry {index}"},
             ctx,
         )
     assert attempts == 2
@@ -204,7 +200,7 @@ def test_late_model_response_cannot_complete_after_deadline(repo, job):
     class LateModel:
         async def next_action(self, messages, schemas):
             ctx.budget.clock = lambda: ctx.budget.deadline + 1
-            proposal = FinalProposal(action="needs_input", reason_summary="缺时区", evidence_ids=[])
+            proposal = FinalProposal(action="needs_input", reason_summary="缺时区")
             return ModelTurn(
                 {"role": "assistant", "content": proposal.model_dump_json()}, proposal=proposal
             )

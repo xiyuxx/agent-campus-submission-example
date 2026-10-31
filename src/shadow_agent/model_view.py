@@ -1,0 +1,92 @@
+"""Explicit business projections; internal identities never become model arguments/data."""
+
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+from .contracts import ToolResult
+
+
+def local_time(value, timezone):
+    if value is None or not timezone:
+        return value
+    return datetime.fromisoformat(value).astimezone(ZoneInfo(timezone)).isoformat()
+
+
+def plan_view(draft, timezone):
+    if not draft:
+        return None
+    return {
+        "validity": draft["validity"],
+        "suggested_at": local_time(draft["at_utc"], timezone)
+        if draft["validity"] == "active"
+        else None,
+        "confirmation_status": draft["confirmation_status"],
+        "pending_items": [
+            {"kind": x["kind"], "message": x["message"]} for x in draft["pending_items"]
+        ],
+    }
+
+
+def tool_view(result: ToolResult, timezone: str | None) -> dict:
+    """Project by tool and explicit field whitelist, including error paths."""
+    raw = result.data
+    if not result.ok:
+        data = {"message": raw.get("message", "工具未完成"), "executed": raw.get("executed", False)}
+        if "current_draft" in raw:
+            data["current_plan"] = plan_view(raw["current_draft"], timezone)
+    elif result.tool == "read_material":
+        material = raw["material"]
+        data = {
+            "detail": raw["detail"],
+            "material": {
+                **{k: material[k] for k in ("title", "type", "caption", "copyright_status")},
+                **{
+                    label: material[key] is not None
+                    for key, label in (
+                        ("source_asset_id", "source_asset_provided"),
+                        ("media_ref", "media_provided"),
+                        ("cover_ref", "cover_provided"),
+                        ("license_ref", "license_provided"),
+                    )
+                },
+            },
+            "missing_fields": raw["missing_fields"],
+            "supplemented": raw["supplemented"],
+        }
+    elif result.tool == "check_rules":
+        data = {
+            "review_status": raw["review_status"],
+            "matches": [
+                {k: match[k] for k in ("field", "severity", "message")} for match in raw["matches"]
+            ],
+        }
+    elif result.tool == "query_slots":
+        data = {
+            "query": "requested" if raw["query"] == "requested" else "nearest",
+            "source": raw["source"],
+            "slots": [
+                {
+                    "at": local_time(slot["at"], timezone),
+                    "available": slot["available"],
+                    "direction": slot.get("direction", "requested"),
+                    "conflict_sources": sorted({x["source"] for x in slot["conflicts"]}),
+                }
+                for slot in raw["slots"]
+            ],
+        }
+    else:
+        data = {
+            **{k: raw[k] for k in ("save_status", "validity", "confirmation_status")},
+            "suggested_at": local_time(raw["suggested_at"], timezone),
+            "pending_items": [
+                {"kind": x["kind"], "message": x["message"]} for x in raw["pending_items"]
+            ],
+            "pending_total_count": raw["pending_total_count"],
+        }
+    return {
+        "tool": result.tool,
+        "ok": result.ok,
+        "code": result.code,
+        "retryable": result.retryable,
+        "data": data,
+    }

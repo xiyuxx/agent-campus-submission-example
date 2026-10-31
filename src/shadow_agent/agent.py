@@ -6,14 +6,13 @@ from .common import BusinessError, dumps
 from .config import ResourceLimits
 from .context import ItemContext
 from .contracts import FinalProposal
+from .model_view import plan_view, tool_view
 from .models.base import validate_turn
 from .models.prompts import SYSTEM
 from .tools.registry import execute, schemas
 
 
 def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
-    if any(x not in ctx.observations for x in proposal.evidence_ids):
-        raise BusinessError("INVALID_FINISH", "结束引用了不属于本轮的观察")
     if ctx.save_status == "unknown":
         ctx.forced_status = "incomplete"
         return
@@ -24,7 +23,15 @@ def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
             )
         ctx.forced_status = "failed"
         return
-    current = ctx.repo.current_draft(ctx.request.request_id, ctx.material_id)
+    state = ctx.repo.runtime_state(ctx.request.request_id, ctx.material_id)
+    current = state["draft"]
+    if ctx.snapshot and state["catalog_revision"] != ctx.snapshot.catalog_revision:
+        raise BusinessError("STALE_EVIDENCE", "资料已更新，结束前需要重新读取、检查与查询")
+    if ctx.save_receipt and any(
+        not current or current[key] != value for key, value in ctx.save_receipt.items()
+    ):
+        ctx.refresh_draft()
+        raise BusinessError("PLAN_CHANGED", "当前方案已变化，请根据新方案重新评估和核实保存")
     if current and current["validity"] == "rejected":
         required = "needs_input"
     elif ctx.review and ctx.review.review_status == "blocked":
@@ -45,10 +52,7 @@ def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
         and current["validity"] == "active"
         and current["catalog_revision"] == ctx.snapshot.catalog_revision
     ):
-        if (
-            ctx.save_observation_id not in ctx.consumed
-            or ctx.save_observation_id not in proposal.evidence_ids
-        ):
+        if ctx.save_observation_id not in ctx.consumed:
             raise BusinessError("INVALID_FINISH", "必须先消费保存回执")
         required = "needs_input" if current["pending_items"] else "finish"
     else:
@@ -68,16 +72,9 @@ def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
 
 
 async def run_item(ctx: ItemContext, model) -> None:
-    current = ctx.repo.current_draft(ctx.request.request_id, ctx.material_id)
+    ctx.refresh_draft()
     start = {
-        "request_id": ctx.request.request_id,
-        "item": ctx.item.model_dump(mode="json"),
-        "existing_draft": {
-            k: current[k] for k in ("draft_id", "revision", "validity", "confirmation_status")
-        }
-        if current
-        else {},
-        "expected_revision": current["revision"] if current else 0,
+        "publish_requirement": ctx.item.publish_requirement.model_dump(mode="json"),
     }
     messages = [
         {"role": "system", "content": SYSTEM + "\n" + dumps(FinalProposal.model_json_schema())},
@@ -97,13 +94,21 @@ async def run_item(ctx: ItemContext, model) -> None:
 
     while not ctx.forced_status:
         try:
-            messages[1]["content"] = dumps({"budget": ctx.budget.summary()})
+            messages[1]["content"] = dumps(
+                {
+                    "budget": ctx.budget.summary(),
+                    "current_plan": plan_view(
+                        ctx.draft_state, ctx.item.publish_requirement.timezone
+                    ),
+                }
+            )
             if (
                 len(dumps({"messages": messages, "tools": schemas()}).encode())
                 > resources.request_bytes
             ):
                 raise BusinessError("CONTEXT_LIMIT", "完整请求上下文超限，未发送模型请求")
             ctx.budget.model_attempt()
+            ctx.turn_revision = ctx.expected_revision
             try:
                 turn = await asyncio.wait_for(
                     model.next_action(messages, schemas()), timeout=min(30, ctx.budget.remaining())
@@ -135,7 +140,9 @@ async def run_item(ctx: ItemContext, model) -> None:
                         {
                             "role": "tool",
                             "tool_call_id": call["id"],
-                            "content": result.model_dump_json(),
+                            "content": dumps(
+                                tool_view(result, ctx.item.publish_requirement.timezone)
+                            ),
                         }
                     )
                 continue

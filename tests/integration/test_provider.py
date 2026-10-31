@@ -75,7 +75,6 @@ def test_provider_retry_limits(repo, job, tmp_path, statuses, expected_count):
                                 {
                                     "action": "finish",
                                     "reason_summary": "无依据成功",
-                                    "evidence_ids": [],
                                 }
                             ),
                         },

@@ -12,17 +12,35 @@ from .contracts import DraftResult, ItemResult, PendingItem, RequestResult
 def assemble_result(ctx: ItemContext) -> ItemResult:
     requirement = ctx.item.publish_requirement
     try:
-        current = ctx.repo.current_draft(ctx.request.request_id, ctx.material_id)
+        state = ctx.repo.runtime_state(ctx.request.request_id, ctx.material_id)
+        current = state["draft"]
     except (BusinessError, sqlite3.Error) as error:
         public = ctx.repo.database_error(error) if isinstance(error, sqlite3.Error) else error
         ctx.technical_error = public.as_dict()
         ctx.forced_status = "incomplete" if ctx.save_status != "not_attempted" else "failed"
         current = None
+        state = None
     pending = [
         PendingItem(id=f"missing:{x}", kind="input", message=f"请在新请求中补充 {x}")
         for x in requirement.missing()
     ]
     review = ctx.review
+    stale = bool(
+        state and ctx.snapshot and state["catalog_revision"] != ctx.snapshot.catalog_revision
+    )
+    changed = bool(
+        ctx.save_receipt
+        and any(not current or current[key] != value for key, value in ctx.save_receipt.items())
+    )
+    if stale or changed:
+        if stale:
+            review = None
+        if not ctx.forced_status or ctx.forced_status == "incomplete":
+            ctx.forced_status = "incomplete"
+            ctx.technical_error = {
+                "code": "STALE_EVIDENCE" if stale else "PLAN_CHANGED",
+                "message": "当前资料或方案已变化，本次结果需要重新评估",
+            }
     if review and review.review_status == "needs_info":
         fields = sorted({x["field"] for x in review.matches if x["severity"] == "needs_info"})
         pending += [

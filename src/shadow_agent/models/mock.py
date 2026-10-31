@@ -1,6 +1,7 @@
 """Deterministic engineering substitute. It consumes observations; never live evidence."""
 
 import json
+from datetime import datetime
 
 from ..common import new_id
 from ..contracts import FinalProposal
@@ -10,7 +11,7 @@ from .base import ModelTurn
 class MockModel:
     async def next_action(self, messages: list[dict], schemas: list[dict]) -> ModelTurn:
         context = json.loads(next(x["content"] for x in messages if x["role"] == "user"))
-        material_id = context["item"]["material_id"]
+        state = json.loads(messages[1]["content"])
         results = [json.loads(x["content"]) for x in messages if x["role"] == "tool"]
 
         def call(name, **kwargs):
@@ -19,7 +20,7 @@ class MockModel:
                 "type": "function",
                 "function": {
                     "name": name,
-                    "arguments": json.dumps({"material_id": material_id, **kwargs}),
+                    "arguments": json.dumps(kwargs),
                 },
             }
             return ModelTurn(
@@ -30,17 +31,22 @@ class MockModel:
             proposal = FinalProposal(
                 action=action,
                 reason_summary=reason,
-                evidence_ids=[r["observation_id"] for r in results],
             )
             return ModelTurn(
                 {"role": "assistant", "content": proposal.model_dump_json()}, proposal=proposal
             )
 
+        if messages[-1]["role"] == "system":
+            feedback = json.loads(messages[-1]["content"])
+            if feedback.get("code") in ("PLAN_CHANGED", "STALE_EVIDENCE"):
+                return call("read_material", detail="basic")
         if not results:
             return call("read_material", detail="basic")
         last = results[-1]
         if not last["ok"]:
-            if last["retryable"]:
+            if last["code"] == "STALE_EVIDENCE":
+                return call("read_material", detail="basic")
+            if last["retryable"] or last["code"] == "REVISION_CONFLICT":
                 retry = next(
                     x
                     for x in reversed(messages)
@@ -48,7 +54,6 @@ class MockModel:
                 )
                 function = retry["tool_calls"][0]["function"]
                 args = json.loads(function["arguments"])
-                args.pop("material_id", None)
                 return call(function["name"], **args)
             if last["code"] in ("DRAFT_REJECTED", "MATERIAL_NOT_FOUND", "DATA_CONFLICT"):
                 return finish("needs_input", "需要用户补充资料或发起独立请求")
@@ -68,10 +73,10 @@ class MockModel:
             if not supplemented:
                 return call("read_material", detail="supplement")
             return finish("needs_input", "补查后仍缺必要资料")
-        requirement = context["item"]["publish_requirement"]
+        requirement = context["publish_requirement"]
         if any(requirement.get(k) is None for k in ("requested_at", "timezone", "constraint")):
             return finish("needs_input", "原时间要求缺项")
-        if context.get("existing_draft", {}).get("validity") == "rejected":
+        if (state.get("current_plan") or {}).get("validity") == "rejected":
             return finish("needs_input", "原方案已拒绝，需要新请求")
         if last["tool"] == "check_rules":
             return call("query_slots", query="requested")
@@ -80,14 +85,19 @@ class MockModel:
             available = [x for x in slots if x["available"]]
             if not available:
                 if last["data"]["query"] == "requested":
-                    return call("query_slots", query="alternatives")
+                    return call("query_slots", query="nearest")
                 return finish("needs_input", "合法候选为空或全部占用，请调整范围")
+            original = datetime.fromisoformat(requirement["requested_at"])
+            chosen = min(
+                available,
+                key=lambda x: (
+                    abs((datetime.fromisoformat(x["at"]) - original).total_seconds()),
+                    datetime.fromisoformat(x["at"]) < original,
+                ),
+            )
             return call(
                 "save_draft",
-                suggested_at=available[0]["at"],
-                expected_revision=context["expected_revision"],
-                review_observation_id=review["observation_id"],
-                slot_observation_id=last["observation_id"],
+                suggested_at=chosen["at"],
             )
         if last["tool"] == "save_draft":
             action = "needs_input" if last["data"]["pending_items"] else "finish"

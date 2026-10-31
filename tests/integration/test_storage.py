@@ -118,7 +118,8 @@ def test_new_request_does_not_exclude_other_request(repo, job):
     own = repo.query_occupancy(job.request_id, job.items[0], snapshot, "alternatives")
     other = repo.query_occupancy(second.request_id, second.items[0], snapshot, "alternatives")
     assert own.slots[0]["available"]
-    assert other.slots[0]["conflicts"] == [{"source": "draft", "id": first["draft_id"]}]
+    assert other.slots == []
+    assert other.checked_slots[0]["conflicts"] == [{"source": "draft", "id": first["draft_id"]}]
 
 
 def test_before_commit_failure_rolls_back_all(repo, job):
@@ -240,7 +241,8 @@ def test_explicit_cross_day_and_empty_candidates(repo, job):
     assert repo.query_occupancy(job.request_id, item, snapshot, "alternatives").slots == []
     item.publish_requirement.candidate_times = None
     default = repo.query_occupancy(job.request_id, item, snapshot, "alternatives")
-    assert len(default.slots) == 3
+    assert len(default.slots) == 1
+    assert default.slots[0]["at"] == "2026-11-03T11:00:00.000000Z"
     assert default.source == "default"
     next_day = Request.model_validate(
         {

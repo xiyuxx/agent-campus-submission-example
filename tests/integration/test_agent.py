@@ -41,24 +41,19 @@ def test_unknown_out_of_scope_and_forged_observation(repo, job):
     assert execute("publish", {}, ctx).code == "UNKNOWN_TOOL"
     assert (
         execute("read_material", {"material_id": "M02", "detail": "basic"}, ctx).code
-        == "OUT_OF_SCOPE"
+        == "INVALID_ARGUMENTS"
     )
-    assert (
-        execute("read_material", {"material_id": "M01", "detail": "supplement"}, ctx).code
-        == "PRECONDITION_FAILED"
-    )
+    assert execute("read_material", {"detail": "supplement"}, ctx).code == "PRECONDITION_FAILED"
     for name, args in [
         ("read_material", {"detail": "basic"}),
         ("read_material", {"detail": "supplement"}),
         ("check_rules", {}),
     ]:
-        assert execute(name, {"material_id": "M01", **args}, ctx).ok
+        assert execute(name, {**args}, ctx).ok
     saved = execute(
         "save_draft",
         {
-            "material_id": "M01",
             "suggested_at": "2026-11-03T19:00:00+08:00",
-            "expected_revision": 0,
             "review_observation_id": "FAKE",
             "slot_observation_id": "FAKE",
         },
@@ -95,9 +90,7 @@ def test_tool_budget_refuses_unexecuted_calls(repo, job):
 
 class PrematureFinish:
     async def next_action(self, messages, schemas):
-        proposal = FinalProposal(
-            action="finish", reason_summary="不执行工具就完成", evidence_ids=[]
-        )
+        proposal = FinalProposal(action="finish", reason_summary="不执行工具就完成")
         return ModelTurn(
             {"role": "assistant", "content": proposal.model_dump_json()}, proposal=proposal
         )

@@ -37,6 +37,14 @@ class ItemContext:
     protocol_feedbacks: int = 0
     observation_calls: dict[str, str] = field(default_factory=dict)
     provider_records: list[dict] = field(default_factory=list)
+    draft_state: dict | None = None
+    expected_revision: int = 0
+    turn_revision: int = 0
+    save_receipt: dict | None = None
+
+    def refresh_draft(self) -> None:
+        self.draft_state = self.repo.current_draft(self.request.request_id, self.material_id)
+        self.expected_revision = self.draft_state["revision"] if self.draft_state else 0
 
     @property
     def material_id(self) -> str:

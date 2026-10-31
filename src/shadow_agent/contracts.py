@@ -249,7 +249,8 @@ class Confirmation(Contract):
 
 
 class MaterialArgs(Contract):
-    material_id: Identifier
+    """Model-facing arguments: identity and evidence are bound locally."""
+
     reason_summary: Annotated[str, Field(max_length=300)] = ""
 
 
@@ -258,20 +259,16 @@ class ReadArgs(MaterialArgs):
 
 
 class SlotArgs(MaterialArgs):
-    query: Literal["requested", "alternatives"]
+    query: Literal["requested", "nearest"]
 
 
 class SaveArgs(MaterialArgs):
     suggested_at: Timestamp
-    expected_revision: Annotated[int, Field(ge=0)]
-    review_observation_id: Identifier
-    slot_observation_id: Identifier
 
 
 class FinalProposal(Contract):
     action: Literal["finish", "needs_input", "block"]
     reason_summary: Annotated[str, Field(max_length=300)]
-    evidence_ids: list[str]
 
 
 class ToolResult(Contract):
@@ -355,3 +352,4 @@ class SlotObservation(Contract):
     query: Literal["requested", "alternatives"]
     source: Literal["requested", "explicit", "default", "none"]
     slots: list[dict]
+    checked_slots: list[dict] = Field(default_factory=list)

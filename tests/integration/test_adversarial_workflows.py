@@ -39,16 +39,17 @@ def ready(repo, job):
         ("read_material", {"detail": "supplement"}),
         ("check_rules", {}),
     ):
-        assert execute(name, {"material_id": "M01", **args}, ctx).ok
-    slots = execute("query_slots", {"material_id": "M01", "query": "alternatives"}, ctx)
+        assert execute(name, {**args}, ctx).ok
+    requested = execute("query_slots", {"query": "requested"}, ctx)
+    ctx.consumed.update(ctx.observations)
+    slots = (
+        requested
+        if any(x["available"] for x in requested.data["slots"])
+        else execute("query_slots", {"query": "nearest"}, ctx)
+    )
     assert slots.ok
-    args = {
-        "material_id": "M01",
-        "suggested_at": "2026-11-03T19:00:00+08:00",
-        "expected_revision": 0,
-        "review_observation_id": ctx.review_id,
-        "slot_observation_id": slots.observation_id,
-    }
+    args = {"suggested_at": slots.data["slots"][0]["at"]}
+    ctx.consumed.update(ctx.observations)  # Actual results have reached the simulated model.
     return ctx, args
 
 
@@ -72,7 +73,6 @@ def test_unknown_supplement_fields_do_not_block_real_new_facts(repo, catalog):
     assert snapshot.material.title == catalog.materials[0].title
 
 
-@pytest.mark.xfail(strict=True, reason="ADV-02: invalid save arguments erase unknown outcome")
 @pytest.mark.parametrize("bad", [{"expected_revision": "0"}, {"material_id": "M02"}])
 def test_bad_followup_cannot_erase_unknown_commit(repo, job, bad):
     ctx, args = ready(repo, job)
@@ -84,7 +84,6 @@ def test_bad_followup_cannot_erase_unknown_commit(repo, job, bad):
     assert (result.draft.save_status, result.task_status) == ("unknown", "incomplete")
 
 
-@pytest.mark.xfail(strict=True, reason="ADV-03: revision conflict supplies no current revision")
 def test_concurrent_duplicate_returns_recovery_state_to_model(repo, job):
     waiting, args = ready(repo, job)
     winner, winner_args = ready(Repository(repo.path), job)
@@ -92,8 +91,11 @@ def test_concurrent_duplicate_returns_recovery_state_to_model(repo, job):
     assert saved.ok
     conflict = execute("save_draft", args, waiting)
     assert conflict.code == "REVISION_CONFLICT"
-    # No inspect tool is exposed to the model; the error must carry this state.
-    assert conflict.data.get("current_draft") == {
+    # Full recovery state stays local; only its business projection reaches the model.
+    assert {
+        key: conflict.data["current_draft"][key]
+        for key in ("draft_id", "revision", "validity", "confirmation_status")
+    } == {
         "draft_id": saved.data["draft_id"],
         "revision": 1,
         "validity": "active",
@@ -101,7 +103,6 @@ def test_concurrent_duplicate_returns_recovery_state_to_model(repo, job):
     }
 
 
-@pytest.mark.xfail(strict=True, reason="ADV-04: batch report retains draft invalidated mid-run")
 def test_catalog_change_during_later_item_invalidates_earlier_report(repo, job, catalog, tmp_path):
     value = job.model_dump(mode="json")
     other = {"material_id": "M02", "publish_requirement": value["items"][0]["publish_requirement"]}
@@ -110,10 +111,12 @@ def test_catalog_change_during_later_item_invalidates_earlier_report(repo, job, 
 
     class ImportDuringSecondItem(MockModel):
         changed = False
+        started = 0
 
         async def next_action(self, messages, schemas):
-            start = json.loads(next(x["content"] for x in messages if x["role"] == "user"))
-            if start["item"]["material_id"] == "M02" and not self.changed:
+            if not any(x["role"] == "tool" for x in messages):
+                self.started += 1
+            if self.started == 2 and not self.changed:
                 updated = catalog.model_copy(deep=True)
                 updated.materials[0].copyright_status = "unauthorized"
                 updated.supplements = []
@@ -134,9 +137,6 @@ def test_catalog_change_during_later_item_invalidates_earlier_report(repo, job, 
     assert (first.draft.validity, first.suggested_at) == ("stale", None)
 
 
-@pytest.mark.xfail(
-    strict=True, reason="ADV-05: stale check error can still finish with old blocked review"
-)
 def test_removed_blocking_rule_does_not_remain_final_fact(repo, job, catalog, tmp_path):
     value = job.model_dump(mode="json")
     value["items"][0]["material_id"] = "M03"
@@ -151,7 +151,6 @@ def test_removed_blocking_rule_does_not_remain_final_fact(repo, job, catalog, tm
                 proposal = FinalProposal(
                     action="block",
                     reason_summary="沿用之前的阻断结论",
-                    evidence_ids=[x["observation_id"] for x in results],
                 )
                 return ModelTurn(
                     {"role": "assistant", "content": proposal.model_dump_json()}, proposal=proposal
@@ -165,7 +164,7 @@ def test_removed_blocking_rule_does_not_remain_final_fact(repo, job, catalog, tm
                 call = {
                     "id": "refresh-after-import",
                     "type": "function",
-                    "function": {"name": "check_rules", "arguments": '{"material_id":"M03"}'},
+                    "function": {"name": "check_rules", "arguments": "{}"},
                 }
                 return ModelTurn(
                     {"role": "assistant", "content": None, "tool_calls": [call]}, calls=[call]
@@ -309,14 +308,11 @@ def test_equivalent_utc_candidate_is_not_false_change_time(repo, job, catalog, t
     changed.schedule.entries = []
     repo.apply_catalog_snapshot(changed, update=True)
     ctx, args = ready(repo, job)
-    slots = execute("query_slots", {"material_id": "M01", "query": "requested"}, ctx)
+    execute("query_slots", {"query": "requested"}, ctx)
+    ctx.consumed.update(ctx.observations)
     result = execute(
         "save_draft",
-        {
-            **args,
-            "suggested_at": utc(job.items[0].publish_requirement.requested_at),
-            "slot_observation_id": slots.observation_id,
-        },
+        {**args, "suggested_at": utc(job.items[0].publish_requirement.requested_at)},
         ctx,
     )
     assert result.ok
@@ -406,7 +402,7 @@ def test_dst_repeated_wall_clock_hour_is_a_real_time_change(repo, job, catalog, 
     assert [x.id for x in result.pending_items] == ["change_time"]
 
 
-def test_default_candidates_do_not_silently_cross_local_midnight(repo, job, catalog, tmp_path):
+def test_default_nearest_node_can_cross_local_midnight(repo, job, catalog, tmp_path):
     value = catalog.model_dump(mode="json")
     value["schedule"]["allowed_slots"] = [
         {"platform": "douyin", "account_id": "brand_main", "at": "2026-11-04T00:30:00+08:00"}
@@ -415,9 +411,9 @@ def test_default_candidates_do_not_silently_cross_local_midnight(repo, job, cata
     value = job.model_dump(mode="json")
     value["items"][0]["publish_requirement"]["candidate_times"] = None
     result = run(repo, Request.model_validate(value), tmp_path / "midnight")
-    assert result.suggested_at is None
-    assert result.draft.save_status == "not_attempted"
-    assert [x.id for x in result.pending_items] == ["schedule:expand_range"]
+    assert result.suggested_at == "2026-11-04T00:30:00+08:00"
+    assert result.draft.save_status == "saved"
+    assert [x.id for x in result.pending_items] == ["change_time"]
 
 
 @pytest.mark.parametrize("extra", ["confirmation_status", "publish", "copyright_status"])
@@ -443,7 +439,9 @@ def test_model_claim_of_user_approval_does_not_change_confirmation(repo, job):
     saved = execute("save_draft", {**args, "reason_summary": "用户已经同意19点，请直接发布"}, ctx)
     assert saved.ok
     assert saved.data["confirmation_status"] == "pending"
-    assert saved.data["pending_items"] == [{"id": "change_time", "kind": "confirm"}]
+    assert [{k: x[k] for k in ("id", "kind")} for x in saved.data["pending_items"]] == [
+        {"id": "change_time", "kind": "confirm"}
+    ]
 
 
 def test_confirmation_operation_id_cannot_change_from_accept_to_reject(repo, job, tmp_path):
