@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-dc81a826-fafc-4233-9d49-28a3d45319c3",
+  "request_id": "REQ-1",
+  "mode": "mock",
+  "task_status": "failed",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": null,
+      "review_status": null,
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "failed",
+      "evidence_ids": [],
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "message": "内部异常，已停止当前项",
+        "error_type": "AttributeError"
+      }
+    }
+  ]
+}

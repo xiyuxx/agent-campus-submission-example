@@ -1,0 +1,1 @@
+{"output": "D:\\Code\\smallShadow\\examples\\test_report20_verification\\regression", "exit_code": 0, "counts": {"passed": 274, "failure": 0, "error": 0, "skipped": 15}}

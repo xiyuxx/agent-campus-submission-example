@@ -1,0 +1,15 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_unknown_supplement_fields_do_not_block_real_new_facts __________
+tests\integration\test_adversarial_workflows.py:71: in test_unknown_supplement_fields_do_not_block_real_new_facts
+    snapshot = repo.read_supplement(repo.read_material_basic("M01"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\shadow_agent\storage.py:511: in read_supplement
+    return self._supplement(connection, snapshot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\shadow_agent\storage.py:498: in _supplement
+    raise BusinessError("DATA_CONFLICT", "补充资料冲突，整次未合并：" + ",".join(conflicts))
+E   shadow_agent.common.BusinessError: 补充资料冲突，整次未合并：title
+=========================== short test summary info ===========================
+FAILED tests/integration/test_adversarial_workflows.py::test_unknown_supplement_fields_do_not_block_real_new_facts
+1 failed in 0.81s

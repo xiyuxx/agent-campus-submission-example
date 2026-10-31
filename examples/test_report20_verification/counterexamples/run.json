@@ -1,0 +1,642 @@
+{
+  "base_commit": "bbd693a381e2b0b304cc17857f8b3118915932e0",
+  "source_sha256": "150736892e11a3538311e4a8a6d84b0c34b6b12daf149a213297ce69e7b319cc",
+  "started_at": "2026-10-31T03:59:06.334102+00:00",
+  "finished_at": "2026-10-31T03:59:18.524362+00:00",
+  "mode": "offline-controlled-model",
+  "real_model_calls": 0,
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:05:56) [MSC v.1942 64 bit (AMD64)]",
+  "command": [
+    "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests\\integration\\test_retest_edge_cases.py",
+    "-q",
+    "--tb=short",
+    "--basetemp=D:\\Code\\smallShadow\\.tmp\\adversarial-20261031T035906334102",
+    "--junitxml=D:\\Code\\smallShadow\\examples\\test_report20_verification\\counterexamples\\junit.xml",
+    "--runxfail"
+  ],
+  "test_sha256": "cf83b1c1329f5024db4a1784dbeabf4ce134be8984a57748de29b3b25c624ba5",
+  "test_sources_sha256": {
+    "tests/conftest.py": "c70b5d67e4860cc7df584b99c090c5f785979a148845b417832067904046a6f3",
+    "tests/integration/test_adversarial_workflows.py": "fb46c256e659f9d7458a0545cfd2608c9539e126117be376ea9dcba5a31c02d2",
+    "tests/integration/test_agent.py": "67c76bcf5e717ef4cf84772dc7e26e97343b6f5bdbca28edb5439b52a9b421e2",
+    "tests/integration/test_cli.py": "0e0ada1cd659d9a5976076c5d94fda7a30618ad0c43a6eb5cee945c5b61f761c",
+    "tests/integration/test_local_binding_nearest.py": "54e5de31702f5d525e48fb5aecc676896c41cc63196455527608f4cdd68ee6c8",
+    "tests/integration/test_provider.py": "5c5d0d75430e6a6fa7d428833c8d4f4893991274fbd9fd939011a8bb75315820",
+    "tests/integration/test_retest_edge_cases.py": "cf83b1c1329f5024db4a1784dbeabf4ce134be8984a57748de29b3b25c624ba5",
+    "tests/integration/test_runtime_limits.py": "c2c6b89146e6c052ffd3d092244a0231593f4c007376a60d7c5aa636fac9af88",
+    "tests/integration/test_storage.py": "910f9fc3b5358b1fcbf437a7369d56e63015909a12347ce08fb80a0b5f0b7f30",
+    "tests/unit/test_contracts.py": "a4f32b35c4b7b7b18966309c78a95fe0d4cf2316b2c2d88198a765ad14424c5b"
+  },
+  "exit_code": 1,
+  "counts": {
+    "passed": 136,
+    "failure": 14,
+    "error": 0,
+    "skipped": 0
+  },
+  "cases": [
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000000-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000000-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000001-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000001-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000010-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000010-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000011-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000011-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000100-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000100-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000101-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000101-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000110-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000110-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000111-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-000111-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001000-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001000-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001001-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001001-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001010-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001010-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001011-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001011-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001100-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001100-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001101-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001101-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001110-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001110-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001111-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-001111-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010000-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010000-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010001-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010001-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010010-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010010-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010011-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010011-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010100-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010100-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010101-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010101-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010110-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010110-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010111-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-010111-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011000-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011000-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011001-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011001-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011010-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011010-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011011-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011011-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011100-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011100-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011101-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011101-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011110-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011110-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011111-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-011111-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100000-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100000-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100001-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100001-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100010-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100010-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100011-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100011-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100100-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100100-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100101-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100101-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100110-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100110-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100111-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-100111-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101000-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101000-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101001-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101001-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101010-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101010-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101011-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101011-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101100-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101100-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101101-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101101-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101110-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101110-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101111-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-101111-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110000-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110000-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110001-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110001-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110010-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110010-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110011-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110011-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110100-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110100-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110101-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110101-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110110-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110110-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110111-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-110111-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111000-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111000-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111001-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111001-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111010-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111010-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111011-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111011-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111100-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111100-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111101-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111101-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111110-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111110-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111111-preset]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_matches_independent_oracle_for_every_occupancy[occupancy-111111-explicit]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_reloading_same_facts_invalidates_old_rule_review[passed]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_reloading_same_facts_invalidates_old_rule_review[blocked]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_reloading_same_facts_invalidates_old_rule_review[needs_info]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_reloading_same_facts_invalidates_old_rule_review[needs_review]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_old_block_cannot_finish_after_rules_are_replaced",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_explicit_rule_recheck_obtains_new_verdict[passed]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_explicit_rule_recheck_obtains_new_verdict[blocked]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_explicit_rule_recheck_obtains_new_verdict[needs_info]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_explicit_rule_recheck_obtains_new_verdict[needs_review]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[message-null]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[message-array]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[message-string]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[call-null]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[call-number]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[function-null]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[function-array]",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[root-array-handled]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[choices-empty-handled]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_shapes_are_classified_as_protocol_errors[missing-role-handled]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_requested_time_is_independent_of_default_nodes",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_running_agent_cannot_finish_with_old_rule_after_refresh",
+      "outcome": "failure"
+    },
+    {
+      "test": "test_one_malformed_provider_response_does_not_abort_recoverable_run",
+      "outcome": "failure"
+    }
+  ]
+}

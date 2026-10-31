@@ -1,0 +1,100 @@
+{
+  "checks": {
+    "source_sha256_matches_report": true,
+    "test_sha256_matches_report": true,
+    "all_15_skips_are_pytest_xfail": true,
+    "failure_groups": {
+      "RT-01": 6,
+      "RT-02": 8
+    }
+  },
+  "exposed_failures": [
+    {
+      "name": "test_reloading_same_facts_invalidates_old_rule_review[passed]",
+      "type": null,
+      "message": "AssertionError: assert 'passed' is None\n +  where 'passed' = ItemResult(material_id='M01', material_version=2, review_status='passed', risk_reasons=[], original_requested_at='2026...264-252dcd9b9b02', 'OBS-f3face09-1528-447f-8252-175c53aed7f5', 'OBS-25b0b139-1b5d-41cb-8373-42723f86ae90'], error=None).review_status\n[+1 more line; full report in element text]"
+    },
+    {
+      "name": "test_reloading_same_facts_invalidates_old_rule_review[blocked]",
+      "type": null,
+      "message": "AssertionError: assert 'blocked' is None\n +  where 'blocked' = ItemResult(material_id='M01', material_version=2, review_status='blocked', risk_reasons=[{'rule_id': 'BRAND', 'version...a58-02cdd391c933', 'OBS-83ae5045-2cbb-4cc9-b323-3453780cf861', 'OBS-f6e5f5dd-134a-45f4-a80b-0308c953088a'], error=None).review_status\n[+1 more line; full report in element text]"
+    },
+    {
+      "name": "test_reloading_same_facts_invalidates_old_rule_review[needs_info]",
+      "type": null,
+      "message": "AssertionError: assert 'needs_info' is None\n +  where 'needs_info' = ItemResult(material_id='M01', material_version=2, review_status='needs_info', risk_reasons=[{'rule_id': 'BRAND', 'vers...c87-3758df63b1e6', 'OBS-be8c945d-a0f4-41cd-b908-df76b055d414', 'OBS-53460956-8036-4f8a-865f-9320720f5ab4'], error=None).review_status\n[+1 more line; full report in element text]"
+    },
+    {
+      "name": "test_reloading_same_facts_invalidates_old_rule_review[needs_review]",
+      "type": null,
+      "message": "AssertionError: assert 'needs_review' is None\n +  where 'needs_review' = ItemResult(material_id='M01', material_version=2, review_status='needs_review', risk_reasons=[{'rule_id': 'BRAND', 've...c3f-9a0c8e83f598', 'OBS-60419edc-d89d-4108-be48-475871cc8e62', 'OBS-a520d4c2-c3db-4a56-b8d5-bfb336129bf9'], error=None).review_status\n[+1 more line; full report in element text]"
+    },
+    {
+      "name": "test_old_block_cannot_finish_after_rules_are_replaced",
+      "type": null,
+      "message": "Failed: DID NOT RAISE BusinessError"
+    },
+    {
+      "name": "test_invalid_provider_shapes_are_classified_as_protocol_errors[message-null]",
+      "type": null,
+      "message": "AttributeError: 'NoneType' object has no attribute 'get'"
+    },
+    {
+      "name": "test_invalid_provider_shapes_are_classified_as_protocol_errors[message-array]",
+      "type": null,
+      "message": "AttributeError: 'list' object has no attribute 'get'"
+    },
+    {
+      "name": "test_invalid_provider_shapes_are_classified_as_protocol_errors[message-string]",
+      "type": null,
+      "message": "AttributeError: 'str' object has no attribute 'get'"
+    },
+    {
+      "name": "test_invalid_provider_shapes_are_classified_as_protocol_errors[call-null]",
+      "type": null,
+      "message": "AttributeError: 'NoneType' object has no attribute 'get'"
+    },
+    {
+      "name": "test_invalid_provider_shapes_are_classified_as_protocol_errors[call-number]",
+      "type": null,
+      "message": "AttributeError: 'int' object has no attribute 'get'"
+    },
+    {
+      "name": "test_invalid_provider_shapes_are_classified_as_protocol_errors[function-null]",
+      "type": null,
+      "message": "AttributeError: 'NoneType' object has no attribute 'get'"
+    },
+    {
+      "name": "test_invalid_provider_shapes_are_classified_as_protocol_errors[function-array]",
+      "type": null,
+      "message": "AttributeError: 'list' object has no attribute 'get'"
+    },
+    {
+      "name": "test_running_agent_cannot_finish_with_old_rule_after_refresh",
+      "type": null,
+      "message": "AssertionError: assert ('blocked' is None or 'blocked' == 'incomplete'\n +  where 'blocked' = ItemResult(material_id='M03', material_version=1, review_status='blocked', risk_reasons=[{'rule_id': 'R-COPYRIGHT-DENI...c3b-5c34775510e5', 'OBS-d07d8b1e-4f5e-42df-817e-28555e30773a', 'OBS-fdbb7cb1-5b6c-4ffa-b801-5f1d7f20b0b1'], error=None).review_status\n  \n  - incomplete\n  + blocked)"
+    },
+    {
+      "name": "test_one_malformed_provider_response_does_not_abort_recoverable_run",
+      "type": null,
+      "message": "AssertionError: assert 'not_attempted' == 'saved'\n  \n  - saved\n  + not_attempted"
+    }
+  ],
+  "xfail_reasons": [
+    "ADV-01: null supplement is treated as contradictory fact",
+    "RT-01: unchanged material preserves obsolete rule review",
+    "RT-01: unchanged material preserves obsolete rule review",
+    "RT-01: unchanged material preserves obsolete rule review",
+    "RT-01: unchanged material preserves obsolete rule review",
+    "RT-01: finish accepts obsolete blocked review after basic reload",
+    "RT-02: malformed provider structure escapes as AttributeError",
+    "RT-02: malformed provider structure escapes as AttributeError",
+    "RT-02: malformed provider structure escapes as AttributeError",
+    "RT-02: malformed provider structure escapes as AttributeError",
+    "RT-02: malformed provider structure escapes as AttributeError",
+    "RT-02: malformed provider structure escapes as AttributeError",
+    "RT-02: malformed provider structure escapes as AttributeError",
+    "RT-01: running agent accepts old block after basic refresh",
+    "RT-02: one malformed response bypasses bounded protocol recovery"
+  ]
+}

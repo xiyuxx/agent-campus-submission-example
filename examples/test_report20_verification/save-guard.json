@@ -1,0 +1,22 @@
+{
+  "mode": "controlled-context-verification",
+  "real_model_calls": 0,
+  "snapshot_catalog_revision": 2,
+  "retained_review_catalog_revision": 1,
+  "public_review_status_before_save": "passed",
+  "fresh_review_status": "blocked",
+  "save_observation": {
+    "observation_id": "OBS-108f319f-fe67-4033-88a5-f225f7c75509",
+    "tool": "save_draft",
+    "ok": false,
+    "code": "STALE_EVIDENCE",
+    "retryable": false,
+    "catalog_revision": null,
+    "data": {
+      "message": "观察已过期，必须重新读取和检查",
+      "executed": true
+    }
+  },
+  "independent_sql_draft_count": 0,
+  "limitation": "Delivery flags are controlled by this verification script, not proof of a real model consuming observations."
+}

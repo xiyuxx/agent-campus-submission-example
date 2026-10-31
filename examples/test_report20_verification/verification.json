@@ -1,0 +1,85 @@
+{
+  "verified_head": {
+    "base_commit": "bbd693a381e2b0b304cc17857f8b3118915932e0",
+    "source_sha256": "150736892e11a3538311e4a8a6d84b0c34b6b12daf149a213297ce69e7b319cc"
+  },
+  "finished_source": {
+    "base_commit": "bbd693a381e2b0b304cc17857f8b3118915932e0",
+    "source_sha256": "150736892e11a3538311e4a8a6d84b0c34b6b12daf149a213297ce69e7b319cc"
+  },
+  "real_model_calls": 0,
+  "runs": [
+    {
+      "group": "baseline",
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests",
+        "--ignore=tests/integration/test_retest_edge_cases.py",
+        "-q",
+        "--tb=short",
+        "--basetemp=D:\\Code\\smallShadow\\.tmp\\report20-4aa455eb92f1426c9dbd5219526d1b14",
+        "--junitxml=D:\\Code\\smallShadow\\examples\\test_report20_verification\\baseline\\junit.xml"
+      ],
+      "started_at": "2026-10-31T03:58:23.442669+00:00",
+      "finished_at": "2026-10-31T03:59:05.552396+00:00",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "test_count": 139,
+      "counts": {
+        "passed": 138,
+        "failure": 0,
+        "error": 0,
+        "skipped": 1
+      }
+    },
+    {
+      "group": "counterexamples",
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "scripts/run_adversarial_tests.py",
+        "--test-path",
+        "tests/integration/test_retest_edge_cases.py",
+        "--runxfail",
+        "--output",
+        "D:\\Code\\smallShadow\\examples\\test_report20_verification\\counterexamples"
+      ],
+      "started_at": "2026-10-31T03:59:05.552552+00:00",
+      "finished_at": "2026-10-31T03:59:18.594498+00:00",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "test_count": 150,
+      "counts": {
+        "passed": 136,
+        "failure": 14,
+        "error": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "group": "regression",
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "scripts/run_adversarial_tests.py",
+        "--all-tests",
+        "--test-path",
+        "tests/integration/test_retest_edge_cases.py",
+        "--output",
+        "D:\\Code\\smallShadow\\examples\\test_report20_verification\\regression"
+      ],
+      "started_at": "2026-10-31T03:59:18.594614+00:00",
+      "finished_at": "2026-10-31T04:00:03.106592+00:00",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "test_count": 289,
+      "counts": {
+        "passed": 274,
+        "failure": 0,
+        "error": 0,
+        "skipped": 15
+      }
+    }
+  ],
+  "test_sha256": "cf83b1c1329f5024db4a1784dbeabf4ce134be8984a57748de29b3b25c624ba5"
+}
