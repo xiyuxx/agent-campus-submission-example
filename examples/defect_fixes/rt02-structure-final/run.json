@@ -1,0 +1,108 @@
+{
+  "base_commit": "a73c71e032c56265d27ec30c645215ec82dd9ca6",
+  "source_sha256": "ba08a4f3ccc3d34d2dd2a53423897b79f510e5ccabac549fc8e2a241478df16f",
+  "started_at": "2026-10-31T04:33:09.441820+00:00",
+  "finished_at": "2026-10-31T04:33:11.785879+00:00",
+  "mode": "offline-controlled-model",
+  "real_model_calls": 0,
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:05:56) [MSC v.1942 64 bit (AMD64)]",
+  "command": [
+    "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests\\integration\\test_provider_structure.py",
+    "-q",
+    "--tb=short",
+    "--basetemp=D:\\Code\\smallShadow\\.tmp\\adversarial-20261031T043309441820",
+    "--junitxml=D:\\Code\\smallShadow\\examples\\defect_fixes\\rt02-structure-final\\junit.xml",
+    "--runxfail"
+  ],
+  "test_sha256": "604da1548cb1ed63e38304be8033a1d4461d00a44a9ddffd812550a2136e7a98",
+  "test_sources_sha256": {
+    "tests/conftest.py": "c70b5d67e4860cc7df584b99c090c5f785979a148845b417832067904046a6f3",
+    "tests/integration/test_adversarial_workflows.py": "fb46c256e659f9d7458a0545cfd2608c9539e126117be376ea9dcba5a31c02d2",
+    "tests/integration/test_agent.py": "67c76bcf5e717ef4cf84772dc7e26e97343b6f5bdbca28edb5439b52a9b421e2",
+    "tests/integration/test_cli.py": "0e0ada1cd659d9a5976076c5d94fda7a30618ad0c43a6eb5cee945c5b61f761c",
+    "tests/integration/test_local_binding_nearest.py": "54e5de31702f5d525e48fb5aecc676896c41cc63196455527608f4cdd68ee6c8",
+    "tests/integration/test_provider.py": "5c5d0d75430e6a6fa7d428833c8d4f4893991274fbd9fd939011a8bb75315820",
+    "tests/integration/test_provider_structure.py": "604da1548cb1ed63e38304be8033a1d4461d00a44a9ddffd812550a2136e7a98",
+    "tests/integration/test_retest_edge_cases.py": "5e513b09eda6b83fefb0fca3511cf313ea051c6b54edf2d9f2f3c535381b3ac7",
+    "tests/integration/test_review_freshness.py": "1a49c6a4a53fdab966fd23b1694befe2c64c14af6a92f760e0b3bd84178b11a5",
+    "tests/integration/test_runtime_limits.py": "c2c6b89146e6c052ffd3d092244a0231593f4c007376a60d7c5aa636fac9af88",
+    "tests/integration/test_storage.py": "910f9fc3b5358b1fcbf437a7369d56e63015909a12347ce08fb80a0b5f0b7f30",
+    "tests/unit/test_contracts.py": "a4f32b35c4b7b7b18966309c78a95fe0d4cf2316b2c2d88198a765ad14424c5b"
+  },
+  "exit_code": 0,
+  "counts": {
+    "passed": 16,
+    "failure": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "cases": [
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[None]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[1]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body2]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body3]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body4]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body5]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body6]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body7]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body8]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body9]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body10]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_containers_and_argument_types_are_protocol_errors[body11]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_persistent_malformed_response_is_bounded_and_executes_nothing[None]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_persistent_malformed_response_is_bounded_and_executes_nothing[bad_message1]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nullable_content_and_final_json_remain_valid",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_internal_attribute_error_is_not_reclassified_as_provider_protocol",
+      "outcome": "passed"
+    }
+  ]
+}

@@ -121,13 +121,7 @@ def response_with(message, finish="tool_calls"):
 
 
 def bad_shape(value, label):
-    return pytest.param(
-        value,
-        id=label,
-        marks=pytest.mark.xfail(
-            strict=True, reason="RT-02: malformed provider structure escapes as AttributeError"
-        ),
-    )
+    return pytest.param(value, id=label)
 
 
 @pytest.mark.parametrize(
@@ -230,9 +224,6 @@ def test_running_agent_cannot_finish_with_old_rule_after_refresh(repo, catalog, 
     assert result.items[0].review_status is None or result.task_status == "incomplete"
 
 
-@pytest.mark.xfail(
-    strict=True, reason="RT-02: one malformed response bypasses bounded protocol recovery"
-)
 def test_one_malformed_provider_response_does_not_abort_recoverable_run(repo, job, tmp_path):
     attempts = 0
 

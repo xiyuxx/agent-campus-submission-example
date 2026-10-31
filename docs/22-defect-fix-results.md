@@ -11,3 +11,11 @@
 首轮回归出现 2 个新增测试断言错误：用异常文本匹配业务错误码，但 BusinessError 文本仅包含消息。改为检查异常的 code 属性；没有改动业务预期。原始失败输出也保留在证据目录。
 
 最终完整离线回归：287 passed、9 xfailed、0 failed/error；余下已知失败为 RT-02 的 8 项和 ADV-01 的 1 项，未计为通过。Ruff check/format --check 通过。实际输出、源码摘要与后续修复见 [证据索引](../examples/defect_fixes/README.md)。
+
+## RT-02：响应结构校验
+
+DeepSeek 适配器在访问字段前逐层检查根对象、choices、choice、message、调用数组、调用对象及 function。content 的字符串/null 与 tool_calls 的数组/省略/null 保持兼容；arguments 必须是字符串，字符串中的业务 JSON 仍由工具注册表校验。结构错误转换为 MODEL_PROTOCOL，不新增重试层，不将任意内部 AttributeError 改报协议错误。
+
+原 7 个结构反例与 1 个完整恢复反例保留断言并移除 xfail。另加 16 项：12 个容器/参数类型反例、持续畸形以及合法调用后接畸形调用的有界零执行、合法 null 正文和最终 JSON、内部 AttributeError 不被掩盖。已有重复调用 ID、混合终态、截断、响应体上限、HTTP 有限重试和本地身份投影继续参与回归。
+
+实际完整回归为 311 passed、1 xfailed（仅 ADV-01），0 failed/error；恢复反例成功保存草稿并返回 needs_input。测试闭包按静态检查建议显式绑定后，该文件 16 项另行复跑全部通过，最终源码与测试摘要单独归档。Ruff check/format --check 通过。持续畸形严格为 3 次模型请求、2 次协议反馈、0 次工具执行，返回 incomplete/PROTOCOL_LIMIT；不将受控结果外推为供应商可靠性结论。

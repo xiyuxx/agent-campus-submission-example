@@ -6,5 +6,7 @@
 
 - [RT-01 首轮](rt01/pytest.txt)：285 passed、2 failed、9 xfailed。两项失败为新增测试误用异常文本匹配 code，随后修正。
 - [RT-01 最终完整回归](rt01-final/pytest.txt)：287 passed、9 xfailed、0 failed/error；9 个 xfail 为尚未修复的 RT-02（8）与 ADV-01（1）。新增邻域 7 项全通过。源码与测试摘要见 [run.json](rt01-final/run.json)。Ruff check/format --check 通过。
+- [RT-02 完整回归](rt02/pytest.txt)：311 passed、1 xfailed（ADV-01），0 failed/error。[单次坏响应后恢复](rt02/scenarios/provider-recovery/output.json) 实际保存草稿，返回 needs_input；[run.json](rt02/run.json) 记录当时测试文件摘要。
+- [RT-02 最终结构测试](rt02-structure-final/pytest.txt)：测试闭包显式绑定后 16 passed、0 xfailed，静态检查也通过。最终测试摘要见 [run.json](rt02-structure-final/run.json)。业务源码与 RT-02 完整回归相同。
 
 修复说明见 [第 22 号记录](../../docs/22-defect-fix-results.md)。

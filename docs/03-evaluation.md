@@ -1,5 +1,7 @@
 # 效果评估
 
+2026-10-31 缺陷修复阶段二：RT-02 的 8 个原反例和 16 个新增结构/恢复边界通过，完整离线回归 311 passed、1 xfailed（仅 ADV-01）；最终结构测试另行 16 passed，Ruff 通过。单次畸形响应后实际恢复并保存，持续畸形有界停止。证据与限制见 [修复记录](22-defect-fix-results.md)。
+
 2026-10-31 缺陷修复阶段一：RT-01 的 6 个原反例与 7 个新增邻域测试通过；完整离线回归 287 passed、9 xfailed（RT-02/ADV-01 尚未修复）。真实模型调用 0，详见 [修复记录](22-defect-fix-results.md)。下方保留历史复测状态。
 
 2026-10-31 最新核实：[docs/20 独立复核与修改建议](21-test-report-verification.md)。在相同业务源码摘要上重跑得到 138 passed/1 xfailed、136 passed/14 failed、完整 274 passed/15 xfailed，与原报告一致；仍存在 RT-01、RT-02、ADV-01，xfail 不计通过。本轮仅复核，没有修复业务源码。

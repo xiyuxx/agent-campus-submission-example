@@ -238,6 +238,8 @@ action 只允许 finish、needs_input、block；evidence_ids 引用本轮观察�
 
 ## 9. DeepSeek HTTP 请求与响应适配
 
+结构边界补充（2026-10-31）：访问供应商字段前校验根对象、choices 数组及唯一 choice、message 对象、tool_calls 数组和每个 function 对象。content 可以是字符串或 null；省略/null tool_calls 表示无调用，其他容器必须拒绝。调用的 name/arguments 必须是字符串（参数字符串内容是否合法由工具注册表判断）。结构异常统一为 MODEL_PROTOCOL，复用最多两次协议反馈和总模型预算，整组校验后才执行；不捕获任意 AttributeError 来掩盖内部程序错误。修复验证见 [第 22 号记录](22-defect-fix-results.md)。
+
 采用非流式 Chat Completions；HTTPX 直接发送 JSON。当前官方非 thinking 工具示例显式设置 thinking.type=disabled，且要求保留 assistant 工具动作和匹配 tool_call_id 的结果。[DeepSeek 工具调用](https://api-docs.deepseek.com/guides/tool_calls/)
 
 请求体按以下项目配置构建；messages 和 tools 必须由程序实际生成，不能使用省略占位值发请求：

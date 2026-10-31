@@ -56,9 +56,13 @@ class DeepSeekModel:
             raise BusinessError("MODEL_TRANSPORT", "模型传输失败", retryable=True) from exc
         try:
             body = json.loads(raw)
-            if len(body["choices"]) != 1:
+            if not isinstance(body, dict) or not isinstance(body.get("choices"), list):
+                raise ValueError("expected response object and choices array")
+            if len(body["choices"]) != 1 or not isinstance(body["choices"][0], dict):
                 raise ValueError("expected one choice")
             message = body["choices"][0]["message"]
+            if not isinstance(message, dict):
+                raise ValueError("expected message object")
             finish = body["choices"][0].get("finish_reason")
             if finish == "content_filter":
                 raise BusinessError("MODEL_REFUSAL", "模型未能处理该内容；未执行工具")
@@ -68,6 +72,8 @@ class DeepSeekModel:
                 )
             if message.get("role") != "assistant":
                 raise ValueError("invalid role")
+            if message.get("content") is not None and not isinstance(message["content"], str):
+                raise ValueError("expected string or null content")
             metadata = {
                 "requested_model": self.settings.model,
                 "returned_model": body.get("model"),
@@ -76,7 +82,11 @@ class DeepSeekModel:
             }
             # Deliberately drop reasoning_content and the full provider response.
             assistant = {"role": "assistant", "content": message.get("content")}
-            calls = message.get("tool_calls") or []
+            calls = message.get("tool_calls")
+            if calls is None:
+                calls = []
+            if not isinstance(calls, list):
+                raise ValueError("expected tool calls array")
             if calls:
                 if finish != "tool_calls":
                     raise ValueError("inconsistent finish reason")
@@ -90,10 +100,13 @@ class DeepSeekModel:
                     else:
                         raise ValueError("mixed calls and final")
                 if any(
-                    x.get("type") != "function"
+                    not isinstance(x, dict)
+                    or x.get("type") != "function"
                     or not isinstance(x.get("id"), str)
                     or not x["id"]
-                    or not isinstance(x.get("function", {}).get("name"), str)
+                    or not isinstance(x.get("function"), dict)
+                    or not isinstance(x["function"].get("name"), str)
+                    or not isinstance(x["function"].get("arguments"), str)
                     for x in calls
                 ) or len({x["id"] for x in calls}) != len(calls):
                     raise ValueError("invalid tool calls")
@@ -103,7 +116,7 @@ class DeepSeekModel:
                         "type": "function",
                         "function": {
                             "name": x["function"]["name"],
-                            "arguments": x["function"].get("arguments", ""),
+                            "arguments": x["function"]["arguments"],
                         },
                     }
                     for x in calls
