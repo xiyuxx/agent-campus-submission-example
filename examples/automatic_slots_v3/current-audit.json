@@ -1,0 +1,149 @@
+{
+  "base_commit": "1e16f93f546d5f3497ec278c6c925c65b961a798",
+  "source_sha256": "eda8b63468af712cc51f447a499a29b6a785506ef8241d100186727094e58996",
+  "source_and_test_hashes_match_current": true,
+  "prompt_version": "4.1",
+  "counts": {
+    "passed": 356,
+    "failure": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "automatic_query_tests": 18,
+  "oracle_cases": 128,
+  "scenarios": [
+    {
+      "scenario": "normal",
+      "path": "current-regression/scenarios/test_automatic_options_service0",
+      "task_status": "completed",
+      "save_status": "saved",
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 1,
+        "draft_history": 1
+      }
+    },
+    {
+      "scenario": "conflict",
+      "path": "current-regression/scenarios/test_automatic_options_service1",
+      "task_status": "needs_input",
+      "save_status": "saved",
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 1,
+        "draft_history": 1
+      }
+    },
+    {
+      "scenario": "empty",
+      "path": "current-regression/scenarios/test_automatic_options_service2",
+      "task_status": "needs_input",
+      "save_status": "not_attempted",
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 0,
+        "draft_history": 0
+      }
+    },
+    {
+      "scenario": "insufficient",
+      "path": "current-regression/scenarios/test_automatic_options_service3",
+      "task_status": "needs_input",
+      "save_status": "not_attempted",
+      "schedule_queries": 0,
+      "database_counts": {
+        "drafts": 0,
+        "draft_history": 0
+      }
+    },
+    {
+      "scenario": "query_failure",
+      "path": "current-regression/scenarios/test_automatic_options_service4",
+      "task_status": "failed",
+      "save_status": "not_attempted",
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 0,
+        "draft_history": 0
+      }
+    },
+    {
+      "scenario": "save_failure",
+      "path": "current-regression/scenarios/test_automatic_options_service5",
+      "task_status": "failed",
+      "save_status": "failed",
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 0,
+        "draft_history": 0
+      }
+    },
+    {
+      "scenario": "duplicate",
+      "path": "current-regression/scenarios/test_automatic_options_service6/repeat",
+      "task_status": "needs_input",
+      "save_status": "reused",
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 1,
+        "draft_history": 1
+      }
+    }
+  ],
+  "existing_live_read_only_verification": [
+    {
+      "case": "normal",
+      "path": "examples/decision_improvements_v4_1/live_normal",
+      "query_calls": 1,
+      "source_matches_current": true,
+      "new_model_calls_for_this_check": 0
+    },
+    {
+      "case": "save_race",
+      "path": "examples/decision_improvements_v4_1/live_save_race",
+      "query_calls": 2,
+      "source_matches_current": true,
+      "new_model_calls_for_this_check": 0
+    }
+  ],
+  "new_live_calls": 0,
+  "quality": [
+    {
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts/run_adversarial_tests.py"
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts/run_adversarial_tests.py"
+      ],
+      "exit_code": 0,
+      "stdout": "40 files already formatted\n"
+    },
+    {
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "scripts/check_decision_examples.py",
+        "examples/decision_improvements_v4_1"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"verified_runs\": 9, \"verified_files\": 65}\n"
+    }
+  ],
+  "current_archive_is_lf": true
+}

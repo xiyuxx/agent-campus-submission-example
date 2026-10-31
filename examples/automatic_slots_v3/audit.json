@@ -1,0 +1,148 @@
+{
+  "mode": "offline-controlled-model",
+  "real_model_calls": 0,
+  "source_sha256": "95e0cec15bee23536a63d7f2c3dabefee9e60198ae723b7f68f60cd6c093db90",
+  "source_and_test_hashes_match": true,
+  "previous_cases": 324,
+  "final_cases": 342,
+  "new_cases": 18,
+  "migrated_obsolete_precondition_test": "test_nearest_requires_observed_original_conflict",
+  "renamed_test": "test_original_free_skips_alternatives_and_rejects_legacy_query_parameter",
+  "counts": {
+    "passed": 342,
+    "failure": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "scenarios": [
+    {
+      "scenario": "normal",
+      "path": "targeted-final/scenarios/test_automatic_options_service0",
+      "task_status": "completed",
+      "save_status": "saved",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 1,
+        "draft_history": 1
+      }
+    },
+    {
+      "scenario": "conflict",
+      "path": "targeted-final/scenarios/test_automatic_options_service1",
+      "task_status": "needs_input",
+      "save_status": "saved",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 1,
+        "draft_history": 1
+      }
+    },
+    {
+      "scenario": "empty",
+      "path": "targeted-final/scenarios/test_automatic_options_service2",
+      "task_status": "needs_input",
+      "save_status": "not_attempted",
+      "model_attempts": 4,
+      "tool_attempts": 3,
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 0,
+        "draft_history": 0
+      }
+    },
+    {
+      "scenario": "insufficient",
+      "path": "targeted-final/scenarios/test_automatic_options_service3",
+      "task_status": "needs_input",
+      "save_status": "not_attempted",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "schedule_queries": 0,
+      "database_counts": {
+        "drafts": 0,
+        "draft_history": 0
+      }
+    },
+    {
+      "scenario": "query_failure",
+      "path": "targeted-final/scenarios/test_automatic_options_service4",
+      "task_status": "failed",
+      "save_status": "not_attempted",
+      "model_attempts": 4,
+      "tool_attempts": 3,
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 0,
+        "draft_history": 0
+      }
+    },
+    {
+      "scenario": "save_failure",
+      "path": "targeted-final/scenarios/test_automatic_options_service5",
+      "task_status": "failed",
+      "save_status": "failed",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 0,
+        "draft_history": 0
+      }
+    },
+    {
+      "scenario": "duplicate",
+      "path": "targeted-final/scenarios/test_automatic_options_service6/repeat",
+      "task_status": "needs_input",
+      "save_status": "reused",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "schedule_queries": 1,
+      "database_counts": {
+        "drafts": 1,
+        "draft_history": 1
+      }
+    }
+  ],
+  "same_controlled_provider_recovery": {
+    "before": {
+      "model_attempts": 9,
+      "tool_attempts": 7
+    },
+    "after": {
+      "model_attempts": 8,
+      "tool_attempts": 6
+    },
+    "includes_one_intentional_protocol_error": true
+  },
+  "quality": [
+    {
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts/run_adversarial_tests.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts/run_adversarial_tests.py"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

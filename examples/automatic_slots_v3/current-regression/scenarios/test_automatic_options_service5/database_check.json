@@ -1,0 +1,8 @@
+{
+  "scenario": "save_failure",
+  "counts": {
+    "drafts": 0,
+    "draft_history": 0
+  },
+  "draft": null
+}

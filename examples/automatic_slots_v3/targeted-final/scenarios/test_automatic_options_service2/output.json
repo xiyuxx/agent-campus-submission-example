@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-91dd7685-6e0e-4646-8743-948a7f2b4f8d",
+  "request_id": "REQ-1",
+  "mode": "mock",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "schedule:expand_range",
+          "kind": "input",
+          "message": "合法候选为空或全部占用，请在新请求中调整原要求或候选范围"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-01704d46-104f-4fdc-a902-ff4b737117ba",
+        "OBS-4a78d958-c79f-4611-866c-147b52030927",
+        "OBS-cfd058c9-2693-4aec-be0e-cad88660100d"
+      ],
+      "error": null
+    }
+  ]
+}

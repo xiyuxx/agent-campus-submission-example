@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-3ddf3b09-34bb-42b5-8e18-ab343eadbd37",
+  "request_id": "REQ-1",
+  "mode": "mock",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T19:00:00+08:00",
+      "confirmation_status": "pending",
+      "pending_items": [
+        {
+          "id": "change_time",
+          "kind": "confirm",
+          "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+        }
+      ],
+      "draft": {
+        "id": "D-6d9b66a7-9835-481e-b18a-1780eebdfbcc",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "reused",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-7bf31041-3615-440f-b6ed-f1bcdb73b159",
+        "OBS-19ff0be8-cae5-4779-97a6-7b6534c65b42",
+        "OBS-d9ecd804-0e18-4b12-8aad-8e9ebd06ea36",
+        "OBS-239e675a-ea0b-4c58-94a8-4172740536f4"
+      ],
+      "error": null
+    }
+  ]
+}

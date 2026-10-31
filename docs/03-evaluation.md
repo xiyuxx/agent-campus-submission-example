@@ -1,5 +1,7 @@
 # 效果评估
 
+2026-10-31 当前版本独立复验：合并排期查询已纳入 0866446；在用户后续改动基线 1e16f93 上重新完整离线 --runxfail 得到 **356 passed、0 failed/error/xfail**。包含合并查询 18 项、有限节点 oracle 128 项，并核对当前源码/测试摘要及七组实际服务场景。Ruff 两项通过；现有提示 4.1 的 9 组证据、65 文件只读校验通过，其中正常与抢槽 live 的查询均为完整选项，未新增 live 调用。当前与历史 342 项记录分开见 [证据索引](../examples/automatic_slots_v3/README.md)。
+
 2026-10-31 最新修复结论：RT-01、RT-02、ADV-01 均已修复，完整离线回归显式 --runxfail 得到 **324 passed，0 failed/error/xfail**。原 289 项逐项保留并通过，新增 35 项邻域测试；Ruff check/format --check 通过，未新增真实模型调用。实际证据、阶段结果和限制见 [修复记录](22-defect-fix-results.md) 与 [证据索引](../examples/defect_fixes/README.md)。下方为各阶段当时的历史状态。
 
 2026-10-31 缺陷修复阶段二：RT-02 的 8 个原反例和 16 个新增结构/恢复边界通过，完整离线回归 311 passed、1 xfailed（仅 ADV-01）；最终结构测试另行 16 passed，Ruff 通过。单次畸形响应后实际恢复并保存，持续畸形有界停止。证据与限制见 [修复记录](22-defect-fix-results.md)。

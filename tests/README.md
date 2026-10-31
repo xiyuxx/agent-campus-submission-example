@@ -1,5 +1,7 @@
 # 测试目录约定
 
+2026-10-31 当前复验：合并查询及后续动态工具、偏好、有限冲突恢复共同完整 --runxfail 为 **356 passed、0 failed/error/xfail**（基线 1e16f93）。包含合并查询 18 项、完整查询入口的独立 oracle 128 项；Ruff 两项通过。七组实际服务场景、源码摘要与已有 live 的只读核对见 [合并查询索引](../examples/automatic_slots_v3/README.md)。下方 342/324 等是各历史阶段的结果。
+
 2026-10-31 最新：RT-01/RT-02/ADV-01 已修复，原 15 个 xfail 全部移除且断言保留。完整 --runxfail 为 **324 passed，0 failed/error/xfail**，其中原 289 项、新增 35 项；Ruff check/format --check 通过。见 [修复记录](../docs/22-defect-fix-results.md) 和 [最终证据](../examples/defect_fixes/README.md)。以下数字为历史执行结果；当前测试应通过，不再预期反例失败。
 
 2026-10-31 再次复测新增 150 项（含最近节点 128 个占用组合穷举）；完整结果为 274 passed、15 xfailed，新增失败属于规则审核失效、异常响应协议处理两类问题，旧 ADV-01 仍失败。详见 [测试设计、覆盖与限制](../docs/20-retest-and-test-design.md) 和 [实际证据](../examples/retest_review/README.md)。可用 `scripts/run_adversarial_tests.py --test-path tests/integration/test_retest_edge_cases.py --runxfail --output examples/my-new-retest` 单独重现新增失败；输出目录需不存在。

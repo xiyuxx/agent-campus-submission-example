@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-b60a966b-0862-4638-ae28-2ffb085dc23d",
+  "request_id": "REQ-1",
+  "mode": "mock",
+  "task_status": "incomplete",
+  "items": [
+    {
+      "material_id": "M03",
+      "material_version": 1,
+      "review_status": null,
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "incomplete",
+      "evidence_ids": [
+        "OBS-24e8d346-79da-47a5-8251-b36b532b5132",
+        "OBS-2d1cd561-9448-4555-9d0a-cc9389387541",
+        "OBS-ffcd2f08-2436-45c4-9d2e-206c91118af0"
+      ],
+      "error": {
+        "code": "PROTOCOL_LIMIT",
+        "message": "协议/结束纠错次数耗尽"
+      }
+    }
+  ]
+}

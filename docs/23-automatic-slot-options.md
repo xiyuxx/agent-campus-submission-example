@@ -1,5 +1,7 @@
 # 一次查询返回排期选项：模型工具协议 v3
 
+当前状态：合并查询已包含于 0866446，并与 [第 24 号决策契约](24-agent-decision-improvements.md) 的动态工具、改期偏好和有限恢复兼容。用户后续改动后，在 1e16f93 上重新执行完整离线回归为 356 passed、0 xfail；[实际证据与版本区分](../examples/automatic_slots_v3/README.md) 已归档。本轮不新增真实模型调用，仅只读核对已有提示 4.1 live 记录。
+
 2026-10-31，用户确认：原时间冲突后检索替代节点属于确定性查询，由程序一次完成；模型消费候选后推荐，不额外决定是否查询 nearest。本文取代第 19 号规范中 requested/nearest 分两次工具调用的约定，其余本地身份、双向节点、确认与幂等边界继续有效。
 
 ## 契约与职责
@@ -18,7 +20,7 @@ query_slots 仅接受可选 reason_summary，调用参数为 {} 即可。删除 
 
 本地 ScheduleOptions 聚合 requested: SlotObservation 和 alternatives: SlotObservation | null；原时段可用时 alternatives 为 null，冲突且无候选时为真实查询得到的空 slots。每次工具执行只生成一个 observation_id，预算计一次工具调用。本地继续保存目录、冲突来源、checked_slots 和来源身份。
 
-模型投影字段为 requested_slot、alternatives_searched、alternative_source、alternatives。节点仅包含带时区的 at、available、direction、conflict_sources，不带业务身份、观察 ID、目录版本或占用记录 ID。提示版本升为 3.0，用户请求/确认/结果的 schema_version=1.0 不变。
+模型投影字段为 requested_slot、alternatives_searched、alternative_source、alternatives。节点仅包含带时区的 at、available、direction、conflict_sources，不带业务身份、观察 ID、目录版本或占用记录 ID。初次提示版本为 3.0，后续按第 24 号契约升为 4.1，合并查询语义保留；用户请求/确认/结果的 schema_version=1.0 不变。
 
 下例为设计示意，不是执行证据：
 
@@ -52,4 +54,6 @@ query_slots 仅接受可选 reason_summary，调用参数为 {} 即可。删除 
 
 ## 验证记录
 
-新增 18 项定向测试已实际通过，包括七组完整离线服务场景：正常、冲突、无候选、资料不足、查询失败、保存失败、重复提交。既有 128 个有限占用组合的独立 oracle 改走完整查询接口，保留双向最近算法断言；旧前置测试改为检查原时间可用时不检索候选并拒绝旧 query 参数。完整回归与实际证据在执行后记于 [后续实现与验证契约](24-agent-decision-improvements.md)。本轮不调用真实模型，旧 live 记录不代表 v3 验证。
+新增 18 项定向测试已实际通过，包括七组完整离线服务场景：正常、冲突、无候选、资料不足、查询失败、保存失败、重复提交。既有 128 个有限占用组合的独立 oracle 改走完整查询接口，保留双向最近算法断言；旧前置测试改为检查原时间可用时不检索候选并拒绝旧 query 参数。初次完整回归 342 passed；用户后续决策改动后的本轮复验 356 passed、0 xfail，Ruff check/format --check 通过。详见 [证据索引](../examples/automatic_slots_v3/README.md) 与 [后续实现契约](24-agent-decision-improvements.md)。
+
+一次查询指一次工具调用取得完整选项，不禁止保存抢槽后的必要刷新。恢复时仍由模型消费实际保存失败，选择重新 query_slots，再从新观察推荐；每次查询内部自动检索替代，模型不分步调用 nearest。已有提示 4.1 的两组 live 只读核对通过，业务源码摘要匹配当前；本轮没有新增 live 请求。

@@ -1,0 +1,201 @@
+{
+  "scenario": "conflict",
+  "counts": {
+    "drafts": 1,
+    "draft_history": 1
+  },
+  "draft": {
+    "draft_id": "D-f09627d6-5e7c-404d-af8b-26f849428351",
+    "request_id": "REQ-1",
+    "material_id": "M01",
+    "revision": 1,
+    "validity": "active",
+    "platform": "douyin",
+    "account_id": "brand_main",
+    "at_utc": "2026-11-03T11:00:00.000000Z",
+    "catalog_revision": 2,
+    "semantic_sha256": "e7180a9e8aa3b3b4f1519f8c320846cf766767fc504598b2684610c2b2533880",
+    "created_at": "2026-10-31T06:31:57.656915Z",
+    "updated_at": "2026-10-31T06:31:57.656915Z",
+    "payload": {
+      "confirmation_items": [
+        {
+          "id": "change_time",
+          "kind": "confirm",
+          "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+        }
+      ],
+      "evidence_ids": [
+        "OBS-fd7ee9c4-1f95-4ad4-98ba-cccf1e61876c",
+        "OBS-887cb505-3fd7-4b91-a5c6-e9820b88e3c6"
+      ],
+      "input_sha256": "3020227c4e0395e3c660d6950f3694ec2dc09fa4457bbad6f55dde9ce0e23530",
+      "original_requirement": {
+        "candidate_times": null,
+        "constraint": "hard",
+        "requested_at": "2026-11-03T10:00:00.000000Z",
+        "timezone": "Asia/Shanghai"
+      },
+      "request_id": "REQ-1",
+      "review": {
+        "catalog_revision": 2,
+        "matches": [],
+        "material_sha256": "1208891a7ddb632fd8b8a95be190c57aa2e9029c5d9b530c98fea557e987f99c",
+        "review_status": "passed",
+        "rules": [
+          {
+            "field": "caption",
+            "message": "示例品牌规则要求人工核实该表述依据",
+            "operator": "contains",
+            "rule_id": "R-CAPTION-REVIEW",
+            "severity": "needs_review",
+            "value": "最强",
+            "version": 1
+          },
+          {
+            "field": "copyright_status",
+            "message": "未授权素材不得进入排期",
+            "operator": "equals",
+            "rule_id": "R-COPYRIGHT-DENIED",
+            "severity": "blocked",
+            "value": "unauthorized",
+            "version": 1
+          },
+          {
+            "field": "copyright_status",
+            "message": "缺少版权状态，请补查授权资料",
+            "operator": "missing",
+            "rule_id": "R-COPYRIGHT-MISSING",
+            "severity": "needs_info",
+            "value": null,
+            "version": 1
+          },
+          {
+            "field": "cover_ref",
+            "message": "示例业务规则要求提供封面引用",
+            "operator": "missing",
+            "rule_id": "R-COVER-MISSING",
+            "severity": "needs_info",
+            "value": null,
+            "version": 1
+          }
+        ]
+      },
+      "run_id": "RUN-c75490b5-2a02-462a-bc20-3439ec1f818e",
+      "save_conflicts": [],
+      "slot_observation": {
+        "catalog_revision": 2,
+        "checked_slots": [
+          {
+            "at": "2026-11-03T11:00:00.000000Z",
+            "available": true,
+            "conflicts": [],
+            "direction": "after"
+          }
+        ],
+        "query": "alternatives",
+        "slots": [
+          {
+            "at": "2026-11-03T11:00:00.000000Z",
+            "available": true,
+            "conflicts": [],
+            "direction": "after"
+          }
+        ],
+        "source": "default"
+      },
+      "slot_observations": [
+        {
+          "catalog_revision": 2,
+          "checked_slots": [
+            {
+              "at": "2026-11-03T10:00:00.000000Z",
+              "available": false,
+              "conflicts": [
+                {
+                  "id": "S01",
+                  "source": "schedule"
+                }
+              ]
+            }
+          ],
+          "query": "requested",
+          "slots": [
+            {
+              "at": "2026-11-03T10:00:00.000000Z",
+              "available": false,
+              "conflicts": [
+                {
+                  "id": "S01",
+                  "source": "schedule"
+                }
+              ]
+            }
+          ],
+          "source": "requested"
+        },
+        {
+          "catalog_revision": 2,
+          "checked_slots": [
+            {
+              "at": "2026-11-03T11:00:00.000000Z",
+              "available": true,
+              "conflicts": [],
+              "direction": "after"
+            }
+          ],
+          "query": "alternatives",
+          "slots": [
+            {
+              "at": "2026-11-03T11:00:00.000000Z",
+              "available": true,
+              "conflicts": [],
+              "direction": "after"
+            }
+          ],
+          "source": "default"
+        }
+      ],
+      "snapshot": {
+        "catalog_revision": 2,
+        "import_id": "IMP-9fd595cb-f774-4ca5-9205-cb5809825cb8",
+        "material": {
+          "account_id": "brand_main",
+          "caption": "支持字幕功能",
+          "copyright_status": "authorized",
+          "cover_ref": "synthetic://cover/M01-v2.jpg",
+          "license_ref": null,
+          "material_id": "M01",
+          "material_version": 2,
+          "media_ref": "synthetic://video/M01-v2.mp4",
+          "platform": "douyin",
+          "source_asset_id": "VIDEO-001",
+          "title": "新品功能介绍",
+          "type": "video"
+        },
+        "sources": {
+          "caption": "materials:M01@2",
+          "copyright_status": "materials:M01@2",
+          "cover_ref": "materials:M01@2",
+          "license_ref": "materials:M01@2",
+          "media_ref": "materials:M01@2",
+          "source_asset_id": "materials:M01@2",
+          "title": "materials:M01@2",
+          "type": "materials:M01@2"
+        },
+        "supplement_version": null,
+        "supplemented": false
+      },
+      "suggested_at": "2026-11-03T11:00:00.000000Z"
+    },
+    "confirmation_status": "pending",
+    "pending_items": [
+      {
+        "id": "change_time",
+        "kind": "confirm",
+        "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+      }
+    ],
+    "accepted_items": []
+  }
+}

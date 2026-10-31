@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "request_id": "REQ-1",
+  "items": [
+    {
+      "material_id": "M01",
+      "publish_requirement": {
+        "requested_at": "2026-11-03T18:00:00+08:00",
+        "timezone": "Asia/Shanghai",
+        "constraint": "hard",
+        "candidate_times": null
+      }
+    }
+  ]
+}

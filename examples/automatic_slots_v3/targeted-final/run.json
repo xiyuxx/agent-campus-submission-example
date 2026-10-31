@@ -1,0 +1,118 @@
+{
+  "base_commit": "6908b7f83f88ed6fe93b78e53b0fde43d1d23f8c",
+  "source_sha256": "95e0cec15bee23536a63d7f2c3dabefee9e60198ae723b7f68f60cd6c093db90",
+  "started_at": "2026-10-31T06:31:55.182533+00:00",
+  "finished_at": "2026-10-31T06:31:59.549581+00:00",
+  "mode": "offline-controlled-model",
+  "real_model_calls": 0,
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:05:56) [MSC v.1942 64 bit (AMD64)]",
+  "command": [
+    "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests\\integration\\test_automatic_slot_options.py",
+    "-q",
+    "--tb=short",
+    "--basetemp=D:\\Code\\smallShadow\\.tmp\\adversarial-20261031T063155182533",
+    "--junitxml=D:\\Code\\smallShadow\\examples\\automatic_slots_v3\\targeted-final\\junit.xml",
+    "--runxfail"
+  ],
+  "test_sha256": "b7740f5b4e3ceb84bbee8f6c9a35c6d7185164bf4b410989c81d885af84f88eb",
+  "test_sources_sha256": {
+    "tests/conftest.py": "c70b5d67e4860cc7df584b99c090c5f785979a148845b417832067904046a6f3",
+    "tests/integration/test_adversarial_workflows.py": "685aab0b6a827b49ab1aa514c616bf1ae439a51d742637b709bb00eed5a095ff",
+    "tests/integration/test_agent.py": "a5ecb5e462b0970bf650e9b8392b929f696799c2ae4905a4c8d2a865b6c451fe",
+    "tests/integration/test_automatic_slot_options.py": "b7740f5b4e3ceb84bbee8f6c9a35c6d7185164bf4b410989c81d885af84f88eb",
+    "tests/integration/test_cli.py": "0e0ada1cd659d9a5976076c5d94fda7a30618ad0c43a6eb5cee945c5b61f761c",
+    "tests/integration/test_local_binding_nearest.py": "98c1351f0babe0775ce3d75c6286d265da56f35c1e4c4912b855b1b34eb7bea0",
+    "tests/integration/test_provider.py": "6674839ddbb048fa62c8636b69962bc027a27ce1f91696539e6b2ce8baeb52c6",
+    "tests/integration/test_provider_structure.py": "604da1548cb1ed63e38304be8033a1d4461d00a44a9ddffd812550a2136e7a98",
+    "tests/integration/test_retest_edge_cases.py": "fed84a86544ba119f10c61de3cff06571fdbc07575b266b71853811253d243e3",
+    "tests/integration/test_review_freshness.py": "1a49c6a4a53fdab966fd23b1694befe2c64c14af6a92f760e0b3bd84178b11a5",
+    "tests/integration/test_runtime_limits.py": "3c8c0e8107968a72dc2cdf2167ae791e63d755270cde105c5d6e2b8d92447adf",
+    "tests/integration/test_storage.py": "910f9fc3b5358b1fcbf437a7369d56e63015909a12347ce08fb80a0b5f0b7f30",
+    "tests/integration/test_supplement_unknowns.py": "d82c9012c2d5a17d422fb8d845d9a28b24f6ce67777f0ecd0c51a54fe7746ca7",
+    "tests/unit/test_contracts.py": "a4f32b35c4b7b7b18966309c78a95fe0d4cf2316b2c2d88198a765ad14424c5b"
+  },
+  "exit_code": 0,
+  "counts": {
+    "passed": 18,
+    "failure": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "cases": [
+    {
+      "test": "test_free_original_does_not_scan_alternatives",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_conflict_returns_both_directions_in_one_observation",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_original_and_alternatives_share_one_sqlite_snapshot",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_query_mode_is_no_longer_a_model_parameter[requested]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_query_mode_is_no_longer_a_model_parameter[nearest]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_partial_lookup_failure_does_not_deliver_a_successful_package",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_new_query_must_be_delivered_even_if_old_query_was_consumed",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_free_original_cannot_be_bypassed_by_choosing_an_unreturned_alternative",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_original_becoming_free_replaces_old_alternative_options",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_candidate_taken_after_lookup_is_rechecked_at_save",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_empty_candidates_allow_needs_input_but_not_premature_success",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_automatic_options_service_scenario[normal]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_automatic_options_service_scenario[conflict]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_automatic_options_service_scenario[empty]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_automatic_options_service_scenario[insufficient]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_automatic_options_service_scenario[query_failure]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_automatic_options_service_scenario[save_failure]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_automatic_options_service_scenario[duplicate]",
+      "outcome": "passed"
+    }
+  ]
+}

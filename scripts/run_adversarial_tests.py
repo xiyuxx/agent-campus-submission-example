@@ -17,7 +17,9 @@ from shadow_agent.service import source_metadata
 def archive_text(path: Path, content: str):
     """Normalize whitespace only; leave actual test messages and outcomes intact."""
     path.write_text(
-        "\n".join(line.rstrip() for line in content.splitlines()) + "\n", encoding="utf-8"
+        "\n".join(line.rstrip() for line in content.splitlines()) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
 
 
@@ -69,6 +71,13 @@ def main():
     ):
         for artifact in temporary.glob(f"{prefix}/{name}"):
             shutil.copytree(artifact, output / "scenarios" / name)
+    for artifact in temporary.glob("test_automatic_options_service*/automatic-options"):
+        shutil.copytree(artifact, output / "scenarios" / artifact.parent.name)
+    for artifact in (output / "scenarios").rglob("*"):
+        if artifact.is_file() and artifact.suffix in {".json", ".jsonl", ".md", ".txt"}:
+            artifact.write_text(
+                artifact.read_text(encoding="utf-8"), encoding="utf-8", newline="\n"
+            )
     cases = []
     if (output / "junit.xml").exists():
         archive_text(output / "junit.xml", (output / "junit.xml").read_text(encoding="utf-8"))
@@ -98,7 +107,7 @@ def main():
         "cases": cases,
     }
     (output / "run.json").write_text(
-        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n"
     )
     print(
         json.dumps(

@@ -1,0 +1,8 @@
+D:\Code\smallShadow\.venv\Scripts\python.exe -m ruff check src tests scripts/run_adversarial_tests.py
+All checks passed!
+
+D:\Code\smallShadow\.venv\Scripts\python.exe -m ruff format --check src tests scripts/run_adversarial_tests.py
+40 files already formatted
+
+D:\Code\smallShadow\.venv\Scripts\python.exe scripts/check_decision_examples.py examples/decision_improvements_v4_1
+{"verified_runs": 9, "verified_files": 65}
