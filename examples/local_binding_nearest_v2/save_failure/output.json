@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-a8e8c6a5-0802-4339-a738-7d44db1f5470",
+  "request_id": "REQ-NEAREST-V2-save_failure",
+  "mode": "mock",
+  "task_status": "failed",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "failed",
+        "error": {
+          "code": "SAVE_FAILED",
+          "message": "显式注入的提交前失败，事务已回滚",
+          "retryable": false
+        }
+      },
+      "task_status": "failed",
+      "evidence_ids": [
+        "OBS-328682d0-2fdd-43fd-b730-cb9a8381b76c",
+        "OBS-4345a664-5297-44df-82cf-0467de2d7e9c",
+        "OBS-29cdcd3b-33b1-4e64-bac8-391717595067",
+        "OBS-a2f64d06-220d-412f-a144-d24e37e8230e"
+      ],
+      "error": {
+        "code": "SAVE_FAILED",
+        "message": "显式注入的提交前失败，事务已回滚",
+        "retryable": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,585 @@
+{
+  "base_commit": "410ae2bcf2d5746df8a6815989183b09e94d21aa",
+  "source_sha256": "150736892e11a3538311e4a8a6d84b0c34b6b12daf149a213297ce69e7b319cc",
+  "started_at": "2026-10-31T03:10:09.671042+00:00",
+  "finished_at": "2026-10-31T03:10:41.778048+00:00",
+  "mode": "offline-controlled-model",
+  "real_model_calls": 0,
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:05:56) [MSC v.1942 64 bit (AMD64)]",
+  "command": [
+    "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "--tb=short",
+    "--basetemp=D:\\Code\\smallShadow\\.tmp\\adversarial-20261031T031009671042",
+    "--junitxml=D:\\Code\\smallShadow\\examples\\local_binding_nearest_v2\\regression\\junit.xml"
+  ],
+  "test_sha256": "fb46c256e659f9d7458a0545cfd2608c9539e126117be376ea9dcba5a31c02d2",
+  "exit_code": 0,
+  "counts": {
+    "passed": 138,
+    "failure": 0,
+    "error": 0,
+    "skipped": 1
+  },
+  "cases": [
+    {
+      "test": "test_unknown_supplement_fields_do_not_block_real_new_facts",
+      "outcome": "skipped"
+    },
+    {
+      "test": "test_bad_followup_cannot_erase_unknown_commit[bad0]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_followup_cannot_erase_unknown_commit[bad1]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_concurrent_duplicate_returns_recovery_state_to_model",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_catalog_change_during_later_item_invalidates_earlier_report",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_removed_blocking_rule_does_not_remain_final_fact",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_conflict_never_means_authorized_time_change[None-hard]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_conflict_never_means_authorized_time_change[None-soft]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_conflict_never_means_authorized_time_change[candidates1-hard]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_conflict_never_means_authorized_time_change[candidates1-soft]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_conflict_never_means_authorized_time_change[candidates2-hard]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_conflict_never_means_authorized_time_change[candidates2-soft]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_missing_requirement_cannot_be_accepted_or_saved[requested_at]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_missing_requirement_cannot_be_accepted_or_saved[timezone]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_missing_requirement_cannot_be_accepted_or_saved[constraint]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_changed_business_input_never_reuses_id[candidate_times]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_changed_business_input_never_reuses_id[constraint]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_changed_business_input_never_reuses_id[requested_at]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_changed_business_input_never_reuses_id[items]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_user_decision_survives_repeat_and_noop_seed[accept]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_user_decision_survives_repeat_and_noop_seed[reject]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_user_decision_survives_repeat_and_noop_seed[skip]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_accepting_one_valid_and_one_invalid_item_is_atomic[missing:cover_ref]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_accepting_one_valid_and_one_invalid_item_is_atomic[risk:invented]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_accepting_one_valid_and_one_invalid_item_is_atomic[schedule:expand_range]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_new_and_existing_drafts_keep_truthful_save_outcome[save_before]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_new_and_existing_drafts_keep_truthful_save_outcome[receipt_lost]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_new_and_existing_drafts_keep_truthful_save_outcome[receipt_unknown]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_other_channel_has_independent_capacity[platform]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_other_channel_has_independent_capacity[account_id]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_explicit_next_day_slot_needs_confirmation",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_equivalent_utc_candidate_is_not_false_change_time",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_stale_confirmation_replay_cannot_approve_new_revision",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_import_between_query_and_save_cannot_use_old_evidence[material]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_import_between_query_and_save_cannot_use_old_evidence[rules]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_import_between_query_and_save_cannot_use_old_evidence[schedule]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_imported_rule_severity_controls_draft_boundary[equals-needs_info]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_imported_rule_severity_controls_draft_boundary[equals-needs_review]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_imported_rule_severity_controls_draft_boundary[equals-blocked]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_imported_rule_severity_controls_draft_boundary[contains-needs_info]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_imported_rule_severity_controls_draft_boundary[contains-needs_review]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_imported_rule_severity_controls_draft_boundary[contains-blocked]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_dst_repeated_wall_clock_hour_is_a_real_time_change",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_default_nearest_node_can_cross_local_midnight",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_cannot_smuggle_authorization_or_facts_into_save[confirmation_status]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_cannot_smuggle_authorization_or_facts_into_save[publish]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_cannot_smuggle_authorization_or_facts_into_save[copyright_status]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_rejected_draft_releases_capacity_for_explicit_new_request",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_claim_of_user_approval_does_not_change_confirmation",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_confirmation_operation_id_cannot_change_from_accept_to_reject",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_unknown_out_of_scope_and_forged_observation",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_mock_conflict_consumes_save_receipt",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_saved_on_last_round_is_still_incomplete",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_tool_budget_refuses_unexecuted_calls",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_premature_success_cannot_bypass_tools",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_technical_failures_are_not_business_confirmation[read_failure]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_technical_failures_are_not_business_confirmation[query_failure]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_technical_failures_are_not_business_confirmation[save_before]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_retry_and_unknown",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_unknown_receipt_is_incomplete",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_empty_candidates_and_missing_requirements",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_partial_confirmation_and_same_revision_reuse",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_changed_occupancy_revises_and_invalidates_old_confirmation",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_timeout_has_bounded_calls",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_cross_process_duplicate_and_output_no_overwrite",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_two_writers_recheck_capacity",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_batch_keeps_success_when_later_items_are_blocked",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_dry_run_does_not_create_or_modify_database",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_seed_is_atomic_and_missing_files_are_errors",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_inspect_and_confirmation_cli_share_state",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_packaged_fixtures_match_source",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nonexistent_database_is_explicit_error",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_one_on_each_side[nodes0-occupied0-expected0]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_one_on_each_side[nodes1-occupied1-expected1]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_one_on_each_side[nodes2-occupied2-expected2]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_one_on_each_side[nodes3-occupied3-expected3]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_one_on_each_side[nodes4-occupied4-expected4]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nodes_can_be_on_previous_and_following_day",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_nearest_requires_observed_original_conflict",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_save_requires_delivered_evidence_and_hides_internal_references",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_cannot_supply_local_binding_fields[material_id]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_cannot_supply_local_binding_fields[expected_revision]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_cannot_supply_local_binding_fields[review_observation_id]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_cannot_supply_local_binding_fields[slot_observation_id]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_model_cannot_supply_local_binding_fields[confirmation_status]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_save_only_uses_latest_returned_nearest_options",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_old_receipt_cannot_finish_a_new_revision",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_earlier_nearest_recommendation_still_requires_confirmation",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_concurrent_revision_recovers_without_model_guessing_ids",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_wire_business_messages_and_schemas_have_no_internal_identity",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_provider_roundtrip_has_real_tool_call_ids_and_drops_reasoning",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_provider_retry_limits[statuses0-2]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_provider_retry_limits[statuses1-2]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_provider_retry_limits[statuses2-1]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_oversized_observation_is_explicit_and_not_usable",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_oversized_arguments_are_not_executed",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_oversized_context_is_not_sent",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_turn_never_partially_executes[truncated]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_turn_never_partially_executes[duplicate]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_turn_never_partially_executes[mixed]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_turn_never_partially_executes[too_many]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_turn_never_partially_executes[reasoning]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_provider_turn_never_partially_executes[huge]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_trace_failure_after_commit_preserves_saved_state",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_trace_preflight_stops_before_save",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_cancellation_returns_incomplete",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_output_failure_updates_exit_code_without_repeating_save",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_refreshing_observation_ids_does_not_reset_retry_limit",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_late_model_response_cannot_complete_after_deadline",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_migration_matches_design",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_seed_noop_and_retains_confirmations",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_import_replaces_occupancy_stales_and_preserves_history",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_request_conflict_does_not_overwrite",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_reject_terminal_and_operation_replay",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_new_request_does_not_exclude_other_request",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_before_commit_failure_rolls_back_all",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_receipt_loss[receipt_lost-saved]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_receipt_loss[receipt_unknown-SAVE_UNKNOWN]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_bad_revision_and_forged_evidence_are_rejected",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_save_rechecks_schedule_after_query",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_supplement_conflict_merges_nothing",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_stopping_directory_rows_preserves_foreign_keys",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_skip_does_not_write_and_replay_keeps_historical_result",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_explicit_cross_day_and_empty_candidates",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_canonical_default_empty_and_order",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_requirement[patch0]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_requirement[patch1]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_requirement[patch2]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_requirement[patch3]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_requirement[patch4]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_invalid_requirement[patch5]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_unknown_business_fields_allowed_but_identity_is_not",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_rule_whitelist[patch0]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_rule_whitelist[patch1]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_rule_whitelist[patch2]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_rule_whitelist[patch3]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_rule_whitelist[patch4]",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_catalog_empty_rules_and_supplement_identity_rejected",
+      "outcome": "passed"
+    },
+    {
+      "test": "test_confirmation_rejects_duplicate_and_mixed",
+      "outcome": "passed"
+    }
+  ]
+}

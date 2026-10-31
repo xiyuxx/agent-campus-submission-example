@@ -2,6 +2,8 @@
 
 2026-10-31 当前方案增补见 [本地身份绑定与双向最近节点](19-local-model-boundary.md)：模型只选业务动作，程序关联身份/证据/修订；默认在预设节点两侧各找一最近空闲时间，允许跨日。旧同日范围与模型手填观察参数不再作为当前契约。
 
+实现中以 model_view.py 白名单生成模型业务输入，完整 ToolResult 留本地；不通过递归删除几个 ID 字段来猜测安全投影。存储复用预设节点与原事务，nearest 返回两侧各一空闲建议并记录 checked_slots。模型选择一个保存，程序本地绑定已回传依据和请求时修订。实际结果见 [新协议示例](../examples/local_binding_nearest_v2/README.md)，不宣称移除 ID 已降低 token 或模型调用量。
+
 状态：架构与技术栈已定稿，契约和存储已有阶段一实现；完整 Agent 与真实模型结果以 [阶段记录](16-implementation-progress.md) 和评估为准。
 
 完整架构、契约、目录、状态与执行预算以 [架构实施基线](10-architecture-baseline.md) 为准；需求见 [验收矩阵](01-requirements.md)。

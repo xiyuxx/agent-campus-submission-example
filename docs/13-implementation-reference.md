@@ -112,11 +112,7 @@ dependencies 显式注入配置、Repository、Model、Clock、TraceSink；不�
       "publish_requirement": {
         "requested_at": "2026-11-03T18:00:00+08:00",
         "timezone": "Asia/Shanghai",
-        "constraint": "hard",
-        "candidate_times": [
-          "2026-11-03T18:00:00+08:00",
-          "2026-11-03T19:00:00+08:00"
-        ]
+        "constraint": "hard"
       }
     }
   ]

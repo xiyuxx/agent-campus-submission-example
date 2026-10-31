@@ -1,5 +1,7 @@
 # 运行证据约定
 
+2026-10-31 新协议已有 [本地身份与双向最近节点实际证据](local_binding_nearest_v2/README.md)：6 组 Mock、2 组 live，附完整离线回归与数据库核查。下方早期“当前没有业务执行记录”描述保留为历史准备约定；旧协议记录不能替代本次新协议证据。
+
 当前没有业务执行记录。数据库设计的实际结构检查记录单独存放于 [design_checks/database-design.txt](design_checks/database-design.txt)，不属于 Agent、Mock/live 或六类业务运行证据。下面是目标结构，不是已经生成的业务证据：
 
 ```text
