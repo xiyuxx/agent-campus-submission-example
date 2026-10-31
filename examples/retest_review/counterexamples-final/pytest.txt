@@ -1,0 +1,198 @@
+........................................................................ [ 48%]
+........................................................FFFFF....FFFFFFF [ 96%]
+....FF                                                                   [100%]
+================================== FAILURES ===================================
+________ test_reloading_same_facts_invalidates_old_rule_review[passed] ________
+tests\integration\test_retest_edge_cases.py:103: in test_reloading_same_facts_invalidates_old_rule_review
+    assert assemble_result(ctx).review_status is None
+E   AssertionError: assert 'passed' is None
+E    +  where 'passed' = ItemResult(material_id='M01', material_version=2, review_status='passed', risk_reasons=[], original_requested_at='2026...0f3-4766d9cbdad0', 'OBS-5fc9021d-f1f3-4bd5-b682-589c32b42747', 'OBS-9fcefede-633c-4790-8f9b-3d479f94e888'], error=None).review_status
+E    +    where ItemResult(material_id='M01', material_version=2, review_status='passed', risk_reasons=[], original_requested_at='2026...0f3-4766d9cbdad0', 'OBS-5fc9021d-f1f3-4bd5-b682-589c32b42747', 'OBS-9fcefede-633c-4790-8f9b-3d479f94e888'], error=None) = assemble_result(ItemContext(request=Request(schema_version='1.0', request_id='REQ-1', items=[RequestItem(material_id='M01', publish_re..., observation_calls={}, provider_records=[], draft_state=None, expected_revision=0, turn_revision=0, save_receipt=None))
+_______ test_reloading_same_facts_invalidates_old_rule_review[blocked] ________
+tests\integration\test_retest_edge_cases.py:103: in test_reloading_same_facts_invalidates_old_rule_review
+    assert assemble_result(ctx).review_status is None
+E   AssertionError: assert 'blocked' is None
+E    +  where 'blocked' = ItemResult(material_id='M01', material_version=2, review_status='blocked', risk_reasons=[{'rule_id': 'BRAND', 'version...154-e18018e8e1d7', 'OBS-e7810fd0-8117-48ee-9bf4-90bf7e6a768b', 'OBS-aea8bc75-5ebf-48bb-ac3c-fd2493d5826d'], error=None).review_status
+E    +    where ItemResult(material_id='M01', material_version=2, review_status='blocked', risk_reasons=[{'rule_id': 'BRAND', 'version...154-e18018e8e1d7', 'OBS-e7810fd0-8117-48ee-9bf4-90bf7e6a768b', 'OBS-aea8bc75-5ebf-48bb-ac3c-fd2493d5826d'], error=None) = assemble_result(ItemContext(request=Request(schema_version='1.0', request_id='REQ-1', items=[RequestItem(material_id='M01', publish_re..., observation_calls={}, provider_records=[], draft_state=None, expected_revision=0, turn_revision=0, save_receipt=None))
+______ test_reloading_same_facts_invalidates_old_rule_review[needs_info] ______
+tests\integration\test_retest_edge_cases.py:103: in test_reloading_same_facts_invalidates_old_rule_review
+    assert assemble_result(ctx).review_status is None
+E   AssertionError: assert 'needs_info' is None
+E    +  where 'needs_info' = ItemResult(material_id='M01', material_version=2, review_status='needs_info', risk_reasons=[{'rule_id': 'BRAND', 'vers...4ff-06368bda3804', 'OBS-97e7f88e-ea03-4e2e-b259-ddbc6c6fbba2', 'OBS-ecf02b37-d752-4ccd-84e0-413fc7485bcc'], error=None).review_status
+E    +    where ItemResult(material_id='M01', material_version=2, review_status='needs_info', risk_reasons=[{'rule_id': 'BRAND', 'vers...4ff-06368bda3804', 'OBS-97e7f88e-ea03-4e2e-b259-ddbc6c6fbba2', 'OBS-ecf02b37-d752-4ccd-84e0-413fc7485bcc'], error=None) = assemble_result(ItemContext(request=Request(schema_version='1.0', request_id='REQ-1', items=[RequestItem(material_id='M01', publish_re..., observation_calls={}, provider_records=[], draft_state=None, expected_revision=0, turn_revision=0, save_receipt=None))
+_____ test_reloading_same_facts_invalidates_old_rule_review[needs_review] _____
+tests\integration\test_retest_edge_cases.py:103: in test_reloading_same_facts_invalidates_old_rule_review
+    assert assemble_result(ctx).review_status is None
+E   AssertionError: assert 'needs_review' is None
+E    +  where 'needs_review' = ItemResult(material_id='M01', material_version=2, review_status='needs_review', risk_reasons=[{'rule_id': 'BRAND', 've...62a-d273b2fcedd9', 'OBS-e920eb9e-bfa4-4287-aca3-6e344be8b8e2', 'OBS-0aca988b-4332-4ad6-89be-b7a588b47cc4'], error=None).review_status
+E    +    where ItemResult(material_id='M01', material_version=2, review_status='needs_review', risk_reasons=[{'rule_id': 'BRAND', 've...62a-d273b2fcedd9', 'OBS-e920eb9e-bfa4-4287-aca3-6e344be8b8e2', 'OBS-0aca988b-4332-4ad6-89be-b7a588b47cc4'], error=None) = assemble_result(ItemContext(request=Request(schema_version='1.0', request_id='REQ-1', items=[RequestItem(material_id='M01', publish_re..., observation_calls={}, provider_records=[], draft_state=None, expected_revision=0, turn_revision=0, save_receipt=None))
+____________ test_old_block_cannot_finish_after_rules_are_replaced ____________
+tests\integration\test_retest_edge_cases.py:111: in test_old_block_cannot_finish_after_rules_are_replaced
+    with pytest.raises(BusinessError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE BusinessError
+_ test_invalid_provider_shapes_are_classified_as_protocol_errors[message-null] _
+tests\integration\test_retest_edge_cases.py:183: in test_invalid_provider_shapes_are_classified_as_protocol_errors
+    asyncio.run(scenario())
+D:\Utils\MiniConda\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\integration\test_retest_edge_cases.py:178: in scenario
+    await model.next_action([], [])
+src\shadow_agent\models\deepseek.py:65: in next_action
+    if message.get("reasoning_content"):
+       ^^^^^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'get'
+_ test_invalid_provider_shapes_are_classified_as_protocol_errors[message-array] _
+tests\integration\test_retest_edge_cases.py:183: in test_invalid_provider_shapes_are_classified_as_protocol_errors
+    asyncio.run(scenario())
+D:\Utils\MiniConda\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\integration\test_retest_edge_cases.py:178: in scenario
+    await model.next_action([], [])
+src\shadow_agent\models\deepseek.py:65: in next_action
+    if message.get("reasoning_content"):
+       ^^^^^^^^^^^
+E   AttributeError: 'list' object has no attribute 'get'
+_ test_invalid_provider_shapes_are_classified_as_protocol_errors[message-string] _
+tests\integration\test_retest_edge_cases.py:183: in test_invalid_provider_shapes_are_classified_as_protocol_errors
+    asyncio.run(scenario())
+D:\Utils\MiniConda\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\integration\test_retest_edge_cases.py:178: in scenario
+    await model.next_action([], [])
+src\shadow_agent\models\deepseek.py:65: in next_action
+    if message.get("reasoning_content"):
+       ^^^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'get'
+__ test_invalid_provider_shapes_are_classified_as_protocol_errors[call-null] __
+tests\integration\test_retest_edge_cases.py:183: in test_invalid_provider_shapes_are_classified_as_protocol_errors
+    asyncio.run(scenario())
+D:\Utils\MiniConda\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\integration\test_retest_edge_cases.py:178: in scenario
+    await model.next_action([], [])
+src\shadow_agent\models\deepseek.py:92: in next_action
+    if any(
+src\shadow_agent\models\deepseek.py:93: in <genexpr>
+    x.get("type") != "function"
+    ^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'get'
+_ test_invalid_provider_shapes_are_classified_as_protocol_errors[call-number] _
+tests\integration\test_retest_edge_cases.py:183: in test_invalid_provider_shapes_are_classified_as_protocol_errors
+    asyncio.run(scenario())
+D:\Utils\MiniConda\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\integration\test_retest_edge_cases.py:178: in scenario
+    await model.next_action([], [])
+src\shadow_agent\models\deepseek.py:92: in next_action
+    if any(
+src\shadow_agent\models\deepseek.py:93: in <genexpr>
+    x.get("type") != "function"
+    ^^^^^
+E   AttributeError: 'int' object has no attribute 'get'
+_ test_invalid_provider_shapes_are_classified_as_protocol_errors[function-null] _
+tests\integration\test_retest_edge_cases.py:183: in test_invalid_provider_shapes_are_classified_as_protocol_errors
+    asyncio.run(scenario())
+D:\Utils\MiniConda\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\integration\test_retest_edge_cases.py:178: in scenario
+    await model.next_action([], [])
+src\shadow_agent\models\deepseek.py:92: in next_action
+    if any(
+src\shadow_agent\models\deepseek.py:96: in <genexpr>
+    or not isinstance(x.get("function", {}).get("name"), str)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'get'
+_ test_invalid_provider_shapes_are_classified_as_protocol_errors[function-array] _
+tests\integration\test_retest_edge_cases.py:183: in test_invalid_provider_shapes_are_classified_as_protocol_errors
+    asyncio.run(scenario())
+D:\Utils\MiniConda\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\integration\test_retest_edge_cases.py:178: in scenario
+    await model.next_action([], [])
+src\shadow_agent\models\deepseek.py:92: in next_action
+    if any(
+src\shadow_agent\models\deepseek.py:96: in <genexpr>
+    or not isinstance(x.get("function", {}).get("name"), str)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'list' object has no attribute 'get'
+________ test_running_agent_cannot_finish_with_old_rule_after_refresh _________
+tests\integration\test_retest_edge_cases.py:235: in test_running_agent_cannot_finish_with_old_rule_after_refresh
+    assert result.items[0].review_status is None or result.task_status == "incomplete"
+E   AssertionError: assert ('blocked' is None or 'blocked' == 'incomplete'
+E    +  where 'blocked' = ItemResult(material_id='M03', material_version=1, review_status='blocked', risk_reasons=[{'rule_id': 'R-COPYRIGHT-DENI...b0f-04150e56e98e', 'OBS-36eb86f9-f8b0-46b8-9103-063450fffdcd', 'OBS-d8a561c2-39f0-4397-aeb7-4737ef152cc9'], error=None).review_status
+E
+E     - incomplete
+E     + blocked)
+_____ test_one_malformed_provider_response_does_not_abort_recoverable_run _____
+tests\integration\test_retest_edge_cases.py:267: in test_one_malformed_provider_response_does_not_abort_recoverable_run
+    assert result.items[0].draft.save_status == "saved"
+E   AssertionError: assert 'not_attempted' == 'saved'
+E
+E     - saved
+E     + not_attempted
+=========================== short test summary info ===========================
+FAILED tests/integration/test_retest_edge_cases.py::test_reloading_same_facts_invalidates_old_rule_review[passed]
+FAILED tests/integration/test_retest_edge_cases.py::test_reloading_same_facts_invalidates_old_rule_review[blocked]
+FAILED tests/integration/test_retest_edge_cases.py::test_reloading_same_facts_invalidates_old_rule_review[needs_info]
+FAILED tests/integration/test_retest_edge_cases.py::test_reloading_same_facts_invalidates_old_rule_review[needs_review]
+FAILED tests/integration/test_retest_edge_cases.py::test_old_block_cannot_finish_after_rules_are_replaced
+FAILED tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[message-null]
+FAILED tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[message-array]
+FAILED tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[message-string]
+FAILED tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[call-null]
+FAILED tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[call-number]
+FAILED tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[function-null]
+FAILED tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[function-array]
+FAILED tests/integration/test_retest_edge_cases.py::test_running_agent_cannot_finish_with_old_rule_after_refresh
+FAILED tests/integration/test_retest_edge_cases.py::test_one_malformed_provider_response_does_not_abort_recoverable_run
+14 failed, 136 passed in 10.03s

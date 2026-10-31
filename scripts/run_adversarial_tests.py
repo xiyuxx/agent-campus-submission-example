@@ -25,6 +25,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--all-tests", action="store_true")
+    parser.add_argument(
+        "--test-path", type=Path, default=Path("tests/integration/test_adversarial_workflows.py")
+    )
     parser.add_argument("--runxfail", action="store_true", help="Expose known defects as failures")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -32,7 +35,9 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     started = datetime.now(UTC)
     temporary = root / ".tmp" / ("adversarial-" + started.strftime("%Y%m%dT%H%M%S%f"))
-    test_file = root / "tests/integration/test_adversarial_workflows.py"
+    test_file = (root / args.test_path).resolve()
+    if not test_file.is_relative_to(root / "tests") or not test_file.is_file():
+        parser.error("--test-path must name an existing file within tests/")
     command = [
         sys.executable,
         "-m",
@@ -59,6 +64,8 @@ def main():
     for name, prefix in (
         ("batch", "test_catalog_change_during_*"),
         ("refresh", "test_removed_blocking_rule_*"),
+        ("rule-refresh", "test_running_agent_*"),
+        ("provider-recovery", "test_one_malformed_provider_*"),
     ):
         for artifact in temporary.glob(f"{prefix}/{name}"):
             shutil.copytree(artifact, output / "scenarios" / name)
@@ -79,6 +86,10 @@ def main():
         "python": sys.version,
         "command": command,
         "test_sha256": hashlib.sha256(test_file.read_bytes()).hexdigest(),
+        "test_sources_sha256": {
+            path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted((root / "tests").rglob("*.py"))
+        },
         "exit_code": result.returncode,
         "counts": {
             status: sum(x["outcome"] == status for x in cases)

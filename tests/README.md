@@ -1,5 +1,7 @@
 # 测试目录约定
 
+2026-10-31 再次复测新增 150 项（含最近节点 128 个占用组合穷举）；完整结果为 274 passed、15 xfailed，新增失败属于规则审核失效、异常响应协议处理两类问题，旧 ADV-01 仍失败。详见 [测试设计、覆盖与限制](../docs/20-retest-and-test-design.md) 和 [实际证据](../examples/retest_review/README.md)。可用 `scripts/run_adversarial_tests.py --test-path tests/integration/test_retest_edge_cases.py --runxfail --output examples/my-new-retest` 单独重现新增失败；输出目录需不存在。
+
 当前已有可执行的契约、存储、工具循环、CLI 和适配器离线测试；真实模型效果需单独验证。
 
 2026-10-31 本地身份与双向最近节点变更后，完整离线回归实际为 **138 passed、1 xfailed**。新增 18 项检查，覆盖模型消息无内部身份、已回传证据、两侧最近/跨日、原时间优先和修订恢复。ADV-02/03/04/05 已转为通过的普通回归，只有 ADV-01 仍使用 strict xfail；下面 44/6 和历史报告描述变更前的执行结果，不能作为当前未修复数量。
