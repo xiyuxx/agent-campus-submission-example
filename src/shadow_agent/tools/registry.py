@@ -10,6 +10,7 @@ from ..config import ResourceLimits
 from ..context import ItemContext
 from ..contracts import FACT_FIELDS, MaterialArgs, ReadArgs, SaveArgs, SlotArgs, ToolResult
 from ..model_view import tool_view
+from .availability import available_tools
 
 ARGUMENTS = {
     "read_material": ReadArgs,
@@ -20,12 +21,13 @@ ARGUMENTS = {
 DESCRIPTIONS = {
     "read_material": "读取当前素材 basic；先 basic 后可选 supplement。补充仅填未知，不改身份。",
     "check_rules": "检查本轮已读取的有效素材，返回规则证据；读资料变化后必须重新检查。",
-    "query_slots": "requested 查原要求；nearest 找前后两侧各一个最近空闲预设节点，允许跨日。",
+    "query_slots": "查询原时间；若冲突，自动返回前后各一个最近空闲合法节点，允许跨日。",
     "save_draft": "保存当前素材的建议时间；程序绑定真实依据和版本，改期待确认，绝不发布。",
 }
 
 
-def schemas() -> list[dict]:
+def schemas(ctx=None) -> list[dict]:
+    allowed = available_tools(ctx, include_pending=True) if ctx is not None else set(ARGUMENTS)
     return [
         {
             "type": "function",
@@ -36,6 +38,7 @@ def schemas() -> list[dict]:
             },
         }
         for name, contract in ARGUMENTS.items()
+        if name in allowed
     ]
 
 
@@ -53,7 +56,12 @@ def retry_key(name, args, ctx) -> str:
 
 
 def execute(
-    name: str, raw_arguments, context: ItemContext, *, call_id: str | None = None
+    name: str,
+    raw_arguments,
+    context: ItemContext,
+    *,
+    call_id: str | None = None,
+    allowed_tools: set[str] | None = None,
 ) -> ToolResult:
     ctx = context
     observation_id = new_id("OBS")
@@ -77,6 +85,10 @@ def execute(
             raise BusinessError("SAVE_UNKNOWN", "此前提交尚未核实，禁止盲目重试保存")
         if name not in ARGUMENTS:
             raise BusinessError("UNKNOWN_TOOL", "未知工具，禁止执行")
+        if allowed_tools is not None and (
+            name not in allowed_tools or name not in available_tools(ctx)
+        ):
+            raise BusinessError("ACTION_NOT_AVAILABLE", "该动作不在本轮可用工具范围内")
         if isinstance(raw_arguments, str):
             if len(raw_arguments.encode()) > ResourceLimits().arguments_bytes:
                 raise BusinessError("INVALID_ARGUMENTS", "工具参数超出 8 KiB；没有执行")
@@ -110,6 +122,7 @@ def execute(
             data["missing_fields"] = [
                 x for x in FACT_FIELDS if getattr(snapshot.material, x) is None
             ]
+            data["supplement_available"] = ctx.repo.supplement_available(ctx.material_id)
             code = "MATERIAL_READ"
         elif name == "check_rules":
             if not ctx.snapshot:
@@ -118,47 +131,57 @@ def execute(
             ctx.review = ctx.repo.read_rule_snapshot(ctx.snapshot)
             ctx.review_id = observation_id
             data, code = ctx.review.model_dump(mode="json"), "RULES_CHECKED"
+            blocking = sorted(
+                {
+                    x["field"]
+                    for x in ctx.review.matches
+                    if x["severity"] == "needs_info"
+                    and getattr(ctx.snapshot.material, x["field"]) is None
+                }
+            )
+            data.update(
+                blocking_missing_fields=blocking,
+                other_missing_fields=[
+                    x
+                    for x in FACT_FIELDS
+                    if getattr(ctx.snapshot.material, x) is None and x not in blocking
+                ],
+                supplement_available=ctx.repo.supplement_available(ctx.material_id),
+                supplemented=ctx.snapshot.supplemented,
+            )
         elif name == "query_slots":
             if not ctx.snapshot:
                 raise BusinessError("PRECONDITION_FAILED", "查询前必须读取可信平台账号")
-            if args.query == "nearest":
-                original = [(key, x) for key, x in ctx.slots.items() if x.query == "requested"]
-                if not original or original[-1][0] not in ctx.consumed:
-                    raise BusinessError("PRECONDITION_FAILED", "先查询原时间并消费其冲突结果")
-                if any(x["available"] for x in original[-1][1].slots):
-                    raise BusinessError("PRECONDITION_FAILED", "原时间可用，应优先保留原要求")
+            if ctx.schedule_refresh_required:
+                if ctx.schedule_requeries >= ctx.budget.limits.schedule_requeries:
+                    raise BusinessError("RECOVERY_LIMIT", "保存冲突后的重新查询次数已耗尽")
+                ctx.schedule_requeries += 1
             executed = True
-            slots = ctx.repo.query_occupancy(
-                ctx.request.request_id,
-                ctx.item,
-                ctx.snapshot,
-                "requested" if args.query == "requested" else "alternatives",
-            )
+            slots = ctx.repo.query_schedule_options(ctx.request.request_id, ctx.item, ctx.snapshot)
             ctx.slots[observation_id] = slots
+            ctx.schedule_refresh_required = False
             data = slots.model_dump()
-            code = (
-                "SLOT_CONFLICT" if any(not x["available"] for x in slots.slots) else "SLOTS_QUERIED"
-            )
+            code = "SLOT_CONFLICT" if not slots.requested.slots[0]["available"] else "SLOTS_QUERIED"
         else:
+            if ctx.schedule_refresh_required:
+                raise BusinessError("PRECONDITION_FAILED", "保存冲突后必须重新查询并消费新候选")
             if not ctx.review or ctx.review_id not in ctx.consumed:
                 raise BusinessError("PRECONDITION_FAILED", "需要已回传的当前规则检查结果")
             suggested = utc(args.suggested_at)
-            query = (
-                (
-                    "requested"
-                    if suggested == utc(ctx.item.publish_requirement.requested_at)
-                    else "alternatives"
-                )
-                if ctx.item.publish_requirement.requested_at
-                else None
-            )
-            candidates = [(key, value) for key, value in ctx.slots.items() if value.query == query]
-            if not candidates:
+            if not ctx.slots:
                 raise BusinessError("PRECONDITION_FAILED", "需要本轮真实时段查询结果")
-            slot_id, slot = candidates[-1]
-            if slot_id not in ctx.consumed or suggested not in {
-                x["at"] for x in slot.slots if x["available"]
-            }:
+            slot_id, options = next(reversed(ctx.slots.items()))
+            slot = (
+                options.requested
+                if ctx.item.publish_requirement.requested_at
+                and suggested == utc(ctx.item.publish_requirement.requested_at)
+                else options.alternatives
+            )
+            if (
+                slot_id not in ctx.consumed
+                or slot is None
+                or suggested not in {x["at"] for x in slot.slots if x["available"]}
+            ):
                 raise BusinessError("PRECONDITION_FAILED", "建议必须来自最新已回传的可用时段结果")
             ctx.trace.check_writable()
             executed = True
@@ -176,7 +199,9 @@ def execute(
                 ctx.turn_revision,
                 evidence_ids=[ctx.review_id, *ctx.slots],
                 run_id=ctx.run_id,
-                slot_evidence=list(ctx.slots.values()),
+                slot_evidence=[
+                    part for options in ctx.slots.values() for part in options.evidence()
+                ],
             )
             ctx.save_status, ctx.save_error = saved["save_status"], None
             ctx.save_observation_id = observation_id
@@ -244,6 +269,13 @@ def execute(
         if error.code == "REVISION_CONFLICT":
             ctx.refresh_draft()
             result.data["current_draft"] = ctx.draft_state
+        if name == "save_draft" and executed and error.code == "SLOT_CONFLICT":
+            ctx.schedule_refresh_required = True
+            result.data["recovery_action"] = "query_slots"
+            result.data["message"] = "保存未完成，候选已被占用；请重新查询，不要重复保存旧候选"
+            if ctx.schedule_requeries >= ctx.budget.limits.schedule_requeries:
+                ctx.forced_status = "incomplete"
+                ctx.technical_error = {"code": "RECOVERY_LIMIT", "message": "保存冲突恢复次数耗尽"}
         if (
             name == "save_draft"
             and attempted
@@ -270,8 +302,9 @@ def execute(
             "OBSERVATION_TOO_LARGE",
         ):
             ctx.technical_error = error.as_dict()
-        if error.code == "BUDGET_EXHAUSTED":
+        if error.code in ("BUDGET_EXHAUSTED", "RECOVERY_LIMIT"):
             ctx.forced_status = "incomplete"
+            ctx.technical_error = error.as_dict()
     except OSError:
         if name == "save_draft" and attempted and ctx.save_status == "not_attempted":
             ctx.save_status = "failed"

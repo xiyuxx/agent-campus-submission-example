@@ -44,6 +44,8 @@ class MockModel:
             return call("read_material", detail="basic")
         last = results[-1]
         if not last["ok"]:
+            if last["data"].get("recovery_action") == "query_slots":
+                return call("query_slots")
             if last["code"] == "STALE_EVIDENCE":
                 return call("read_material", detail="basic")
             if last["retryable"] or last["code"] == "REVISION_CONFLICT":
@@ -71,7 +73,8 @@ class MockModel:
                 for r in results
             )
             if not supplemented:
-                return call("read_material", detail="supplement")
+                if review["data"].get("supplement_available", True):
+                    return call("read_material", detail="supplement")
             return finish("needs_input", "补查后仍缺必要资料")
         requirement = context["publish_requirement"]
         if any(requirement.get(k) is None for k in ("requested_at", "timezone", "constraint")):
@@ -79,21 +82,33 @@ class MockModel:
         if (state.get("current_plan") or {}).get("validity") == "rejected":
             return finish("needs_input", "原方案已拒绝，需要新请求")
         if last["tool"] == "check_rules":
-            return call("query_slots", query="requested")
+            return call("query_slots")
         if last["tool"] == "query_slots":
-            slots = last["data"]["slots"]
+            slots = [last["data"]["requested_slot"], *last["data"]["alternatives"]]
             available = [x for x in slots if x["available"]]
             if not available:
-                if last["data"]["query"] == "requested":
-                    return call("query_slots", query="nearest")
                 return finish("needs_input", "合法候选为空或全部占用，请调整范围")
             original = datetime.fromisoformat(requirement["requested_at"])
+            preference = requirement.get("reschedule_preference", "nearest")
+
+            def rank(slot):
+                at = datetime.fromisoformat(slot["at"])
+                preferred = (
+                    preference == "prefer_before"
+                    and at < original
+                    or preference == "prefer_after"
+                    and at > original
+                )
+                return (
+                    at != original,
+                    preference != "nearest" and not preferred,
+                    abs((at - original).total_seconds()),
+                    at < original,
+                )
+
             chosen = min(
                 available,
-                key=lambda x: (
-                    abs((datetime.fromisoformat(x["at"]) - original).total_seconds()),
-                    datetime.fromisoformat(x["at"]) < original,
-                ),
+                key=rank,
             )
             return call(
                 "save_draft",

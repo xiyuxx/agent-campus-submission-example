@@ -8,7 +8,7 @@ from .contracts import (
     Request,
     RequestItem,
     RuleCheck,
-    SlotObservation,
+    ScheduleOptions,
     ToolResult,
 )
 from .storage import Repository
@@ -26,7 +26,7 @@ class ItemContext:
     snapshot: MaterialSnapshot | None = None
     review: RuleCheck | None = None
     review_id: str | None = None
-    slots: dict[str, SlotObservation] = field(default_factory=dict)
+    slots: dict[str, ScheduleOptions] = field(default_factory=dict)
     consumed: set[str] = field(default_factory=set)
     save_status: str = "not_attempted"
     save_error: dict | None = None
@@ -41,6 +41,8 @@ class ItemContext:
     expected_revision: int = 0
     turn_revision: int = 0
     save_receipt: dict | None = None
+    schedule_refresh_required: bool = False
+    schedule_requeries: int = 0
 
     def refresh_draft(self) -> None:
         self.draft_state = self.repo.current_draft(self.request.request_id, self.material_id)

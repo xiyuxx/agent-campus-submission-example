@@ -82,25 +82,23 @@ def test_nodes_can_be_on_previous_and_following_day(repo, catalog, job):
     assert output.original_requested_at == ORIGINAL
 
 
-def ready(ctx, query="nearest"):
+def ready(ctx):
     for name, args in (
         ("read_material", {"detail": "basic"}),
         ("check_rules", {}),
-        ("query_slots", {"query": "requested"}),
+        ("query_slots", {}),
     ):
         assert execute(name, args, ctx).ok
-    if query == "nearest":
-        ctx.consumed.update(ctx.observations)
-        assert execute("query_slots", {"query": "nearest"}, ctx).ok
 
 
-def test_nearest_requires_observed_original_conflict(repo, catalog, job):
+def test_original_free_skips_alternatives_and_rejects_legacy_query_parameter(repo, catalog, job):
     ctx = prepare(repo, catalog, job, ["2026-11-03T19:00:00+08:00"], [])
     assert execute("read_material", {"detail": "basic"}, ctx).ok
-    assert execute("query_slots", {"query": "nearest"}, ctx).code == "PRECONDITION_FAILED"
-    assert execute("query_slots", {"query": "requested"}, ctx).ok
-    ctx.consumed.update(ctx.observations)
-    assert execute("query_slots", {"query": "nearest"}, ctx).code == "PRECONDITION_FAILED"
+    assert execute("query_slots", {"query": "nearest"}, ctx).code == "INVALID_ARGUMENTS"
+    result = execute("query_slots", {}, ctx)
+    assert result.ok
+    assert result.data["requested"]["slots"][0]["available"]
+    assert result.data["alternatives"] is None
 
 
 def test_save_requires_delivered_evidence_and_hides_internal_references(repo, catalog, job):
@@ -155,7 +153,7 @@ def test_save_only_uses_latest_returned_nearest_options(repo, catalog, job):
                 ctx.snapshot.import_id,
             ),
         )
-    assert execute("query_slots", {"query": "nearest"}, ctx).ok
+    assert execute("query_slots", {}, ctx).ok
     ctx.consumed.update(ctx.observations)
     rejected = execute("save_draft", {"suggested_at": nodes[0]}, ctx)
     assert rejected.code == "PRECONDITION_FAILED"
@@ -164,7 +162,7 @@ def test_save_only_uses_latest_returned_nearest_options(repo, catalog, job):
 
 def test_old_receipt_cannot_finish_a_new_revision(repo, catalog, job):
     ctx = prepare(repo, catalog, job, ["2026-11-03T19:00:00+08:00"], [])
-    ready(ctx, "requested")
+    ready(ctx)
     ctx.consumed.update(ctx.observations)
     saved = execute("save_draft", {"suggested_at": ORIGINAL}, ctx)
     assert saved.ok
@@ -302,5 +300,5 @@ def test_wire_business_messages_and_schemas_have_no_internal_identity(repo, job,
     assert output.items[0].draft.save_status == "saved"
     assert output.request_id == job.request_id
     assert output.items[0].material_id == "M01"
-    assert len(requests) == 8
+    assert len(requests) == 7
     check(schemas())

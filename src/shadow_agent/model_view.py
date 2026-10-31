@@ -34,6 +34,8 @@ def tool_view(result: ToolResult, timezone: str | None) -> dict:
         data = {"message": raw.get("message", "工具未完成"), "executed": raw.get("executed", False)}
         if "current_draft" in raw:
             data["current_plan"] = plan_view(raw["current_draft"], timezone)
+        if "recovery_action" in raw:
+            data["recovery_action"] = raw["recovery_action"]
     elif result.tool == "read_material":
         material = raw["material"]
         data = {
@@ -52,27 +54,43 @@ def tool_view(result: ToolResult, timezone: str | None) -> dict:
             },
             "missing_fields": raw["missing_fields"],
             "supplemented": raw["supplemented"],
+            "supplement_available": raw.get("supplement_available", False),
         }
     elif result.tool == "check_rules":
         data = {
             "review_status": raw["review_status"],
+            **{
+                k: raw[k]
+                for k in (
+                    "blocking_missing_fields",
+                    "other_missing_fields",
+                    "supplement_available",
+                    "supplemented",
+                )
+                if k in raw
+            },
             "matches": [
                 {k: match[k] for k in ("field", "severity", "message")} for match in raw["matches"]
             ],
         }
     elif result.tool == "query_slots":
+
+        def slot_view(slot):
+            return {
+                "at": local_time(slot["at"], timezone),
+                "available": slot["available"],
+                "direction": slot.get("direction", "requested"),
+                "conflict_sources": sorted({x["source"] for x in slot["conflicts"]}),
+            }
+
+        alternatives = raw["alternatives"]
         data = {
-            "query": "requested" if raw["query"] == "requested" else "nearest",
-            "source": raw["source"],
-            "slots": [
-                {
-                    "at": local_time(slot["at"], timezone),
-                    "available": slot["available"],
-                    "direction": slot.get("direction", "requested"),
-                    "conflict_sources": sorted({x["source"] for x in slot["conflicts"]}),
-                }
-                for slot in raw["slots"]
-            ],
+            "requested_slot": slot_view(raw["requested"]["slots"][0]),
+            "alternatives_searched": alternatives is not None,
+            "alternative_source": alternatives["source"] if alternatives else None,
+            "alternatives": [slot_view(slot) for slot in alternatives["slots"]]
+            if alternatives
+            else [],
         }
     else:
         data = {

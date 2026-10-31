@@ -40,6 +40,7 @@ class PublishRequirement(Contract):
     timezone: Identifier | None = None
     constraint: Literal["hard", "soft"] | None = None
     candidate_times: list[Timestamp] | None = None
+    reschedule_preference: Literal["nearest", "prefer_before", "prefer_after"] = "nearest"
 
     @model_validator(mode="after")
     def validate_timezone(self):
@@ -58,6 +59,11 @@ class PublishRequirement(Contract):
 
     def canonical(self) -> dict:
         return {
+            **(
+                {"reschedule_preference": self.reschedule_preference}
+                if self.reschedule_preference != "nearest"
+                else {}
+            ),
             "requested_at": utc(self.requested_at) if self.requested_at else None,
             "timezone": self.timezone,
             "constraint": self.constraint,
@@ -259,7 +265,7 @@ class ReadArgs(MaterialArgs):
 
 
 class SlotArgs(MaterialArgs):
-    query: Literal["requested", "nearest"]
+    """One query returns the original slot and any necessary alternatives."""
 
 
 class SaveArgs(MaterialArgs):
@@ -353,3 +359,19 @@ class SlotObservation(Contract):
     source: Literal["requested", "explicit", "default", "none"]
     slots: list[dict]
     checked_slots: list[dict] = Field(default_factory=list)
+
+
+class ScheduleOptions(Contract):
+    requested: SlotObservation
+    alternatives: SlotObservation | None = None
+
+    def evidence(self) -> list[SlotObservation]:
+        return [self.requested] + ([self.alternatives] if self.alternatives else [])
+
+    def available_slots(self) -> list[dict]:
+        return [
+            slot
+            for observation in self.evidence()
+            for slot in observation.slots
+            if slot["available"]
+        ]

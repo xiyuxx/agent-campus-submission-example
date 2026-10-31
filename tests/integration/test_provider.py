@@ -43,7 +43,7 @@ def test_provider_roundtrip_has_real_tool_call_ids_and_drops_reasoning(repo, job
 
     result = asyncio.run(scenario())
     assert result.items[0].draft.save_status == "saved"
-    assert len(requests) == 8
+    assert len(requests) == 7
     trace = (tmp_path / "provider/trace.jsonl").read_text(encoding="utf-8")
     assert "DO-NOT-STORE" not in trace
     assert "synthetic-test-credential" not in trace

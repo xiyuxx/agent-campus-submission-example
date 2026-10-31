@@ -1,4 +1,8 @@
-# 开发实现参考 v1.4
+# 开发实现参考 v1.6
+
+2026-10-31 决策信息、动态工具、改期偏好和保存冲突恢复以 [第 24 号契约](24-agent-decision-improvements.md) 为准；默认偏好保持旧请求摘要兼容。外部视频审核尚未接入。
+
+2026-10-31 排期查询调整：以 [一次查询返回排期选项](23-automatic-slot-options.md) 为准。query_slots 不再接受 query 参数；程序在同一读事务检查原时间，冲突时自动检索双向最近合法候选，一次回传给模型推荐。模型不再单独发起 nearest；保存、确认、幂等与身份绑定不变。
 
 2026-10-31 审核有效性补充：审核必须同时匹配当前目录版本和有效素材摘要。重读资料后，只要目录版本或有效摘要变化，就清除旧审核的当前资格；结束校验与公开结果组装再次核对，旧观察仍保留为历史。保存事务的独立复核继续有效。修复记录见 [第 22 号记录](22-defect-fix-results.md)。
 
@@ -274,12 +278,12 @@ ItemContext 由程序持有，至少包含 run_id、request_id、当前 material
 | --- | --- | --- |
 | read_material | detail: basic/supplement | 程序绑定当前素材；supplement 需先读取 basic |
 | check_rules | 无核心业务参数 | 至少读取 basic；检查本轮有效快照 |
-| query_slots | query: requested/nearest | 平台账号与范围由本地上下文决定；nearest 返回两侧各一最近空闲节点 |
+| query_slots | 无核心业务参数 | 至少读取 basic；原要求明确；同一读事务返回原时间状态，冲突时附带双向最近候选 |
 | save_draft | suggested_at | 程序注入已回传审核/时段观察及本轮绑定修订；最新检查允许，原要求明确、时刻合法可用且方案未 rejected |
 
 查候选只在第 4.1 节确定的集合内；用户显式列出的跨日候选可查，模型不能自行添加账号、日期或时刻。save_draft 不接受 review_status、confirmation_status、request_id、draft_id 这些由程序决定的字段。
 
-以下为仅留本地和 Trace 的 ToolResult 示例；不能原样发给模型。模型观察采用白名单业务投影，详见第 19 号规范：
+以下为仅留本地和 Trace 的 ToolResult 示例；不能原样发给模型。模型观察采用白名单业务投影，当前聚合结构详见第 23 号规范；以下历史简化片段不代表 v3 完整 Schema：
 
 ```json
 {
@@ -299,7 +303,7 @@ ItemContext 由程序持有，至少包含 run_id、request_id、当前 material
 ```
 
 时段占用是成功查询到的业务事实，故 ok=true；未知工具、错误参数、保存冲突等动作未完成为 ok=false。工具实际异常也转换成错误观察并记录。不能把失败返回包装为空成功结果。
-requested 查询只返回原时段；模型 nearest 查询在存储内部沿用 alternatives 标签，从全部合法节点中查找原时间前后各一最近可用节点。内部 checked_slots 记录实际核查过的占用，slots 仅返回最多两个可用建议；模型投影不含占用记录 ID。空集合也是成功查询，表示配置范围内两侧都无可用节点，不伪装成工具失败。原时刻不进入替代结果；当前草稿自身排除由本地上下文确定。
+query_slots 一次返回原时段与必要的替代候选。原时间可用时不检索替代；冲突时在同一读事务内，从合法节点查找前后各一最近可用节点。内部子观察沿用 requested/alternatives 标签，checked_slots 记录实际检查的占用，模型投影不含占用记录 ID。空候选也是成功查询，不伪装成工具失败。原时刻不进入替代结果；当前草稿自身排除由本地上下文确定。
 规则命中包含 rule_id、severity、field、observed_value、source_id、message；工具返回不把媒体文件、密钥或无限长文本送进模型。
 
 ## 7. 模型循环和结束协议

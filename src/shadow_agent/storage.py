@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from importlib.resources import files
 from pathlib import Path
 
+from .auditing import Auditor, LocalMetadataAuditor
 from .common import BusinessError, digest, dumps, new_id, now, utc
 from .contracts import (
     FACT_FIELDS,
@@ -18,6 +19,7 @@ from .contracts import (
     RequestItem,
     Rule,
     RuleCheck,
+    ScheduleOptions,
     SlotObservation,
 )
 from .policy import check_rules, confirmation_definitions, semantic_hash
@@ -43,11 +45,13 @@ class Repository:
         clock: Callable[[], str] = now,
         fault: str | None = None,
         busy_ms: int = 2000,
+        auditor: Auditor | None = None,
     ):
         self.path = Path(path)
         self.clock = clock
         self.fault = fault
         self.busy_ms = min(max(busy_ms, 0), 2000)
+        self.auditor = auditor or LocalMetadataAuditor()
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.path, autocommit=True, timeout=self.busy_ms / 1000)
@@ -525,7 +529,29 @@ class Repository:
         with self.transaction() as connection:
             if self._meta(connection)["revision"] != snapshot.catalog_revision:
                 raise BusinessError("STALE_EVIDENCE", "资料已变，请刷新素材与规则")
-            return check_rules(snapshot, self._rules(connection))
+            rules = self._rules(connection)
+        # No database transaction is held while the audit implementation runs.
+        report = self.auditor.evaluate(
+            snapshot.model_copy(deep=True), [rule.model_copy(deep=True) for rule in rules]
+        )
+        if (
+            not isinstance(report, RuleCheck)
+            or report.material_sha256 != snapshot.facts_hash()
+            or report.catalog_revision != snapshot.catalog_revision
+            or report.rules != rules
+        ):
+            raise BusinessError("INVALID_AUDIT", "审核报告与本次素材或规则不匹配")
+        return report
+
+    def supplement_available(self, material_id: str) -> bool:
+        with self.transaction() as connection:
+            return (
+                connection.execute(
+                    "SELECT 1 FROM supplements WHERE material_id=? AND is_current=1",
+                    (material_id,),
+                ).fetchone()
+                is not None
+            )
 
     @staticmethod
     def _draft(connection, request_id: str, material_id: str):
@@ -576,57 +602,80 @@ class Repository:
     def query_occupancy(
         self, request_id: str, item: RequestItem, snapshot: MaterialSnapshot, query: str
     ) -> SlotObservation:
+        with self.transaction() as connection:
+            return self._query_occupancy(connection, request_id, item, snapshot, query)
+
+    def query_schedule_options(
+        self, request_id: str, item: RequestItem, snapshot: MaterialSnapshot
+    ) -> ScheduleOptions:
+        """Observe the original and necessary alternatives in one consistent read transaction."""
+        with self.transaction() as connection:
+            requested = self._query_occupancy(connection, request_id, item, snapshot, "requested")
+            alternatives = (
+                self._query_occupancy(connection, request_id, item, snapshot, "alternatives")
+                if not requested.slots[0]["available"]
+                else None
+            )
+            return ScheduleOptions(requested=requested, alternatives=alternatives)
+
+    def _query_occupancy(
+        self,
+        connection: sqlite3.Connection,
+        request_id: str,
+        item: RequestItem,
+        snapshot: MaterialSnapshot,
+        query: str,
+    ) -> SlotObservation:
         if self.fault == "query_failure":
             raise BusinessError("QUERY_FAILED", "显式注入的时段查询失败")
         requirement = item.publish_requirement
         if requirement.missing():
             raise BusinessError("PRECONDITION_FAILED", "缺少原时间、时区或 hard/soft，不能查询")
-        with self.transaction() as connection:
-            meta = self._meta(connection)
-            if meta["revision"] != snapshot.catalog_revision:
-                raise BusinessError("STALE_EVIDENCE", "资料已变，请刷新素材")
-            draft = self._draft(connection, request_id, item.material_id)
-            self_id = draft["draft_id"] if draft else None
-            if query == "requested":
-                times, source = [utc(requirement.requested_at)], "requested"
-            else:
-                if query != "alternatives":
-                    raise BusinessError("INVALID_QUERY", "不支持的本地时段查询")
-                times, source = self._candidate_times(connection, item, snapshot)
+        meta = self._meta(connection)
+        if meta["revision"] != snapshot.catalog_revision:
+            raise BusinessError("STALE_EVIDENCE", "资料已变，请刷新素材")
+        draft = self._draft(connection, request_id, item.material_id)
+        self_id = draft["draft_id"] if draft else None
+        if query == "requested":
+            times, source = [utc(requirement.requested_at)], "requested"
+        else:
+            if query != "alternatives":
+                raise BusinessError("INVALID_QUERY", "不支持的本地时段查询")
+            times, source = self._candidate_times(connection, item, snapshot)
 
-            def inspect(at):
-                conflicts = self._occupancy(
-                    connection,
-                    snapshot.material.platform,
-                    snapshot.material.account_id,
-                    at,
-                    self_id,
-                )
-                return {"at": at, "available": not conflicts, "conflicts": conflicts}
-
-            checked, slots = [], []
-            if query == "requested":
-                slots = [inspect(times[0])]
-                checked = list(slots)
-            else:
-                original = utc(requirement.requested_at)
-                for direction, candidates in (
-                    ("before", reversed([at for at in times if at < original])),
-                    ("after", [at for at in times if at > original]),
-                ):
-                    for at in candidates:
-                        slot = {**inspect(at), "direction": direction}
-                        checked.append(slot)
-                        if slot["available"]:
-                            slots.append(slot)
-                            break
-            return SlotObservation(
-                catalog_revision=meta["revision"],
-                query=query,
-                source=source,
-                slots=slots,
-                checked_slots=checked,
+        def inspect(at):
+            conflicts = self._occupancy(
+                connection,
+                snapshot.material.platform,
+                snapshot.material.account_id,
+                at,
+                self_id,
             )
+            return {"at": at, "available": not conflicts, "conflicts": conflicts}
+
+        checked, slots = [], []
+        if query == "requested":
+            slots = [inspect(times[0])]
+            checked = list(slots)
+        else:
+            original = utc(requirement.requested_at)
+            for direction, candidates in (
+                ("before", reversed([at for at in times if at < original])),
+                ("after", [at for at in times if at > original]),
+            ):
+                for at in candidates:
+                    slot = {**inspect(at), "direction": direction}
+                    checked.append(slot)
+                    if slot["available"]:
+                        slots.append(slot)
+                        break
+        return SlotObservation(
+            catalog_revision=meta["revision"],
+            query=query,
+            source=source,
+            slots=slots,
+            checked_slots=checked,
+        )
 
     def _stale(self, connection, draft, reason, *, import_id=None, run_id=None) -> None:
         if draft["validity"] != "active":

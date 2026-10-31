@@ -74,11 +74,11 @@ def test_mock_conflict_consumes_save_receipt(repo, job):
 
 
 def test_saved_on_last_round_is_still_incomplete(repo, job):
-    ctx, result = run(repo, job, limits=Limits(model_attempts=7))
+    ctx, result = run(repo, job, limits=Limits(model_attempts=6))
     assert result.draft.save_status == "saved"
     assert result.draft.id
     assert result.task_status == "incomplete"
-    assert ctx.budget.models == 7
+    assert ctx.budget.models == 6
 
 
 def test_tool_budget_refuses_unexecuted_calls(repo, job):

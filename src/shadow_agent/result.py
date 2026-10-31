@@ -83,11 +83,11 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
                     message="该方案已拒绝，请以新 request_id 发起独立请求",
                 )
             )
-    alternatives = [x for x in ctx.slots.values() if x.query == "alternatives"]
+    options = next(reversed(ctx.slots.values()), None)
     if (
         not suggested
-        and alternatives
-        and not any(s["available"] for s in alternatives[-1].slots)
+        and options
+        and not options.available_slots()
         and review
         and review.review_status in ("passed", "needs_review")
         and not requirement.missing()

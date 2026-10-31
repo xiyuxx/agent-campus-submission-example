@@ -16,6 +16,7 @@ class Limits:
     item_seconds: float = 180
     request_seconds: float = 540
     protocol_feedbacks: int = 2
+    schedule_requeries: int = 2
 
     def __post_init__(self):
         if not (
@@ -24,6 +25,7 @@ class Limits:
             and 0 < self.item_seconds <= 180
             and 0 < self.request_seconds <= 540
             and 0 <= self.protocol_feedbacks <= 2
+            and 0 <= self.schedule_requeries <= 2
         ):
             raise BusinessError("INVALID_LIMITS", "预算必须在模型16次/工具16次/单项180秒/总540秒内")
 

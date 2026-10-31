@@ -55,7 +55,10 @@ def test_nearest_matches_independent_oracle_for_every_occupancy(repo, catalog, j
     )
     request = Request.model_validate(request)
     snapshot = repo.read_material_basic("M01")
-    result = repo.query_occupancy(request.request_id, request.items[0], snapshot, "alternatives")
+    options = repo.query_schedule_options(request.request_id, request.items[0], snapshot)
+    assert not options.requested.slots[0]["available"]
+    result = options.alternatives
+    assert result is not None and result.catalog_revision == options.requested.catalog_revision
     # Oracle operates on sets of datetimes, independently of SQL/string scan order.
     free = set(nodes) - occupied
     before = [node for node in free if node < origin]

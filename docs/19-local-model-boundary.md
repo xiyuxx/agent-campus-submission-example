@@ -1,5 +1,7 @@
 # 本地身份绑定与双向最近节点 v1.0
 
+2026-10-31 后续变更：查询契约已由 [第 23 号规范](23-automatic-slot-options.md) 升为 v3，query_slots 一次返回原时间与冲突时自动检索的候选，不再接收 query 参数。本文件其余身份、候选、确认与幂等约束继续有效；下方 v2 实现与运行数字保留历史含义。
+
 状态：2026-10-31，用户已确认的变更契约；实现与验证结果另记于阶段记录。本文取代 docs/13、docs/17 中“模型填写身份/观察 ID/修订”“默认候选限同日”“返回全部候选”的旧约定；其他预算、规则、确认、事务和幂等语义继续有效。设计示例不是实际运行证据。
 
 实际实现提交为 410ae2b。新协议实际示例见 [运行索引](../examples/local_binding_nearest_v2/README.md)：6 组 Mock、2 组 live；完整离线回归 138 passed、1 xfailed（已有 ADV-01）。运行、类型/关联核查及数据库交叉检查分别保留，不把协议投影重建检查等同于原始 HTTP 报文归档。
@@ -14,7 +16,7 @@ request_id、material_id、account_id、draft_id、revision、observation_id、r
 
 ## 2. 双向最近节点
 
-原时间单独精确查询，即使它不在预设节点中也允许检查。原时间空闲时可保存原方案；冲突后由模型选择 nearest 查询，不由程序偷偷补做业务链路。
+原时间精确检查，即使它不在预设节点中也允许查询。按 v3 契约，原时间与冲突时必要的双向候选检索合并为一次工具调用，在同一读事务内完成；原时间空闲时不检索替代，由模型根据完整观察推荐。
 
 nearest 在同平台、同账号的合法节点范围中，按 UTC 绝对时刻分别检查：
 
@@ -28,13 +30,13 @@ candidate_times 作为旧输入兼容限制保留：省略/null 使用全部已�
 
 例如原要求 18:00，17:30/18:30 已占用，17:00/19:00 空闲，返回 17:00 和 19:00。不是只往后查，也不是全局取距离最小的两个（它们可能在同一侧）。
 
-## 3. 模型工具契约 v2
+## 3. 当前模型工具契约（查询更新为 v3）
 
 | 工具 | 模型参数 | 本地注入 |
 | --- | --- | --- |
 | read_material | detail=basic/supplement，reason_summary 可选 | 当前素材与目录身份 |
 | check_rules | reason_summary 可选 | 当前有效素材快照 |
-| query_slots | query=requested/nearest，reason_summary 可选 | 当前请求、平台账号与合法节点范围 |
+| query_slots | reason_summary 可选，无 query 参数 | 当前请求、平台账号与合法节点范围；自动检查原时间及必要候选 |
 | save_draft | suggested_at，reason_summary 可选 | 已回传审核/时段证据、请求身份和本轮绑定修订 |
 
 未知参数仍拒绝；模型不能借额外 material_id、expected_revision、观察 ID、确认字段或发布字段改变作用域。FinalProposal 仅 action=finish/needs_input/block 和 reason_summary，不再有 evidence_ids。本地最终结果和 Trace 仍保留完整证据引用，不改变用户结果 schema_version=1.0。

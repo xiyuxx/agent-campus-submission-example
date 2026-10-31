@@ -30,7 +30,7 @@ class DeepSeekModel:
                 json={
                     "model": self.settings.model,
                     "messages": messages,
-                    "tools": schemas,
+                    **({"tools": schemas} if schemas else {}),
                     "thinking": {"type": "disabled"},
                     "max_tokens": resources.max_output_tokens,
                     "temperature": 0,

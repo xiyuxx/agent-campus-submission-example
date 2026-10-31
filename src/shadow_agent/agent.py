@@ -24,6 +24,8 @@ def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
             )
         ctx.forced_status = "failed"
         return
+    if ctx.schedule_refresh_required:
+        raise BusinessError("INVALID_FINISH", "保存冲突尚未解决，需要重新查询排期")
     state = ctx.repo.runtime_state(ctx.request.request_id, ctx.material_id)
     current = state["draft"]
     if ctx.snapshot and (
@@ -63,14 +65,8 @@ def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
             raise BusinessError("INVALID_FINISH", "必须先消费保存回执")
         required = "needs_input" if current["pending_items"] else "finish"
     else:
-        requested = [x for x in ctx.slots.values() if x.query == "requested"]
-        alternatives = [x for x in ctx.slots.values() if x.query == "alternatives"]
-        if (
-            requested
-            and not any(x["available"] for x in requested[-1].slots)
-            and alternatives
-            and not any(x["available"] for x in alternatives[-1].slots)
-        ):
+        options = next(reversed(ctx.slots.values()), None)
+        if options and not options.available_slots():
             required = "needs_input"
         else:
             raise BusinessError("INVALID_FINISH", "需要真实查询；有可用方案时先保存并消费回执")
@@ -101,6 +97,8 @@ async def run_item(ctx: ItemContext, model) -> None:
 
     while not ctx.forced_status:
         try:
+            tool_schemas = schemas(ctx)
+            offered_tools = {x["function"]["name"] for x in tool_schemas}
             messages[1]["content"] = dumps(
                 {
                     "budget": ctx.budget.summary(),
@@ -110,7 +108,7 @@ async def run_item(ctx: ItemContext, model) -> None:
                 }
             )
             if (
-                len(dumps({"messages": messages, "tools": schemas()}).encode())
+                len(dumps({"messages": messages, "tools": tool_schemas}).encode())
                 > resources.request_bytes
             ):
                 raise BusinessError("CONTEXT_LIMIT", "完整请求上下文超限，未发送模型请求")
@@ -118,7 +116,8 @@ async def run_item(ctx: ItemContext, model) -> None:
             ctx.turn_revision = ctx.expected_revision
             try:
                 turn = await asyncio.wait_for(
-                    model.next_action(messages, schemas()), timeout=min(30, ctx.budget.remaining())
+                    model.next_action(messages, tool_schemas),
+                    timeout=min(30, ctx.budget.remaining()),
                 )
             except TimeoutError as exc:
                 raise BusinessError("MODEL_TIMEOUT", "模型整轮请求超时", retryable=True) from exc
@@ -135,13 +134,18 @@ async def run_item(ctx: ItemContext, model) -> None:
                 calls=turn.calls,
                 proposal=turn.proposal.model_dump() if turn.proposal else None,
                 provider=turn.metadata,
+                offered_tools=sorted(offered_tools),
                 delivered_observation_ids=sorted(ctx.consumed),
             )
             if turn.calls:
                 for call in turn.calls:
                     function = call["function"]
                     result = execute(
-                        function["name"], function["arguments"], ctx, call_id=call["id"]
+                        function["name"],
+                        function["arguments"],
+                        ctx,
+                        call_id=call["id"],
+                        allowed_tools=offered_tools,
                     )
                     messages.append(
                         {

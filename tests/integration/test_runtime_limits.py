@@ -174,10 +174,8 @@ def test_refreshing_observation_ids_does_not_reset_retry_limit(repo, job, monkey
         raise BusinessError("DATABASE_BUSY", "synthetic busy", retryable=True)
 
     monkeypatch.setattr(repo, "save_draft", busy)
-    assert execute("query_slots", {"query": "requested"}, ctx).ok
-    ctx.consumed.update(ctx.observations)
     for index in range(3):
-        execute("query_slots", {"query": "nearest"}, ctx)
+        execute("query_slots", {}, ctx)
         ctx.consumed.update(ctx.observations)  # Simulate delivering the actual observations.
         result = execute(
             "save_draft",

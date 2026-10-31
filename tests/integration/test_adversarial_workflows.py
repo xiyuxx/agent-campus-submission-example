@@ -36,15 +36,10 @@ def ready(repo, job):
         ("check_rules", {}),
     ):
         assert execute(name, {**args}, ctx).ok
-    requested = execute("query_slots", {"query": "requested"}, ctx)
-    ctx.consumed.update(ctx.observations)
-    slots = (
-        requested
-        if any(x["available"] for x in requested.data["slots"])
-        else execute("query_slots", {"query": "nearest"}, ctx)
-    )
+    slots = execute("query_slots", {}, ctx)
     assert slots.ok
-    args = {"suggested_at": slots.data["slots"][0]["at"]}
+    options = next(reversed(ctx.slots.values()))
+    args = {"suggested_at": options.available_slots()[0]["at"]}
     ctx.consumed.update(ctx.observations)  # Actual results have reached the simulated model.
     return ctx, args
 
@@ -303,7 +298,7 @@ def test_equivalent_utc_candidate_is_not_false_change_time(repo, job, catalog, t
     changed.schedule.entries = []
     repo.apply_catalog_snapshot(changed, update=True)
     ctx, args = ready(repo, job)
-    execute("query_slots", {"query": "requested"}, ctx)
+    execute("query_slots", {}, ctx)
     ctx.consumed.update(ctx.observations)
     result = execute(
         "save_draft",
