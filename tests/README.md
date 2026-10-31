@@ -1,10 +1,16 @@
 # 测试目录约定
 
-当前没有业务实现，也没有已执行的测试。选题后添加可执行测试。
+当前已有可执行的契约、存储、工具循环、CLI 和适配器离线测试；真实模型效果需单独验证。
 
 - `unit/`：参数校验、工具返回规范、预算计数、终止状态等确定性逻辑。
 - `integration/`：完整 CLI 和 Agent 循环，使用受控模型替身与合成工具。
 - `live/`：显式开启的真实模型评估，默认测试不产生付费调用。
 
-具体用例与验收矩阵同步维护。不要为凑覆盖率编写仅复述实现的测试。
-测试命令、依赖和实际结果在实现后补齐；证据保存到 `examples/`。
+2026-10-31 新增 50 个对抗性业务场景，44 个通过、6 个反例失败，归为 5 类缺陷。已知缺陷保持期望断言并使用 strict xfail；xfail 不是通过，也不表示业务问题已经修复。详见 [复现报告](../docs/18-adversarial-test-review.md) 与 [原始证据索引](../examples/adversarial_review/README.md)。
+
+```powershell
+.venv/Scripts/python.exe -m pytest -q --basetemp=.tmp/tests-new
+.venv/Scripts/python.exe -m pytest tests/integration/test_adversarial_workflows.py --runxfail -q --basetemp=.tmp/counterexamples-new
+```
+
+第二条用于直接重现已知失败，当前应返回退出码 1。Windows 沙箱若阻塞 asyncio 本地套接字，需要使用获准的正常执行环境；不得把环境挂起算成业务缺陷。不要为凑覆盖率编写仅复述实现的测试。

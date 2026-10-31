@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-1f286ab1-213b-4d87-a62b-df8dd7cd7221",
+  "request_id": "REQ-1",
+  "mode": "mock",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T19:00:00+08:00",
+      "confirmation_status": "pending",
+      "pending_items": [
+        {
+          "id": "change_time",
+          "kind": "confirm",
+          "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+        }
+      ],
+      "draft": {
+        "id": "D-e0b74092-017a-4cd7-a57d-90d8f58ebdde",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-38782365-bf93-487f-be1c-8c1065b4e6c6",
+        "OBS-9f1c3de5-b6a6-4f32-9b84-12faea3c5d0e",
+        "OBS-65e52a7f-ba18-46cc-9359-08ebdc5582ff",
+        "OBS-39d45c67-fd44-463b-b5de-aa700cc50e5e",
+        "OBS-e9c64cd9-bfcf-4fba-9622-5656c26542a4",
+        "OBS-1a280ecc-ea48-4781-8cad-648bc27f5cc6",
+        "OBS-93d8442e-bc64-4810-a77f-4462d05a5c26"
+      ],
+      "error": null
+    },
+    {
+      "material_id": "M02",
+      "material_version": 1,
+      "review_status": "needs_info",
+      "risk_reasons": [
+        {
+          "rule_id": "R-COPYRIGHT-MISSING",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "copyright_status",
+          "observed_value": null,
+          "source_id": "materials:M02@1",
+          "message": "缺少版权状态，请补查授权资料"
+        },
+        {
+          "rule_id": "R-COVER-MISSING",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "cover_ref",
+          "observed_value": null,
+          "source_id": "materials:M02@1",
+          "message": "示例业务规则要求提供封面引用"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "missing:copyright_status",
+          "kind": "input",
+          "message": "请补充素材 copyright_status 并显式导入"
+        },
+        {
+          "id": "missing:cover_ref",
+          "kind": "input",
+          "message": "请补充素材 cover_ref 并显式导入"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-90059d1f-a9d7-40b3-9f85-90d0c6e1d19a",
+        "OBS-b4243856-77ba-419d-9b60-85128a9c8927",
+        "OBS-dec9a81d-041c-4109-a773-63d15f0a3b35",
+        "OBS-9b4d053e-96ac-4a79-9016-7d2c2eec0251"
+      ],
+      "error": null
+    }
+  ]
+}

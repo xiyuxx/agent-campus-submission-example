@@ -1,0 +1,10 @@
+xxxxxx.................................................................. [ 59%]
+.................................................                        [100%]
+=========================== short test summary info ===========================
+XFAIL tests/integration/test_adversarial_workflows.py::test_unknown_supplement_fields_do_not_block_real_new_facts - ADV-01: null supplement is treated as contradictory fact
+XFAIL tests/integration/test_adversarial_workflows.py::test_bad_followup_cannot_erase_unknown_commit[bad0] - ADV-02: invalid save arguments erase unknown outcome
+XFAIL tests/integration/test_adversarial_workflows.py::test_bad_followup_cannot_erase_unknown_commit[bad1] - ADV-02: invalid save arguments erase unknown outcome
+XFAIL tests/integration/test_adversarial_workflows.py::test_concurrent_duplicate_returns_recovery_state_to_model - ADV-03: revision conflict supplies no current revision
+XFAIL tests/integration/test_adversarial_workflows.py::test_catalog_change_during_later_item_invalidates_earlier_report - ADV-04: batch report retains draft invalidated mid-run
+XFAIL tests/integration/test_adversarial_workflows.py::test_removed_blocking_rule_does_not_remain_final_fact - ADV-05: stale check error can still finish with old blocked review
+115 passed, 6 xfailed in 30.33s

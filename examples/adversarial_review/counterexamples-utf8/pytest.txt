@@ -1,0 +1,56 @@
+FFFFFF............................................                       [100%]
+================================== FAILURES ===================================
+_________ test_unknown_supplement_fields_do_not_block_real_new_facts __________
+tests\integration\test_adversarial_workflows.py:70: in test_unknown_supplement_fields_do_not_block_real_new_facts
+    snapshot = repo.read_supplement(repo.read_material_basic("M01"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\shadow_agent\storage.py:513: in read_supplement
+    return self._supplement(connection, snapshot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\shadow_agent\storage.py:500: in _supplement
+    raise BusinessError("DATA_CONFLICT", "补充资料冲突，整次未合并：" + ",".join(conflicts))
+E   shadow_agent.common.BusinessError: 补充资料冲突，整次未合并：title
+_____________ test_bad_followup_cannot_erase_unknown_commit[bad0] _____________
+tests\integration\test_adversarial_workflows.py:84: in test_bad_followup_cannot_erase_unknown_commit
+    assert (result.draft.save_status, result.task_status) == ("unknown", "incomplete")
+E   AssertionError: assert ('failed', 'needs_input') == ('unknown', 'incomplete')
+E
+E     At index 0 diff: 'failed' != 'unknown'
+E     Use -v to get more diff
+_____________ test_bad_followup_cannot_erase_unknown_commit[bad1] _____________
+tests\integration\test_adversarial_workflows.py:84: in test_bad_followup_cannot_erase_unknown_commit
+    assert (result.draft.save_status, result.task_status) == ("unknown", "incomplete")
+E   AssertionError: assert ('failed', 'needs_input') == ('unknown', 'incomplete')
+E
+E     At index 0 diff: 'failed' != 'unknown'
+E     Use -v to get more diff
+__________ test_concurrent_duplicate_returns_recovery_state_to_model __________
+tests\integration\test_adversarial_workflows.py:96: in test_concurrent_duplicate_returns_recovery_state_to_model
+    assert conflict.data.get("current_draft") == {
+E   AssertionError: assert None == {'draft_id': 'D-b56df045-5b46-41a3-af7d-64ebc21f12a1', 'revision': 1, 'validity': 'active', 'confirmation_status': 'pending'}
+E    +  where None = <built-in method get of dict object at 0x00000229FE9A8A80>('current_draft')
+E    +    where <built-in method get of dict object at 0x00000229FE9A8A80> = {'message': '当前草稿修订已改变，请重新观察', 'executed': True}.get
+E    +      where {'message': '当前草稿修订已改变，请重新观察', 'executed': True} = ToolResult(observation_id='OBS-8779d97d-e878-4d29-82e0-108f6c2b6577', tool='save_draft', ok=False, code='REVISION_CONFLICT', retryable=False, catalog_revision=None, data={'message': '当前草稿修订已改变，请重新观察', 'executed': True}).data
+______ test_catalog_change_during_later_item_invalidates_earlier_report _______
+tests\integration\test_adversarial_workflows.py:134: in test_catalog_change_during_later_item_invalidates_earlier_report
+    assert (first.draft.validity, first.suggested_at) == ("stale", None)
+E   AssertionError: assert ('active', '2...:00:00+08:00') == ('stale', None)
+E
+E     At index 0 diff: 'active' != 'stale'
+E     Use -v to get more diff
+____________ test_removed_blocking_rule_does_not_remain_final_fact ____________
+tests\integration\test_adversarial_workflows.py:181: in test_removed_blocking_rule_does_not_remain_final_fact
+    assert result.review_status != "blocked" or result.task_status == "incomplete"
+E   AssertionError: assert ('blocked' != 'blocked' or 'blocked' == 'incomplete'
+E    +  where 'blocked' = ItemResult(material_id='M03', material_version=1, review_status='blocked', risk_reasons=[{'rule_id': 'R-COPYRIGHT-DENI...7df-11b2c962f491', 'OBS-34c73f25-58a7-46ec-a7f7-650222f2f4cb', 'OBS-5047ea7a-c0ac-4025-8ff3-76480834886b'], error=None).review_status
+E
+E     - incomplete
+E     + blocked)
+=========================== short test summary info ===========================
+FAILED tests/integration/test_adversarial_workflows.py::test_unknown_supplement_fields_do_not_block_real_new_facts
+FAILED tests/integration/test_adversarial_workflows.py::test_bad_followup_cannot_erase_unknown_commit[bad0]
+FAILED tests/integration/test_adversarial_workflows.py::test_bad_followup_cannot_erase_unknown_commit[bad1]
+FAILED tests/integration/test_adversarial_workflows.py::test_concurrent_duplicate_returns_recovery_state_to_model
+FAILED tests/integration/test_adversarial_workflows.py::test_catalog_change_during_later_item_invalidates_earlier_report
+FAILED tests/integration/test_adversarial_workflows.py::test_removed_blocking_rule_does_not_remain_final_fact
+6 failed, 44 passed in 11.76s
