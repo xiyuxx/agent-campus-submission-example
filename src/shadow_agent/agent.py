@@ -9,6 +9,7 @@ from .contracts import FinalProposal
 from .model_view import plan_view, tool_view
 from .models.base import validate_turn
 from .models.prompts import SYSTEM
+from .policy import review_is_current
 from .tools.registry import execute, schemas
 
 
@@ -25,7 +26,13 @@ def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
         return
     state = ctx.repo.runtime_state(ctx.request.request_id, ctx.material_id)
     current = state["draft"]
-    if ctx.snapshot and state["catalog_revision"] != ctx.snapshot.catalog_revision:
+    if ctx.snapshot and (
+        state["catalog_revision"] != ctx.snapshot.catalog_revision
+        or (
+            ctx.review
+            and not review_is_current(ctx.snapshot, ctx.review, state["catalog_revision"])
+        )
+    ):
         raise BusinessError("STALE_EVIDENCE", "资料已更新，结束前需要重新读取、检查与查询")
     if ctx.save_receipt and any(
         not current or current[key] != value for key, value in ctx.save_receipt.items()

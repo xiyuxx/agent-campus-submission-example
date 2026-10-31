@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 from .common import BusinessError
 from .context import ItemContext
 from .contracts import DraftResult, ItemResult, PendingItem, RequestResult
+from .policy import review_is_current
 
 
 def assemble_result(ctx: ItemContext) -> ItemResult:
@@ -26,7 +27,12 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
     ]
     review = ctx.review
     stale = bool(
-        state and ctx.snapshot and state["catalog_revision"] != ctx.snapshot.catalog_revision
+        state
+        and ctx.snapshot
+        and (
+            state["catalog_revision"] != ctx.snapshot.catalog_revision
+            or (review and not review_is_current(ctx.snapshot, review, state["catalog_revision"]))
+        )
     )
     changed = bool(
         ctx.save_receipt

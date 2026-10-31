@@ -1,0 +1,16 @@
+x....................................................................... [ 24%]
+........................................................................ [ 48%]
+........................................................................ [ 72%]
+...............xxxxxxx.....x............................................ [ 97%]
+........                                                                 [100%]
+=========================== short test summary info ===========================
+XFAIL tests/integration/test_adversarial_workflows.py::test_unknown_supplement_fields_do_not_block_real_new_facts - ADV-01: null supplement is treated as contradictory fact
+XFAIL tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[message-null] - RT-02: malformed provider structure escapes as AttributeError
+XFAIL tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[message-array] - RT-02: malformed provider structure escapes as AttributeError
+XFAIL tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[message-string] - RT-02: malformed provider structure escapes as AttributeError
+XFAIL tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[call-null] - RT-02: malformed provider structure escapes as AttributeError
+XFAIL tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[call-number] - RT-02: malformed provider structure escapes as AttributeError
+XFAIL tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[function-null] - RT-02: malformed provider structure escapes as AttributeError
+XFAIL tests/integration/test_retest_edge_cases.py::test_invalid_provider_shapes_are_classified_as_protocol_errors[function-array] - RT-02: malformed provider structure escapes as AttributeError
+XFAIL tests/integration/test_retest_edge_cases.py::test_one_malformed_provider_response_does_not_abort_recoverable_run - RT-02: one malformed response bypasses bounded protocol recovery
+287 passed, 9 xfailed in 43.87s

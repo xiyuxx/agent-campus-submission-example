@@ -1,5 +1,7 @@
 # 效果评估
 
+2026-10-31 缺陷修复阶段一：RT-01 的 6 个原反例与 7 个新增邻域测试通过；完整离线回归 287 passed、9 xfailed（RT-02/ADV-01 尚未修复）。真实模型调用 0，详见 [修复记录](22-defect-fix-results.md)。下方保留历史复测状态。
+
 2026-10-31 最新核实：[docs/20 独立复核与修改建议](21-test-report-verification.md)。在相同业务源码摘要上重跑得到 138 passed/1 xfailed、136 passed/14 failed、完整 274 passed/15 xfailed，与原报告一致；仍存在 RT-01、RT-02、ADV-01，xfail 不计通过。本轮仅复核，没有修复业务源码。
 
 2026-10-31 改动后再次找错：基线 74cdcac 的既有测试为 138 passed、1 xfailed；新增 150 项显式运行得到 136 passed、14 failed（2 类问题：相同素材重读后保留旧规则审核、畸形模型响应逃逸协议纠错）。完整回归为 274 passed、15 xfailed，包含尚未修复的旧 ADV-01；详情、覆盖分析和实际证据见 [复测与测试设计](20-retest-and-test-design.md)。本轮未修改业务代码、未调用真实模型，xfail 不算业务通过。

@@ -96,16 +96,12 @@ def changed_rules_context(repo, catalog, job, status):
     return ctx
 
 
-@pytest.mark.xfail(strict=True, reason="RT-01: unchanged material preserves obsolete rule review")
 @pytest.mark.parametrize("status", ["passed", "blocked", "needs_info", "needs_review"])
 def test_reloading_same_facts_invalidates_old_rule_review(repo, catalog, job, status):
     ctx = changed_rules_context(repo, catalog, job, status)
     assert assemble_result(ctx).review_status is None
 
 
-@pytest.mark.xfail(
-    strict=True, reason="RT-01: finish accepts obsolete blocked review after basic reload"
-)
 def test_old_block_cannot_finish_after_rules_are_replaced(repo, catalog, job):
     ctx = changed_rules_context(repo, catalog, job, "blocked")
     with pytest.raises(BusinessError):
@@ -194,7 +190,6 @@ def test_requested_time_is_independent_of_default_nodes(repo, catalog, job):
     assert result.slots[0]["available"]
 
 
-@pytest.mark.xfail(strict=True, reason="RT-01: running agent accepts old block after basic refresh")
 def test_running_agent_cannot_finish_with_old_rule_after_refresh(repo, catalog, job, tmp_path):
     value = job.model_dump(mode="json")
     value["items"][0]["material_id"] = "M03"

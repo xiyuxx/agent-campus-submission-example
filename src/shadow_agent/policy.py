@@ -4,6 +4,13 @@ from .common import BusinessError, digest, utc
 from .contracts import MaterialSnapshot, RequestItem, Rule, RuleCheck
 
 
+def review_is_current(snapshot: MaterialSnapshot, review: RuleCheck, catalog_revision: int) -> bool:
+    return (
+        review.catalog_revision == snapshot.catalog_revision == catalog_revision
+        and review.material_sha256 == snapshot.facts_hash()
+    )
+
+
 def check_rules(snapshot: MaterialSnapshot, rules: list[Rule]) -> RuleCheck:
     if not rules:
         raise BusinessError("INVALID_RULES", "当前规则集不可为空")

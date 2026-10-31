@@ -96,7 +96,11 @@ def execute(
                     raise BusinessError("PRECONDITION_FAILED", "supplement 之前必须先读取 basic")
                 executed = True
                 snapshot = ctx.repo.read_supplement(ctx.snapshot)
-            if not ctx.snapshot or ctx.snapshot.facts_hash() != snapshot.facts_hash():
+            if (
+                not ctx.snapshot
+                or ctx.snapshot.catalog_revision != snapshot.catalog_revision
+                or ctx.snapshot.facts_hash() != snapshot.facts_hash()
+            ):
                 ctx.review, ctx.review_id = None, None
             if not ctx.snapshot or ctx.snapshot.catalog_revision != snapshot.catalog_revision:
                 ctx.slots.clear()
