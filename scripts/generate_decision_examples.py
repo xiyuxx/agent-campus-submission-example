@@ -121,6 +121,7 @@ def verify(folder, repo, result, case):
         )
         + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     return {
         "directory": folder.name,
@@ -168,7 +169,9 @@ async def generate(args):
                     mode=mode,
                     output=folder,
                 )
-                (folder / "catalog.json").write_text(catalog.model_dump_json(indent=2), "utf-8")
+                (folder / "catalog.json").write_text(
+                    catalog.model_dump_json(indent=2), encoding="utf-8", newline="\n"
+                )
                 records.append(verify(folder, repo, result, case))
                 if mode == "mock" and case == "normal":
                     duplicate_folder = output / "mock_duplicate"
@@ -182,13 +185,17 @@ async def generate(args):
     finally:
         if model:
             await model.aclose()
-        (output / "index.json").write_text(dumps({"runs": records}) + "\n", "utf-8")
+        (output / "index.json").write_text(
+            dumps({"runs": records}) + "\n", encoding="utf-8", newline="\n"
+        )
         manifest = {
             p.relative_to(output).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(output.rglob("*"))
             if p.is_file()
         }
-        (output / "manifest.json").write_text(dumps(manifest) + "\n", "utf-8")
+        (output / "manifest.json").write_text(
+            dumps(manifest) + "\n", encoding="utf-8", newline="\n"
+        )
 
 
 if __name__ == "__main__":
