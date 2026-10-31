@@ -1,4 +1,6 @@
-# 开发实现参考 v1.3
+# 开发实现参考 v1.4
+
+2026-10-31 当前变更：模型工具协议与最近节点查找以 [本地身份绑定与双向最近节点](19-local-model-boundary.md) 为准。内部业务 ID/修订/证据留本地，模型只接收业务投影；普通请求无需候选，默认在全部预设节点中找原时间前后各一个最近可用节点，允许跨日。本文未涉及的预算、确认与事务约束继续有效。
 
 状态：业务设计完成；契约与存储已有阶段一实现和离线验证，后续模块完成状态以 [实际阶段记录](16-implementation-progress.md) 为准。本文将已确认的 CLI、技术栈和业务要求落实为模块、接口、数据格式及验收规则。本文是后续开发的详细依据；与早期设计冲突时以本文为准，原始题目要求和用户后续明确指令优先。不得把本文的示例视为实际运行记录。
 
@@ -129,8 +131,8 @@ platform/account_id/version 从可信素材读取，不让用户请求和模型�
 | 输入 | 查询与保存边界 |
 | --- | --- |
 | requested_at | 原始要求，requested 查询只检查此时刻；即使不在 allowed_slots 或 candidate_times 内也可查询，观察为可用后可保存 |
-| candidate_times 为非空列表 | alternatives 只查询此列表，按 UTC 去重；无需与 allowed_slots 取交集，用户明确列出次日等跨日时间时允许查询 |
-| candidate_times 省略或为 null | 使用该平台、账号的 allowed_slots，按请求 timezone 换算后筛选与 requested_at 同一自然日；不自动跨日扩展 |
+| candidate_times 为非空列表 | 兼容的显式范围限制；按 UTC 去重，只返回其中原时间前后各一个最近可用节点，无需与 allowed_slots 取交集 |
+| candidate_times 省略或为 null | 普通入口使用该平台、账号的全部已配置 allowed_slots，在原时间前后各找一个最近可用节点，允许跨日，不只向后找 |
 | candidate_times 为 [] | 用户未提供替代空间，alternatives 返回空候选，不回退到 allowed_slots；原要求仍可查询和保存 |
 
 candidate_times 仅允许查询和建议，不代表已经接受改期。所有非空时间均需合法且偏移与请求 timezone 在该日期的偏移一致，跨日候选也按各自日期校验。模型不能通过工具参数添加候选；没有替代空间或候选全部占用时，明确请求用户调整要求或候选范围。所有偏离原时刻的建议，无论 hard/soft、是否来自用户候选，都产生 change_time 待确认项；同一 UTC 时刻的不同表示不算改期。
@@ -260,7 +262,7 @@ requested、alternatives 查询、旧方案核查、保存和确认采用相同�
 字段生命周期、模型可见投影、消息配对和跨进程恢复边界进一步遵循 [Agent 开发流程规范第 6–10、16 章](17-agent-development-spec.md#6-itemcontext事实来源与失效规则)。
 
 ItemContext 由程序持有，至少包含 run_id、request_id、当前 material_id、不可变原要求、预算/截止时间、observations 映射、已读取有效素材、最新规则检查、候选查询、保存尝试和已有草稿修订。
-起始模型消息提供原请求及该逻辑键的已有 draft_id、revision、validity、当前确认摘要；无草稿时 expected_revision=0。这是程序提供的持久化状态，不代替本轮素材读取、规则检查或时段观察。REVISION_CONFLICT 返回当前修订与状态供模型重新判断，不能靠猜测修订号覆盖。
+起始模型消息只提供当前项原时间要求、已有方案的业务时间/有效性/确认摘要；request_id、material_id、draft_id、revision、观察和来源标识不进入模型业务消息。程序本地记录每次模型请求依据的修订，保存时注入；冲突后刷新业务投影供模型重新判断，不能猜测或自动覆盖。已有状态不代替本轮素材、规则和时段观察。
 模型只在当前素材范围内调用工具；请求范围外的素材 ID、伪造观察引用或其他用户确认被拒绝。全部模型文字与素材文本视为不可信数据，不能直接更新 context 的事实字段。
 
 采用一个保守的 catalog_revision：资料、规则或已有排期实际变化时递增；同内容重新 seed 不递增。观察与草稿记录该版本和有效素材摘要。任何资料版本变化都要求刷新相关检查，可能造成额外复查，但能减少首版版本判断复杂度。
@@ -272,14 +274,14 @@ ItemContext 由程序持有，至少包含 run_id、request_id、当前 material
 
 | 工具 | 参数 | 前置条件 |
 | --- | --- | --- |
-| read_material | material_id, detail: basic/supplement | 当前请求作用域内；supplement 需先读取 basic |
-| check_rules | material_id | 至少读取 basic；检查本轮有效快照 |
-| query_slots | material_id, query: requested/alternatives | 已取得平台账号；原时间等必要信息明确 |
-| save_draft | material_id, suggested_at, expected_revision, review_observation_id, slot_observation_id | 最新检查非 blocked/needs_info，原时间要求明确，拟保存时刻为已观察可用的原时刻或合法候选；当前草稿未 rejected |
+| read_material | detail: basic/supplement | 程序绑定当前素材；supplement 需先读取 basic |
+| check_rules | 无核心业务参数 | 至少读取 basic；检查本轮有效快照 |
+| query_slots | query: requested/nearest | 平台账号与范围由本地上下文决定；nearest 返回两侧各一最近空闲节点 |
+| save_draft | suggested_at | 程序注入已回传审核/时段观察及本轮绑定修订；最新检查允许，原要求明确、时刻合法可用且方案未 rejected |
 
 查候选只在第 4.1 节确定的集合内；用户显式列出的跨日候选可查，模型不能自行添加账号、日期或时刻。save_draft 不接受 review_status、confirmation_status、request_id、draft_id 这些由程序决定的字段。
 
-统一 ToolResult 示例：
+以下为仅留本地和 Trace 的 ToolResult 示例；不能原样发给模型。模型观察采用白名单业务投影，详见第 19 号规范：
 
 ```json
 {
@@ -299,8 +301,7 @@ ItemContext 由程序持有，至少包含 run_id、request_id、当前 material
 ```
 
 时段占用是成功查询到的业务事实，故 ok=true；未知工具、错误参数、保存冲突等动作未完成为 ok=false。工具实际异常也转换成错误观察并记录。不能把失败返回包装为空成功结果。
-requested 查询只返回原时段；alternatives 查询才返回候选与各自占用，便于观察冲突后模型是否主动补查。
-alternatives 返回候选来源（explicit/default/none）、完整合法候选的可用性和冲突引用；空集合也是成功查询，不伪装成工具失败。原时刻不自动加入 alternatives；只有其本身属于候选集合时才出现。当前草稿自身的排除由程序上下文确定，模型无权指定忽略其他占用。
+requested 查询只返回原时段；模型 nearest 查询在存储内部沿用 alternatives 标签，从全部合法节点中查找原时间前后各一最近可用节点。内部 checked_slots 记录实际核查过的占用，slots 仅返回最多两个可用建议；模型投影不含占用记录 ID。空集合也是成功查询，表示配置范围内两侧都无可用节点，不伪装成工具失败。原时刻不进入替代结果；当前草稿自身排除由本地上下文确定。
 规则命中包含 rule_id、severity、field、observed_value、source_id、message；工具返回不把媒体文件、密钥或无限长文本送进模型。
 
 ## 7. 模型循环和结束协议
@@ -316,8 +317,7 @@ FinalProposal 只请求 finish/needs_input/block，并提交简短说明和观�
 ```json
 {
   "action": "needs_input",
-  "reason_summary": "原时段已占用，已找到替代时段，需要用户确认",
-  "evidence_ids": ["OBS-003", "OBS-004", "OBS-005", "OBS-006"]
+  "reason_summary": "原时段已占用，已找到最近可用时段，需要用户确认"
 }
 ```
 
@@ -438,7 +438,7 @@ rejected 是当前逻辑请求的终止决定；同 request_id 重跑仍可产�
 ### 保存事务
 
 1. 核对请求身份、当前草稿 revision（新建为 0）、观察归属和引用真实性。
-2. 核对 catalog_revision 和有效素材/规则快照，不一致返回 STALE_EVIDENCE，模型需重新读取和检查。
+2. 程序绑定本轮已回传的审核/时段依据和修订，核对 catalog_revision 与真实快照；不一致返回 STALE_EVIDENCE，模型需重新读取和检查。模型不填写内部引用。
 3. 核查最新规则状态、运行身份字段、明确的原时间要求、已观察可用的原时刻或合法候选、账号。业务必填性只由导入规则产生；阻断或关键缺项返回 PRECONDITION_FAILED，已拒绝方案返回 DRAFT_REJECTED。
 4. 在同一写事务内检查 schedule 和其他 active drafts，排除当前 draft_id；发现冲突返回 SLOT_CONFLICT，不落库新方案。
 5. 比较语义摘要：material_version、有效资料摘要、完整适用规则定义/版本及命中、原要求、建议时段和方案要求确认的事项定义。事项定义按用户决定之前的方案计算，不使用已过滤掉接受项的 pending_items；用户接受本身不改变方案语义。排除措辞、观察 ID、时间戳、模型说明和用户决定状态，避免随机文案或确认操作导致假修订。
