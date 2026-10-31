@@ -2,6 +2,8 @@
 
 ## 2026-10-31：测试报告缺陷修复
 
+最终：RT-01、RT-02、ADV-01 三类已修复，原 15 个 xfail 全部移除，原断言保留。ADV-01 新增 12 项邻域后，完整离线 --runxfail 为 324 passed、0 failed/error/xfail；JUnit 比对确认原 289 项全部保留并通过，本轮新增 35 项，源码/测试摘要核对通过。Ruff check/format --check 通过；没有新 live 调用或数据库迁移。实际材料见 [第 22 号记录](22-defect-fix-results.md)。以下保留分阶段结果。
+
 RT-02 已实现逐层响应结构校验，复用既有协议纠错预算，整组校验后执行；8 个原反例转为普通通过，新增 16 项边界。完整回归 311 passed、1 xfailed（仅 ADV-01），测试闭包静态检查调整后另行 16 passed，Ruff 通过。无真实模型调用。
 
 RT-01 已实现目录版本/有效摘要联合失效与结束/输出复核。原 6 个 xfail 转为普通回归，新增 7 项邻域测试。完整离线验证 287 passed、9 xfailed，Ruff check/format --check 通过；剩余 RT-02/ADV-01 按后续阶段处理。实际输出和限制见 [第 22 号记录](22-defect-fix-results.md)，无真实模型调用。

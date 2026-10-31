@@ -1,5 +1,7 @@
 # 测试目录约定
 
+2026-10-31 最新：RT-01/RT-02/ADV-01 已修复，原 15 个 xfail 全部移除且断言保留。完整 --runxfail 为 **324 passed，0 failed/error/xfail**，其中原 289 项、新增 35 项；Ruff check/format --check 通过。见 [修复记录](../docs/22-defect-fix-results.md) 和 [最终证据](../examples/defect_fixes/README.md)。以下数字为历史执行结果；当前测试应通过，不再预期反例失败。
+
 2026-10-31 再次复测新增 150 项（含最近节点 128 个占用组合穷举）；完整结果为 274 passed、15 xfailed，新增失败属于规则审核失效、异常响应协议处理两类问题，旧 ADV-01 仍失败。详见 [测试设计、覆盖与限制](../docs/20-retest-and-test-design.md) 和 [实际证据](../examples/retest_review/README.md)。可用 `scripts/run_adversarial_tests.py --test-path tests/integration/test_retest_edge_cases.py --runxfail --output examples/my-new-retest` 单独重现新增失败；输出目录需不存在。
 
 当前已有可执行的契约、存储、工具循环、CLI 和适配器离线测试；真实模型效果需单独验证。
@@ -17,4 +19,4 @@
 .venv/Scripts/python.exe -m pytest tests/integration/test_adversarial_workflows.py --runxfail -q --basetemp=.tmp/counterexamples-new
 ```
 
-第二条用于直接重现已知失败，当前应返回退出码 1。Windows 沙箱若阻塞 asyncio 本地套接字，需要使用获准的正常执行环境；不得把环境挂起算成业务缺陷。不要为凑覆盖率编写仅复述实现的测试。
+第二条用于显式运行历史反例断言，修复后的当前版本应返回退出码 0。Windows 沙箱若阻塞 asyncio 本地套接字，需要使用获准的正常执行环境；不得把环境挂起算成业务缺陷。不要为凑覆盖率编写仅复述实现的测试。

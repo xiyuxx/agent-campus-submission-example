@@ -77,7 +77,7 @@ singleton_id 固定为 1（PK）；revision、current_import_id、source_sha256�
 
 material_id 为 PK 和到 materials 的 FK；supplement_version（正整数）、source_id（非空 TEXT）、fields_json（字段对象）、content_sha256、is_current、last_import_id 均非空。每素材首版最多一条当前补充资料。
 
-导入时要求其素材出现在同一完整快照中；FK 仅检查身份存在，当前有效性由导入服务检查。fields_json 仅允许八个业务字段，不得修改身份。读取补充资料不会写回 materials，只合入本轮有效快照；冲突整次不合并，保持原来源。补充资料缺席时停用旧记录，不从旧导入捞回补查结果。
+导入时要求其素材出现在同一完整快照中；FK 仅检查身份存在，当前有效性由导入服务检查。fields_json 仅允许八个业务字段，不得修改身份。读取补充资料不会写回 materials，只合入本轮有效快照；冲突整次不合并，保持原来源。补充侧缺省/null/空白均为未知，不覆盖或冲突；两侧已知且不同才判冲突，已知相同保留原来源，基本未知且补充已知才填入并标注补充来源。null 不表示删除，规范化后的 null 仍保留在导入字段快照中。补充资料缺席时停用旧记录，不从旧导入捞回补查结果。
 
 ### rules：当前规则
 

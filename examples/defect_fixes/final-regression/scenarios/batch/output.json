@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-ed73df15-5e75-4775-8fb1-73f05bfb922f",
+  "request_id": "REQ-1",
+  "mode": "mock",
+  "task_status": "incomplete",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": null,
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "pending",
+      "pending_items": [],
+      "draft": {
+        "id": "D-400757c9-bc53-4c94-80cc-546c893646fe",
+        "revision": 1,
+        "validity": "stale",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "incomplete",
+      "evidence_ids": [
+        "OBS-58224791-4cd0-4d2b-a8d5-6de004b8e4b4",
+        "OBS-2e18e753-5407-47bb-9c91-3a4d08cd8cbf",
+        "OBS-1711cc62-1cc6-48f3-9579-255d07d2c23d",
+        "OBS-b6847006-a3ba-49ae-a7fc-3125f8c442e3",
+        "OBS-fdd58a43-8c3c-4f58-86aa-3653807640cb",
+        "OBS-8de110ae-1a99-4099-9ab3-0e05c08918c6",
+        "OBS-936251d5-00fc-4ec4-8807-283b708a4539"
+      ],
+      "error": {
+        "code": "STALE_EVIDENCE",
+        "message": "当前资料或方案已变化，本次结果需要重新评估"
+      }
+    },
+    {
+      "material_id": "M02",
+      "material_version": 1,
+      "review_status": "needs_info",
+      "risk_reasons": [
+        {
+          "rule_id": "R-COPYRIGHT-MISSING",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "copyright_status",
+          "observed_value": null,
+          "source_id": "materials:M02@1",
+          "message": "缺少版权状态，请补查授权资料"
+        },
+        {
+          "rule_id": "R-COVER-MISSING",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "cover_ref",
+          "observed_value": null,
+          "source_id": "materials:M02@1",
+          "message": "示例业务规则要求提供封面引用"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "missing:copyright_status",
+          "kind": "input",
+          "message": "请补充素材 copyright_status 并显式导入"
+        },
+        {
+          "id": "missing:cover_ref",
+          "kind": "input",
+          "message": "请补充素材 cover_ref 并显式导入"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-b77c09fc-d8e2-40de-9f73-83745a6ab4b0",
+        "OBS-ae5da34f-6de0-4d1d-8192-58a96d214d50",
+        "OBS-5332c1b4-c756-49b0-8e3d-e7e360badd7d",
+        "OBS-b18c53b4-65e6-4334-8f4f-e9b530888cb1"
+      ],
+      "error": null
+    }
+  ]
+}

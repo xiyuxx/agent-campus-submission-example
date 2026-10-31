@@ -1,0 +1,5 @@
+D:\Code\smallShadow\.venv\Scripts\python.exe -m ruff check src tests
+All checks passed!
+
+D:\Code\smallShadow\.venv\Scripts\python.exe -m ruff format --check src tests
+35 files already formatted

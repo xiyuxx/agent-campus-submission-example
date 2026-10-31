@@ -1,8 +1,4 @@
-"""Business counterexamples; all models and data are synthetic and offline.
-
-Known defects keep the desired assertion, with strict xfail so a future fix is visible.
-Use --runxfail to reproduce the actual failures instead of accepting known defects.
-"""
+"""Business counterexample regressions; all models and data are synthetic and offline."""
 
 import asyncio
 import json
@@ -62,7 +58,6 @@ def decision(draft, operation, choices):
     )
 
 
-@pytest.mark.xfail(strict=True, reason="ADV-01: null supplement is treated as contradictory fact")
 def test_unknown_supplement_fields_do_not_block_real_new_facts(repo, catalog):
     value = catalog.model_dump(mode="json")
     value["supplements"][0]["fields"]["title"] = None

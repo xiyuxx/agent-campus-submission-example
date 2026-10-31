@@ -493,7 +493,9 @@ class Repository:
             return result
         facts = json.loads(row["fields_json"])
         data = snapshot.material.model_dump()
-        conflicts = [k for k, v in facts.items() if data[k] is not None and data[k] != v]
+        conflicts = [
+            k for k, v in facts.items() if data[k] is not None and v is not None and data[k] != v
+        ]
         if conflicts:
             raise BusinessError("DATA_CONFLICT", "补充资料冲突，整次未合并：" + ",".join(conflicts))
         for key, value in facts.items():

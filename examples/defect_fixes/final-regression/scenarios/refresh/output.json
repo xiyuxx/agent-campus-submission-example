@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-b6d80ab2-141d-44ff-8e14-4212ca76c6b8",
+  "request_id": "REQ-1",
+  "mode": "mock",
+  "task_status": "incomplete",
+  "items": [
+    {
+      "material_id": "M03",
+      "material_version": 1,
+      "review_status": null,
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "incomplete",
+      "evidence_ids": [
+        "OBS-90bdf78d-b3d5-4bdb-80be-ec99f26070db",
+        "OBS-b2b5f7ba-a1e4-47d1-bf18-471774690787",
+        "OBS-1e6631a4-af0f-42dd-8dce-ed5c6862c126"
+      ],
+      "error": {
+        "code": "STALE_EVIDENCE",
+        "message": "当前资料或方案已变化，本次结果需要重新评估"
+      }
+    }
+  ]
+}

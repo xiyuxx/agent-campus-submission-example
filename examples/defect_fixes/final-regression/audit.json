@@ -1,0 +1,35 @@
+{
+  "original_cases": 289,
+  "final_cases": 324,
+  "added_cases": 35,
+  "all_original_cases_retained_and_passed": true,
+  "failures_errors_skips": 0,
+  "source_and_test_hashes_match_current_files": true,
+  "source_sha256": "a418c5b4c9f0a1b572c86d1bf20b8b2bc8e5697effa3c8e62eb25c33ae005d14",
+  "quality_checks": [
+    {
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "D:\\Code\\smallShadow\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "real_model_calls": 0
+}
