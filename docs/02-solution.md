@@ -54,3 +54,10 @@ Python 3.13 + argparse CLI + 原生单 Agent 工具循环 + DeepSeek Tool Calls 
 数据库方案详见 [表结构与调用规范](15-database-design.md) 及 [DDL](15-database-schema.sql)：13 张表保留当前目录、不可变原要求、稳定草稿身份、每版完整审核证据、明确用户决定与状态事件。完整导入事务同时更新目录和失效旧方案；无变化导入 noop。当前方案通过延迟 FK 指向真实历史修订，保存回执不明时通过内部写入凭据核对，确认重放区分原回执和当前有效性。设计 DDL 检查与后续阶段一 Repository 验证分别记录，不替代完整 Agent 或真实模型验收。
 
 模型可用性、提示词效果、六类完整场景的实际执行结果、干净安装和真实模型 Trace，均待据实补齐；已有依赖锁不代表这些项目已通过。
+
+
+## 2026-10-31 决策改进实际记录
+
+模型按审核观察控制业务动作。程序按当前事实收窄工具集合及 read_material.detail；阻塞缺项、其他缺项、来源可用性和补查状态分别展示。保存抢槽后旧查询失效，模型消费 recovery_action 再重新查询；最多两次冲突恢复。LocalMetadataAuditor 在短读事务外运行，保存事务独立复核本地规则。
+
+详见 [决策契约](24-agent-decision-improvements.md) 与 [实际证据](../examples/decision_improvements_v4_1/README.md)。

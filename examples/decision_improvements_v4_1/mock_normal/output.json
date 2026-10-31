@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-4e800c09-27e0-412f-9962-031baaccf319",
+  "request_id": "REQ-DEMO-NEAREST-V2",
+  "mode": "mock",
+  "task_status": "completed",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T18:00:00+08:00",
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": "D-080f6629-0e3c-489c-94ba-f2d8426d0e62",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "completed",
+      "evidence_ids": [
+        "OBS-eb22b39b-9487-4453-b035-22b641df0cd2",
+        "OBS-45744b41-b720-4a24-8c1a-981769b3e3cd",
+        "OBS-131cdbb8-dd47-47c7-8fa3-1d8d306b947b",
+        "OBS-8ff9e383-5386-4a95-a256-aefa2370a759"
+      ],
+      "error": null
+    }
+  ]
+}

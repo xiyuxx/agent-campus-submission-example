@@ -1,0 +1,129 @@
+{
+  "materials": [
+    {
+      "source_asset_id": "VIDEO-001",
+      "title": "新品功能介绍",
+      "type": "video",
+      "media_ref": "synthetic://video/M01-v2.mp4",
+      "caption": "支持字幕功能",
+      "cover_ref": "synthetic://cover/M01-v2.jpg",
+      "copyright_status": "unauthorized",
+      "license_ref": null,
+      "material_id": "M01",
+      "material_version": 2,
+      "platform": "douyin",
+      "account_id": "brand_main"
+    },
+    {
+      "source_asset_id": null,
+      "title": "门店花絮",
+      "type": "video",
+      "media_ref": null,
+      "caption": "门店日常",
+      "cover_ref": null,
+      "copyright_status": null,
+      "license_ref": null,
+      "material_id": "M02",
+      "material_version": 1,
+      "platform": "douyin",
+      "account_id": "brand_main"
+    },
+    {
+      "source_asset_id": null,
+      "title": "未授权示例",
+      "type": "image",
+      "media_ref": null,
+      "caption": "合成测试素材",
+      "cover_ref": "synthetic://cover/M03.jpg",
+      "copyright_status": "unauthorized",
+      "license_ref": null,
+      "material_id": "M03",
+      "material_version": 1,
+      "platform": "douyin",
+      "account_id": "brand_main"
+    }
+  ],
+  "supplements": [
+    {
+      "material_id": "M01",
+      "supplement_version": 1,
+      "source_id": "SYNTHETIC-LICENSE-REGISTER",
+      "fields": {
+        "copyright_status": "authorized",
+        "license_ref": "LIC-001"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "R-COPYRIGHT-MISSING",
+      "version": 1,
+      "field": "copyright_status",
+      "operator": "missing",
+      "value": null,
+      "severity": "needs_info",
+      "message": "缺少版权状态，请补查授权资料"
+    },
+    {
+      "rule_id": "R-COPYRIGHT-DENIED",
+      "version": 1,
+      "field": "copyright_status",
+      "operator": "equals",
+      "value": "unauthorized",
+      "severity": "blocked",
+      "message": "未授权素材不得进入排期"
+    },
+    {
+      "rule_id": "R-COVER-MISSING",
+      "version": 1,
+      "field": "cover_ref",
+      "operator": "missing",
+      "value": null,
+      "severity": "needs_info",
+      "message": "示例业务规则要求提供封面引用"
+    },
+    {
+      "rule_id": "R-CAPTION-REVIEW",
+      "version": 1,
+      "field": "caption",
+      "operator": "contains",
+      "value": "最强",
+      "severity": "needs_review",
+      "message": "示例品牌规则要求人工核实该表述依据"
+    }
+  ],
+  "schedule": {
+    "schedule_version": 1,
+    "allowed_slots": [
+      {
+        "platform": "douyin",
+        "account_id": "brand_main",
+        "at": "2026-11-03T17:00:00+08:00"
+      },
+      {
+        "platform": "douyin",
+        "account_id": "brand_main",
+        "at": "2026-11-03T19:00:00+08:00"
+      },
+      {
+        "platform": "douyin",
+        "account_id": "brand_main",
+        "at": "2026-11-03T20:00:00+08:00"
+      },
+      {
+        "platform": "douyin",
+        "account_id": "brand_main",
+        "at": "2026-11-03T21:00:00+08:00"
+      }
+    ],
+    "entries": [
+      {
+        "platform": "douyin",
+        "account_id": "brand_main",
+        "at": "2026-11-03T18:00:00+08:00",
+        "entry_id": "S01",
+        "material_id": "M00"
+      }
+    ]
+  }
+}

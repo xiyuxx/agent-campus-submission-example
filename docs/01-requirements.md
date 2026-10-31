@@ -106,3 +106,10 @@
 ## Agent 开发规范的验收落点
 
 [Agent 开发流程规范](17-agent-development-spec.md) 将 G01–G06、B01–B09 落实为模块职责、可核验观察、测试条件与阶段退出要求。第 19 章规定消息配对、可信观察、预算和故障测试；第 20 章明确六个必验场景及参考实例逐轮推演；第 21 章规定实施、检查和本地提交顺序。新增资源与纠错限制是待实现运行层约束，不修改本文件业务范围或现有数据契约。本次只完成设计，不新增任何业务验收通过项。
+
+
+## 2026-10-31 决策改进实际记录
+
+请求支持 reschedule_preference=nearest/prefer_before/prefer_after；偏好只影响已查询候选的推荐，不改变原 hard/soft 要求、合法范围或改期待确认。默认 nearest 保持旧请求摘要兼容，非默认偏好参与请求判重。
+
+详见 [决策契约](24-agent-decision-improvements.md) 与 [实际证据](../examples/decision_improvements_v4_1/README.md)。
