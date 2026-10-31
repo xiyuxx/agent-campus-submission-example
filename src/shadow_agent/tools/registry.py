@@ -10,7 +10,7 @@ from ..config import ResourceLimits
 from ..context import ItemContext
 from ..contracts import FACT_FIELDS, MaterialArgs, ReadArgs, SaveArgs, SlotArgs, ToolResult
 from ..model_view import tool_view
-from .availability import available_tools
+from .availability import available_tools, read_details
 
 ARGUMENTS = {
     "read_material": ReadArgs,
@@ -28,7 +28,7 @@ DESCRIPTIONS = {
 
 def schemas(ctx=None) -> list[dict]:
     allowed = available_tools(ctx, include_pending=True) if ctx is not None else set(ARGUMENTS)
-    return [
+    result = [
         {
             "type": "function",
             "function": {
@@ -40,6 +40,13 @@ def schemas(ctx=None) -> list[dict]:
         for name, contract in ARGUMENTS.items()
         if name in allowed
     ]
+    if ctx is not None:
+        for tool in result:
+            if tool["function"]["name"] == "read_material":
+                tool["function"]["parameters"]["properties"]["detail"]["enum"] = read_details(
+                    ctx, include_pending=True
+                )
+    return result
 
 
 def retry_key(name, args, ctx) -> str:
@@ -94,6 +101,12 @@ def execute(
                 raise BusinessError("INVALID_ARGUMENTS", "工具参数超出 8 KiB；没有执行")
             raw_arguments = json.loads(raw_arguments)
         args = ARGUMENTS[name].model_validate(raw_arguments)
+        if (
+            allowed_tools is not None
+            and name == "read_material"
+            and args.detail not in read_details(ctx)
+        ):
+            raise BusinessError("ACTION_NOT_AVAILABLE", "补查需要当前审核依据、可用来源且尚未补查")
         key = retry_key(name, args, ctx)
         if ctx.retry_counts.get(key, 0) > 1:
             raise BusinessError("RETRY_LIMIT", "该临时失败最多额外重试一次")
@@ -123,6 +136,7 @@ def execute(
                 x for x in FACT_FIELDS if getattr(snapshot.material, x) is None
             ]
             data["supplement_available"] = ctx.repo.supplement_available(ctx.material_id)
+            ctx.supplement_available = data["supplement_available"]
             code = "MATERIAL_READ"
         elif name == "check_rules":
             if not ctx.snapshot:

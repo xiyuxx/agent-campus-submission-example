@@ -43,6 +43,7 @@ class ItemContext:
     save_receipt: dict | None = None
     schedule_refresh_required: bool = False
     schedule_requeries: int = 0
+    supplement_available: bool = False
 
     def refresh_draft(self) -> None:
         self.draft_state = self.repo.current_draft(self.request.request_id, self.material_id)

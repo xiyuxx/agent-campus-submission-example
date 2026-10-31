@@ -17,6 +17,24 @@ def names(ctx):
     return {x["function"]["name"] for x in schemas(ctx)}
 
 
+def test_supplement_requires_a_real_review_reason_and_is_not_repeatable(repo, job):
+    ctx = context(repo, job)
+    execute("read_material", {"detail": "basic"}, ctx)
+
+    def details():
+        tool = next(x["function"] for x in schemas(ctx) if x["function"]["name"] == "read_material")
+        return tool["parameters"]["properties"]["detail"]["enum"]
+
+    assert details() == ["basic"]
+    denied = execute("read_material", {"detail": "supplement"}, ctx, allowed_tools=names(ctx))
+    assert denied.code == "ACTION_NOT_AVAILABLE" and not ctx.snapshot.supplemented
+    execute("check_rules", {}, ctx)
+    ctx.consumed.update(ctx.observations)
+    assert "supplement" in details()
+    assert execute("read_material", {"detail": "supplement"}, ctx, allowed_tools=names(ctx)).ok
+    assert details() == ["basic"]
+
+
 def test_optional_missing_is_not_a_blocking_requirement(repo, job, catalog):
     catalog.materials[0].copyright_status = "authorized"
     repo.apply_catalog_snapshot(catalog, update=True)
@@ -28,6 +46,9 @@ def test_optional_missing_is_not_a_blocking_requirement(repo, job, catalog):
     assert data["blocking_missing_fields"] == []
     assert "license_ref" in data["other_missing_fields"]
     assert data["supplement_available"] and not data["supplemented"]
+    ctx.consumed.update(ctx.observations)
+    denied = execute("read_material", {"detail": "supplement"}, ctx, allowed_tools=names(ctx))
+    assert denied.code == "ACTION_NOT_AVAILABLE"
 
 
 def test_blocking_field_and_available_source_are_explicit(repo, job):

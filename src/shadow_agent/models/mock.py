@@ -73,7 +73,14 @@ class MockModel:
                 for r in results
             )
             if not supplemented:
-                if review["data"].get("supplement_available", True):
+                read_schema = next(
+                    (x["function"] for x in schemas if x["function"]["name"] == "read_material"),
+                    None,
+                )
+                details = (
+                    read_schema["parameters"]["properties"]["detail"]["enum"] if read_schema else []
+                )
+                if review["data"].get("supplement_available", True) and "supplement" in details:
                     return call("read_material", detail="supplement")
             return finish("needs_input", "补查后仍缺必要资料")
         requirement = context["publish_requirement"]
