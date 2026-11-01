@@ -1,5 +1,7 @@
 # 实际运行证据入口
 
+[GitHub推送后克隆复验](submission_push_20261101/README.md)记录远程基线、360项独立回归与归档核对。
+
 当前交付入口为 [2026-11-01复核](submission_audit_20261101/README.md)：当前源码15次离线业务运行、最终360项测试、干净安装与证据检查报告。
 
 真实模型优先看 [提示4.1归档](decision_improvements_v4_1/README.md)：7组Mock和2条DeepSeek live。两条live源码摘要与当前一致，本轮只读核查，没有重复调用模型。观察与下一动作的逐步对比见 [评估](../docs/03-evaluation.md#真实模型的两条路径)。

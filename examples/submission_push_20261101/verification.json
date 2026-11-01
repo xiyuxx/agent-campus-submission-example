@@ -1,0 +1,94 @@
+{
+  "kind": "remote-clone-verification",
+  "repository": "https://github.com/xiyuxx/agent-campus-submission-example",
+  "tested_commit": "f3e7b9d8fff8b3b59f0af062a4d8b75706ff5be2",
+  "local_head_matched_remote_main": true,
+  "remote_history_count_at_check": 23,
+  "method": "Fresh clone from GitHub; use previously clean-installed locked wheel environment with isolated Python imports. No source changes after the tested baseline; follow-up commit records delivery verification only.",
+  "offline_tests": {
+    "passed": 360,
+    "failed": 0,
+    "skipped": 0,
+    "elapsed_seconds": 46.95
+  },
+  "application_evidence_runs_checked": 17,
+  "prior_archive_runs_checked": 9,
+  "prior_archive_hashes_checked": 65,
+  "markdown_file_links_checked": 277,
+  "missing_file_links": 0,
+  "both_manifests_match_clone_bytes": true,
+  "local_env_not_tracked": true,
+  "initial_history_credential_scan": {
+    "commits": 22,
+    "blobs": 1050,
+    "findings": 0
+  },
+  "commands": [
+    {
+      "command": [
+        "installed-clean-venv/python",
+        "-I",
+        "-m",
+        "pytest",
+        "--basetemp=D:\\Code\\smallShadow\\.tmp\\submission-remote-pytest",
+        "-q",
+        "--runxfail",
+        "--junitxml=D:\\Code\\smallShadow\\runtime\\submission-remote-junit.xml"
+      ],
+      "exit_code": 0,
+      "output": "........................................................................ [ 20%]\n........................................................................ [ 40%]\n........................................................................ [ 60%]\n........................................................................ [ 80%]\n........................................................................ [100%]\n360 passed in 46.95s\n"
+    },
+    {
+      "command": [
+        "installed-clean-venv/python",
+        "-I",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "installed-clean-venv/python",
+        "-I",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0,
+      "output": "50 files already formatted\n"
+    },
+    {
+      "command": [
+        "installed-clean-venv/python",
+        "-I",
+        "scripts/check_evidence.py",
+        "examples/submission_audit_20261101/scenarios",
+        "--live-directory",
+        "examples/decision_improvements_v4_1"
+      ],
+      "exit_code": 0,
+      "output": "Validated 17 application runs; live paths checked: True.\n"
+    },
+    {
+      "command": [
+        "installed-clean-venv/python",
+        "-I",
+        "scripts/check_decision_examples.py",
+        "examples/decision_improvements_v4_1"
+      ],
+      "exit_code": 0,
+      "output": "{\"verified_runs\": 9, \"verified_files\": 65}\n"
+    }
+  ],
+  "live_model_calls": 0
+}
