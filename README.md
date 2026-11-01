@@ -79,6 +79,7 @@ stdout 是 UTF-8 JSON；中文摘要和进度说明走 stderr。退出码：0=�
 ## 检查与复现
 
 ```powershell
+New-Item -ItemType Directory -Force .tmp | Out-Null
 .\.venv\Scripts\python.exe -m pytest --basetemp=.tmp/pytest -q --runxfail
 .\.venv\Scripts\python.exe -m ruff check src tests scripts
 .\.venv\Scripts\python.exe -m ruff format --check src tests scripts
