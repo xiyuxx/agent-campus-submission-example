@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-25f3b4c4-d021-4b0a-a6b4-1fd219976837",
+  "request_id": "REQ-EVIDENCE-slot_conflict",
+  "mode": "mock",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T19:00:00+08:00",
+      "confirmation_status": "pending",
+      "pending_items": [
+        {
+          "id": "change_time",
+          "kind": "confirm",
+          "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+        }
+      ],
+      "draft": {
+        "id": "D-5fd658b5-92a2-4f62-a5e2-4f631685294e",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-8d94fd91-4fe1-4b7a-a7b3-84a8c6205c7d",
+        "OBS-f7bc3616-91bc-438c-9754-5c3d5ebebfbe",
+        "OBS-7fe997a7-333c-4d13-abd9-ff56bead3518",
+        "OBS-ad9d6005-4e6a-4e79-a332-b79176e53872",
+        "OBS-2ddde4fb-1f9f-454a-8a75-1d7339589d24",
+        "OBS-d96aea6a-ad86-4bf6-a93a-7ec8f872b6b4"
+      ],
+      "error": null
+    }
+  ]
+}

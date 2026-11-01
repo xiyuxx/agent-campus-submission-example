@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-fe1a006f-ad61-44b2-b612-b91b741e2f05",
+  "request_id": "REQ-EVIDENCE-rule_risk",
+  "mode": "mock",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "needs_review",
+      "risk_reasons": [
+        {
+          "rule_id": "R-CAPTION-REVIEW",
+          "version": 1,
+          "severity": "needs_review",
+          "field": "caption",
+          "observed_value": "示例最强功能，需人工核实",
+          "source_id": "materials:M01@2",
+          "message": "示例品牌规则要求人工核实该表述依据"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T18:00:00+08:00",
+      "confirmation_status": "pending",
+      "pending_items": [
+        {
+          "id": "risk:R-CAPTION-REVIEW",
+          "kind": "confirm",
+          "message": "示例品牌规则要求人工核实该表述依据"
+        }
+      ],
+      "draft": {
+        "id": "D-e501a3f8-af79-412f-aa7a-aec0a85b23f4",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-b48ad3f4-7433-4590-a549-2fde9ba25599",
+        "OBS-45e04a1b-8eff-4ae5-9722-310810a0b749",
+        "OBS-085ceaef-6c1b-4df8-8b34-28f5808a61a1",
+        "OBS-52345476-d3c2-428d-928d-7ae212617689",
+        "OBS-3bfc2c31-ebc7-497c-97b1-d43fbdbb6b00",
+        "OBS-6cf6d1c6-ee31-4caa-82fd-1a7e18b153a6"
+      ],
+      "error": null
+    }
+  ]
+}

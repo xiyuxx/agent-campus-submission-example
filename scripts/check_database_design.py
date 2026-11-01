@@ -1,10 +1,9 @@
 """Check the proposed DDL in disposable databases; not application acceptance tests."""
 
-from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
-
+from pathlib import Path
 
 SCHEMA = Path(__file__).resolve().parents[1] / "docs" / "15-database-schema.sql"
 STAMP = "2026-11-03T10:00:00.000000Z"
@@ -27,9 +26,7 @@ class DesignSchemaChecks(unittest.TestCase):
             "INSERT INTO catalog_imports VALUES (?, 0, 1, 'applied', ?, ?, 1, '{}', '{}', ?)",
             ("I1", "synthetic-design-check", DIGEST, STAMP),
         )
-        self.db.execute(
-            "INSERT INTO catalog_meta VALUES (1, 1, 'I1', ?, 1, ?)", (DIGEST, STAMP)
-        )
+        self.db.execute("INSERT INTO catalog_meta VALUES (1, 1, 'I1', ?, 1, ?)", (DIGEST, STAMP))
         self.db.execute(
             "INSERT INTO materials (material_id, material_version, platform, account_id, "
             "content_sha256, is_current, last_import_id) VALUES ('M1', 1, 'p', 'a', ?, 1, 'I1')",
@@ -183,9 +180,7 @@ class DesignSchemaChecks(unittest.TestCase):
             )
 
     def test_default_candidates_and_empty_candidates_are_distinct(self) -> None:
-        self.db.execute(
-            "UPDATE request_items SET candidate_times_json='[]' WHERE request_id='R2'"
-        )
+        self.db.execute("UPDATE request_items SET candidate_times_json='[]' WHERE request_id='R2'")
         values = self.db.execute(
             "SELECT candidate_times_json FROM request_items ORDER BY request_id"
         ).fetchall()
@@ -225,7 +220,8 @@ class DesignSchemaChecks(unittest.TestCase):
     def test_active_conflict_query_uses_partial_index(self) -> None:
         plan = self.db.execute(
             "EXPLAIN QUERY PLAN SELECT draft_id FROM drafts WHERE platform=? AND account_id=? "
-            "AND at_utc=? AND validity='active'", ("p", "a", STAMP)
+            "AND at_utc=? AND validity='active'",
+            ("p", "a", STAMP),
         ).fetchall()
         self.assertIn("ux_drafts_active_slot", str(plan))
 

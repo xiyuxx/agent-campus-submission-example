@@ -1,13 +1,14 @@
 # 素材审核与发布排期 Agent
 
-当前阶段：**契约与存储已有阶段一验证，完整 Agent 验收尚未在本文记录**。选择用户列出的第一个项目：素材审核与发布排期 Agent。实际实现与检查范围见 [阶段记录](docs/16-implementation-progress.md)，不以模块文件存在或设计示例认定完整功能已通过。
+当前阶段：**本地 CLI、13 表存储、四类工具、原生 Agent、Mock 与 DeepSeek 已实现并实测**。2026-11-01 最终离线回归 **360 项通过**，本轮 15 次 Mock 运行覆盖六个必验场景及扩展边界；既有两条提示 4.1 live 的源码摘要与当前一致，体现正常保存和抢槽后重查改选。详见 [评估](docs/03-evaluation.md) 和 [当前证据](examples/submission_audit_20261101/README.md)。仅保存本地草稿，无真实发布能力。本轮未新增模型调用；用户已授权将本地历史及本轮交付修正提交并推送。
 
-业务流程以开发实现参考 v1.3 和数据库设计 v1.0 为基线，Agent 开发按新增的流程规范逐阶段实施。原时间与显式候选独立于默认候选；同请求重跑重新检查、排除自身并保留未变方案的有效确认。改变原始要求需独立新请求，不会自动替代旧草稿；首版不提供原要求就地编辑、自动替换请求或已确认方案撤回。review 拒绝仅适用于尚有可确认待办的当前有效方案，已拒绝方案不会被同请求重跑恢复。完整入口与模型路径仍需实际验收。
+业务流程以开发实现参考和第 19、23、24 号修订为准，数据库设计 v1.0 为存储基线。原时间与显式候选独立于默认候选；同请求重跑重新检查、排除自身并保留未变方案的有效确认。改变原始要求需独立新请求，不会自动替代旧草稿；首版不提供原要求就地编辑、自动替换请求或已确认方案撤回。review 拒绝仅适用于尚有可确认待办的当前有效方案，已拒绝方案不会被同请求重跑恢复。
 
 ## 评审入口
 
 | 材料 | 用途 |
 | --- | --- |
+| [当前交付审核](docs/25-submission-audit.md) | 本轮缺口、修正、验证与尚待提交的信息 |
 | [Agent 开发流程规范](docs/17-agent-development-spec.md) | 实施手册：24 章覆盖提示/消息、上下文、工具、循环、预算、记忆、故障、竞品依据、验收与阶段提交 |
 | [实际实现进度](docs/16-implementation-progress.md) | 已发生的实现、检查结果与未完成部分 |
 | [数据库设计](docs/15-database-design.md) | 13 张表、字段、主外键、索引、完整导入、审计与数据库调用规范；附 DDL |
@@ -28,33 +29,80 @@
 
 ## 环境与安装
 
-已检查的准备环境：Windows / PowerShell、Python 3.13.12、Git 2.47.0、ripgrep 15.1.0。
-这不是运行兼容性测试结果。开发基线确定为 Python 3.13，依赖在实现时锁定并验证。
+实测环境：Windows / PowerShell、Python 3.13.12、SQLite 3.51.1；使用 HTTPX 0.28.1、Pydantic 2.14.2、pytest 9.2.0、Ruff 0.17.3。全部运行、验证及构建依赖精确版本见 requirements.lock。其他系统尚未实测。
 
-确定使用 Python 3.13、argparse CLI、原生单 Agent、DeepSeek Tool Calls、HTTPX、Pydantic 2、SQLite、pytest 和 Ruff。阶段一已在独立 .venv 安装并锁定依赖，已有契约/存储检查；干净安装、完整 CLI 和 live 的结论须另有实际记录。
-
-可在仓库根目录创建隔离环境：
+在仓库根目录创建独立环境并安装：
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe --version
+.\.venv\Scripts\python.exe -m pip install -r requirements.lock
+.\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
 ```
 
-后续直接调用虚拟环境解释器，不要求修改 PowerShell 执行策略。
-已有 .venv 与 requirements.lock；上述创建命令供新环境参考。Git 已初始化并配置本地阶段性提交钩子。
+直接调用虚拟环境解释器，不要求修改 PowerShell 执行策略。克隆后按 [Git 规范](docs/14-git-workflow.md) 启用本地钩子。受限 Windows 环境如在 asyncio 初始化处挂起，需要允许本机回环 socket；该行为在纯离线 Mock 中也会发生。
 
-## 后续运行入口
+## 使用
 
-数据库方案已细化为完整快照导入、草稿证据快照、导入记录和状态事件，阶段一已实现契约、迁移与 Repository。可运行 `python scripts/check_database_design.py` 检查设计 DDL 的约束；它仅验证 SQLite 结构，不运行 Agent 或证明业务验收通过。
+一键演示默认 Mock，不需要密钥，资料和数据库隔离于 runtime/demo。重复 demo 使用相同业务请求，可观察草稿复用：
 
-完整 Agent、真实模型、离线 Mock 和 CLI 的实施与命令模板见 [开发阶段](docs/17-agent-development-spec.md#21-可以逐项执行的开发阶段与退出条件)。模板在对应模块验证前不视为可运行入口；实际结果另行记录，不提供虚构输出或通过率。
+```powershell
+.\.venv\Scripts\python.exe -m shadow_agent demo
+.\.venv\Scripts\python.exe -m shadow_agent review --db runtime/demo/agent.db
+```
+
+demo 包含冲突、缺资料和阻断三项，所以整批退出码为 4 是预期业务结果；已保存部分仍保留。自动化入口：
+
+```powershell
+.\.venv\Scripts\python.exe -m shadow_agent seed --data data --db runtime/agent.db
+.\.venv\Scripts\python.exe -m shadow_agent run --input data/request.json --mode mock --db runtime/agent.db --output runtime/runs/first
+.\.venv\Scripts\python.exe -m shadow_agent inspect-draft --id <实际草稿ID> --db runtime/agent.db
+.\.venv\Scripts\python.exe -m shadow_agent confirm --input confirmation.json --db runtime/agent.db
+```
+
+review 是数字菜单，默认暂不处理；confirm 的 JSON 格式见 [确认契约](docs/13-implementation-reference.md#11-用户确认与-review)。原要求不能就地改写；补原时间/候选需新 request_id，补素材则改资料文件并显式更新。
+
+```powershell
+.\.venv\Scripts\python.exe -m shadow_agent seed --data data --db runtime/agent.db --update --dry-run
+.\.venv\Scripts\python.exe -m shadow_agent seed --data data --db runtime/agent.db --update
+```
+
+更新是四文件完整目录。缺文件失败；缺席资料退出当前目录，已有排期被新集合替换，历史保留。实际目录变化让旧 active 草稿统一 stale；同内容导入 noop 不失效。预览是检查工具，程序不会猜测文件漏项。
+
+真实模型必须显式 live；只有这个分支加载所指定 .env 中的 DeepSeek 配置，不读取 GitHub 凭据，不自动加载 .env：
+
+```powershell
+.\.venv\Scripts\python.exe -m shadow_agent run --input data/request.json --mode live --env-file .env --db runtime/agent.db --output runtime/runs/live-first
+```
+
+stdout 是 UTF-8 JSON；中文摘要和进度说明走 stderr。退出码：0=完成/查询成功，2=输入或配置错误，3=需用户输入/确认，4=规则阻断，5=未完成，1=技术失败。输出目录不能覆盖；每次输出 input.json、output.json、summary.md、trace.jsonl、run.json。
+
+## 检查与复现
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest --basetemp=.tmp/pytest -q --runxfail
+.\.venv\Scripts\python.exe -m ruff check src tests scripts
+.\.venv\Scripts\python.exe -m ruff format --check src tests scripts
+.\.venv\Scripts\python.exe scripts/check_evidence.py examples/submission_audit_20261101/scenarios --live-directory examples/decision_improvements_v4_1
+.\.venv\Scripts\python.exe scripts/check_decision_examples.py examples/decision_improvements_v4_1
+```
+
+默认测试完全离线。重生成场景证据时使用新目录，不覆盖已归档结果：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/generate_examples.py --mode mock --output runtime/reproduced-mock
+.\.venv\Scripts\python.exe scripts/generate_examples.py --mode live --env-file .env --cases normal slot_conflict --output runtime/reproduced-live
+```
+
+故障只通过显式 `run --fault` 或场景脚本注入，写入 run.json，模型不能触发。支持 save_before、save_once、receipt_lost、receipt_unknown、read_failure、query_failure。Mock 是工程替身，不作为真实模型能力证据。
+
+限制：本地规划容量不代表平台预约；审核只针对提供的合成元数据与规则；本地确认没有企业鉴权；保守目录版本可能导致额外复查；短历史不做自动摘要，体积超限明确 incomplete；没有全局最优、真实发布或通用撤回入口。
 
 ## 提交信息
 
 - 所选项目：素材审核与发布排期 Agent（用户列出的第 1 项；平台正式题号待核对）。
-- GitHub URL：待创建或由候选人提供。
-- 最终 commit SHA：待最终验证并提交后填写。
-- 模型：DeepSeek API，默认 deepseek-flash、非 thinking；原生循环，不使用 Runtime 框架。已有阶段一依赖锁；API 可用性和效果需真实调用验证。
-- 用时：准备阶段与正式作答阶段分别记录；平台计时以平台为准。
+- GitHub URL：[xiyuxx/agent-campus-submission-example](https://github.com/xiyuxx/agent-campus-submission-example)。仓库公开，已配置 origin 并成功推送既有 22 次本地提交。交付修正随本轮新提交上传。
+- 最终 commit SHA：以本轮完成后的 `git rev-parse HEAD`、GitHub main 和交付回复为准。既有历史已完整保留，不改写提交；本提交不能在自身文件中嵌入自身 SHA。
+- 模型：DeepSeek API，实测请求/返回均为 deepseek-flash，thinking 显式 disabled；小样本结论见评估，不外推稳定成功率。
+- 用时：既有 5 个聊天 47 轮跨 2026-10-30 至 10-31；人工实际投入未精确计时，不把聊天跨度当工时，见 [复盘](docs/05-retrospective.md#时间记录)。个人需求修正与 AI 实现范围见 [贡献记录](docs/04-ai-usage.md)。
 
 仅提交实现所需的合成资料、代码及说明，避免在仓库转载试卷全文、页面或个人信息。

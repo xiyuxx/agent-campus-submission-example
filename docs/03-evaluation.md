@@ -1,84 +1,45 @@
-# 效果评估
+# 测试、实际结果与限制
 
-2026-10-31 当前版本独立复验：合并排期查询已纳入 0866446；在用户后续改动基线 1e16f93 上重新完整离线 --runxfail 得到 **356 passed、0 failed/error/xfail**。包含合并查询 18 项、有限节点 oracle 128 项，并核对当前源码/测试摘要及七组实际服务场景。Ruff 两项通过；现有提示 4.1 的 9 组证据、65 文件只读校验通过，其中正常与抢槽 live 的查询均为完整选项，未新增 live 调用。当前与历史 342 项记录分开见 [证据索引](../examples/automatic_slots_v3/README.md)。
+2026-11-01 交付复核：当前源码的六类必验场景及确认/变占用等扩展场景通过；最终完整离线回归 **360 passed，44.07秒，0失败/xfail**。这是工程测试结果，不是模型任务成功率。完整材料见 [本轮证据索引](../examples/submission_audit_20261101/README.md)。
 
-2026-10-31 最新修复结论：RT-01、RT-02、ADV-01 均已修复，完整离线回归显式 --runxfail 得到 **324 passed，0 failed/error/xfail**。原 289 项逐项保留并通过，新增 35 项邻域测试；Ruff check/format --check 通过，未新增真实模型调用。实际证据、阶段结果和限制见 [修复记录](22-defect-fix-results.md) 与 [证据索引](../examples/defect_fixes/README.md)。下方为各阶段当时的历史状态。
+## 配置与执行范围
 
-2026-10-31 缺陷修复阶段二：RT-02 的 8 个原反例和 16 个新增结构/恢复边界通过，完整离线回归 311 passed、1 xfailed（仅 ADV-01）；最终结构测试另行 16 passed，Ruff 通过。单次畸形响应后实际恢复并保存，持续畸形有界停止。证据与限制见 [修复记录](22-defect-fix-results.md)。
+Windows/PowerShell、Python 3.13.12；依赖精确版本见 requirements.lock。原业务356项完整回归先通过（42.13秒），修复交付检查器并增加4个证据篡改反例后，最终360项全部通过。命令和源码标识见 [audit.json](../examples/submission_audit_20261101/audit.json)，原始 [pytest输出](../examples/submission_audit_20261101/pytest-final.txt) 与 [JUnit](../examples/submission_audit_20261101/junit-final.xml) 可核对。
 
-2026-10-31 缺陷修复阶段一：RT-01 的 6 个原反例与 7 个新增邻域测试通过；完整离线回归 287 passed、9 xfailed（RT-02/ADV-01 尚未修复）。真实模型调用 0，详见 [修复记录](22-defect-fix-results.md)。下方保留历史复测状态。
+初次默认临时目录不可写，改用仓库 .tmp 后又受限于本机回环 socket；中止这些尝试后在允许回环的环境完成离线回归。初次失败和中止不计为通过。
 
-2026-10-31 最新核实：[docs/20 独立复核与修改建议](21-test-report-verification.md)。在相同业务源码摘要上重跑得到 138 passed/1 xfailed、136 passed/14 failed、完整 274 passed/15 xfailed，与原报告一致；仍存在 RT-01、RT-02、ADV-01，xfail 不计通过。本轮仅复核，没有修复业务源码。
+全新 venv 按 requirements.lock 安装依赖、构建并安装当前 wheel、pip check、隔离导入及CLI demo全部通过。demo退出4是其中未授权素材被阻断的预期结果，正常素材确实保存了待确认草稿。见 [安装报告](../examples/submission_audit_20261101/install-check.json) 和 [实际输出](../examples/submission_audit_20261101/installed-demo-output.json)。
 
-2026-10-31 改动后再次找错：基线 74cdcac 的既有测试为 138 passed、1 xfailed；新增 150 项显式运行得到 136 passed、14 failed（2 类问题：相同素材重读后保留旧规则审核、畸形模型响应逃逸协议纠错）。完整回归为 274 passed、15 xfailed，包含尚未修复的旧 ADV-01；详情、覆盖分析和实际证据见 [复测与测试设计](20-retest-and-test-design.md)。本轮未修改业务代码、未调用真实模型，xfail 不算业务通过。
+## 六类验收及扩展场景
 
-2026-10-31 新增本地身份绑定与双向最近节点变更；设计契约见 [第 19 号规范](19-local-model-boundary.md)。旧证据保留其原始源码/协议版本，不支持新协议已经通过的结论；新测试与实际运行结果在实施后单独补录。
+[场景目录](../examples/submission_audit_20261101/scenarios) 包含12类场景、15次实际Mock程序运行；重复、确认、变占用另保留before运行。每次都有输入、输出、Trace和运行元数据；最终场景另有目录快照及数据库查询结果。
 
-## 2026-10-31 新协议实际结果
+| 场景 | 预期 | 实际结果与证据 |
+| --- | --- | --- |
+| 正常 | 审核通过、原时间保存 | [passed/saved/completed，18:00](../examples/submission_audit_20261101/scenarios/normal/output.json) |
+| 信息不足 | 列出缺项、不编造 | [needs_info/needs_input，未保存](../examples/submission_audit_20261101/scenarios/insufficient/output.json) |
+| 规则风险 | 软风险待确认，阻断不得保存 | [软风险saved/pending](../examples/submission_audit_20261101/scenarios/rule_risk/output.json)、[未授权blocked](../examples/submission_audit_20261101/scenarios/blocked/output.json) |
+| 时段冲突 | 原18:00不变，建议19:00待确认 | [hard仍保留，saved/pending](../examples/submission_audit_20261101/scenarios/slot_conflict/output.json) |
+| 重复提交 | 同ID/修订，仅一份草稿 | [reused](../examples/submission_audit_20261101/scenarios/duplicate/output.json)、[一份草稿一条历史](../examples/submission_audit_20261101/scenarios/duplicate/database_state.json) |
+| 保存失败 | 明确failed，无成功行 | [failed](../examples/submission_audit_20261101/scenarios/save_failure/output.json)、[数据库零草稿](../examples/submission_audit_20261101/scenarios/save_failure/database_state.json) |
+| 工具查询失败 | 技术失败不得伪装无候选 | [failed/未保存](../examples/submission_audit_20261101/scenarios/tool_failure/output.json) |
+| 改占用再提交 | 同草稿新修订，旧确认失效 | [revision2，新建议20:00/pending](../examples/submission_audit_20261101/scenarios/changed_occupancy/output.json) |
+| 显式确认 | 当前修订有效接受，重跑保留 | [reused/confirmed](../examples/submission_audit_20261101/scenarios/confirmation/output.json) |
+| 回执丢失/未知 | 可核实时恢复；否则未完成 | [恢复saved](../examples/submission_audit_20261101/scenarios/receipt_lost/output.json)、[unknown/incomplete](../examples/submission_audit_20261101/scenarios/receipt_unknown/output.json) |
 
-实现提交 410ae2b，提示版本 2.0。完整离线归档结果为 138 passed、1 xfailed；Ruff check/format 通过。8 组实际程序运行及类型、调用/观察关联、保存回执送达和本地数据库交叉核查见 [新协议证据索引](../examples/local_binding_nearest_v2/README.md)。
+跨进程去重、版本冲突、确认重放、拒绝后重跑、规则更新、异常响应、并发抢槽、预算和超时等由tests/integration覆盖。新增4个反例验证检查器拒绝未来观察、输出篡改、源码不符及缺文件。最近节点另有128个独立oracle占用组合。不得把旧报告的xfail计为当前通过，历史缺陷及修复见 [复测](20-retest-and-test-design.md)、[核实](21-test-report-verification.md)、[修复](22-defect-fix-results.md)。
 
-两组 DeepSeek live：原时段可用，7 次模型/6 次工具后保存 18:00 并 completed；原时段冲突，6 次模型/5 次工具，nearest 返回 17:00/19:00，模型选 19:00，保存后 needs_input、pending，未发布。两条路径均来自真实工具观察；正常路径额外补查了授权引用，不将本次结果解释为最少调用策略。17:00 与 19:00 等距，不能以模型“较近”的措辞证明 19:00 更优。
+## 真实模型的两条路径
 
-模型业务字段白名单有真实 HTTP MockTransport 捕获测试；live 归档包含服务响应 ID/usage、工具动作、完整本地观察和结果，不保存原始 HTTP 报文或完整模型上下文。可从对应源码重建投影进行字段核查，但不冒充原始报文记录。ADV-01 仍未修复；样本仅两条 live，不外推总体模型成功率，不宣称温度/预算提示收益。
+本轮新增真实模型调用为0。复核的是2026-10-31归档的提示4.1两条DeepSeek live，源码摘要与当前源码完全相同：eda8b63468af712cc51f447a499a29b6a785506ef8241d100186727094e58996。配置为deepseek-flash、thinking disabled、temperature=0；返回模型、响应ID、usage及预算见各run.json。两条均为单次样本，不能外推稳定成功率。
 
-2026-10-31 对抗性复核补充：新增 50 个离线场景，44 通过、6 失败，归为 5 类缺陷；原有 71 个测试单独通过。失败涉及未知提交状态被覆盖、批量最终报告保留过期建议、并发冲突缺少恢复信息、过期审核结论被接受、补充未知值误判冲突。详见 [复现报告](18-adversarial-test-review.md) 与 [实际证据索引](../examples/adversarial_review/README.md)。本次未修复业务代码、未调用真实模型；下方历史阶段记录不作为本次完整验收结论。
+1. [正常Trace](../examples/decision_improvements_v4_1/live_normal/trace.jsonl)：step6查询观察表明18:00可用；step7模型消费该观察，选择save_draft(18:00)；step8保存成功；step9消费回执后finish。5次有效模型动作、4次工具调用。
+2. [抢槽Trace](../examples/decision_improvements_v4_1/live_save_race/trace.jsonl)：step6原18:00冲突，返回17:00和19:00；step7模型依据prefer_after选择19:00；step8实际保存时返回SLOT_CONFLICT；step9消费错误后选择query_slots；step10新观察显示19:00已占、20:00可用；step11改存20:00；step12保存成功；step13消费回执后needs_input。7次有效模型动作、6次工具调用，最终只有一份待确认草稿。
 
-状态：**契约/存储已有阶段一验证，完整 Agent 业务验收尚未在本文件记录通过**。文档、设计 DDL 和阶段一离线检查分开记录，不声明完整业务成功率或真实模型测试通过率。
+占用由脚本在首次保存前受控注入，是真实工具失败观察，但不是生产并发事故；重查及候选选择来自模型实际响应。Trace含工具参数、返回和简短依据，不保存内部思维过程。逐步机器比较见 [evidence-check.json](../examples/submission_audit_20261101/evidence-check.json)，完整9组归档的65个文件哈希也由check_decision_examples核对通过。
 
-需求、架构与技术栈已定稿，详见 [架构实施基线](10-architecture-baseline.md)。当前已核查设计文件、引用、验收覆盖及设计 DDL 的部分结构性质，不属于完整业务测试。
+## 仍未证明的部分
 
-## 测试计划
+合成样本和少量live不能证明真实视频审核能力、总体模型成功率、成本或温度参数收益。没有长期并发、断电/进程强杀、大数据量性能或跨系统原子性验证。本地确认没有企业身份鉴权。其他操作系统未实测。
 
-| 用例 | 预期 | 实际结果 | 证据 |
-| --- | --- | --- | --- |
-| 正常场景 | 按题目要求完成核心任务 | 未运行 | 尚未生成 |
-| 信息或资料不足 | 补查、澄清或明确缺口，不编造 | 未运行 | 尚未生成 |
-| 工具失败 | 依据观察调整动作，失败有界 | 未运行 | 尚未生成 |
-| 预算耗尽 | 明确未完成，保留部分结果和缺口 | 未运行 | 尚未生成 |
-| 规则风险 | 提供规则依据，不能绕过阻断保存 | 未运行 | 尚未生成 |
-| 时段冲突 | 建议替代但不擅改硬要求，明确待确认 | 未运行 | 尚未生成 |
-| 重复提交 | 跨进程重复保存仅一份草稿 | 未运行 | 尚未生成 |
-| 保存失败 | 状态明确失败，无虚构草稿 ID | 未运行 | 尚未生成 |
-| 同请求变更占用后重评估 | 重新观察并调整方案，同一草稿修订更新且旧确认失效 | 未运行 | 尚未生成 |
-| 保存结果未知 | 核对实际提交状态，未核实前不声称成功或确定未保存 | 未运行 | 尚未生成 |
-| 确认和版本变化 | 确认绑定具体草稿修订，不能越过阻断或沿用过期确认 | 未运行 | 尚未生成 |
-| 字段与规则边界 | 身份格式错误拒绝导入，合法未知业务事实按规则判断；默认不额外要求授权引用 | 未运行 | 尚未生成 |
-| 时间范围 | 原时间和显式候选独立于默认时段；显式跨日可查，省略/null 与 [] 分别处理，soft 改期仍需确认 | 未运行 | 尚未生成 |
-| 无可用时段与结束校验 | 真正全占用时请求调整范围且不保存；已有可保存方案却只输出确认文字则拒绝结束 | 未运行 | 尚未生成 |
-| 自身排除与独立请求 | 查询及保存排除当前草稿，计入同素材其他请求；新请求不自动替代旧草稿 | 未运行 | 尚未生成 |
-| 用户决定保持 | 同方案复用保留有效确认，已拒绝方案重跑不恢复，缺项不能接受为通过 | 未运行 | 尚未生成 |
-
-业务验收计划已在 [需求矩阵](01-requirements.md) 中补齐；详细补充断言见 [开发实现参考](13-implementation-reference.md#14-验收实现顺序与设计理由)。实现后每条引用真实存在的 `examples/` 文件。
-真实模型结果、离线测试结果分别报告，不互相代替。
-
-## 当前准备核查
-
-- 最初准备时目录为空；仓库现已初始化 Git 并配置阶段性提交钩子，业务代码与运行证据仍未生成。
-- 检测到 Python 3.13.12、Git 2.47.0、ripgrep 15.1.0。
-- 已准备结构与工程、测试、证据、交付约定；未安装运行依赖。
-
-2026-10-30 业务流程文档修订核查：9 份变更 Markdown 中的 9 段 JSON 示例可解析，32 个本地链接及锚点存在，25 张表列数一致；已核对设计示例间的素材、时段冲突、草稿修订及确认项引用，git diff --check 无空白错误。上述为文档静态检查，不是类型、数据库、工具、Agent 或真实模型测试，业务验收结果仍为未运行。
-
-## 数据库设计实际检查
-
-2026-10-30 数据库设计检查：新增 [设计文档](15-database-design.md)、[DDL](15-database-schema.sql) 和标准库检查脚本。实际结构检查输出见 [数据库设计检查记录](../examples/design_checks/database-design.txt)，仅涵盖临时数据库中的 SQL 约束、延迟 FK、回滚、写锁与索引使用。它不执行完整导入/确认服务，不检查模型观察真实性，不构成 B01–B09 或真实模型证据。首次执行因系统临时目录不可写失败，改用仓库忽略的 .tmp 下隔离目录后通过；未更改业务存储语义。
-
-## 实测后填写
-
-实现阶段进度见 [阶段记录](16-implementation-progress.md)。2026-10-30 阶段一：30 项离线契约/存储测试通过、Ruff 通过；这覆盖部分确定性逻辑，不等同于上方完整业务场景、CLI 或真实模型验收。
-
-记录执行命令、环境、代码版本、模式、样本量、模型及采样配置、预期和实际差异、失败原因与修复结果。
-至少对两条真实模型路径逐步解释“工具观察发生了什么变化 → 模型实际选择了什么动作”。
-不可重复或未验证的部分如实标注，并说明这些限制影响哪条结论。
-
-## Agent 开发流程规范的设计核查
-
-2026-10-30：新增 [24 章开发规范](17-agent-development-spec.md)，覆盖竞品设计依据、消息和上下文、四类工具、循环、结束、预算、记忆、恢复、测试及阶段提交。文档静态检查通过，实际计数与范围见 [规范设计检查记录](../examples/design_checks/agent-development.txt)：仅检查 Markdown、JSON 示例、链接/锚点、差异和规范自身一致性，不运行新 Agent、CLI、DeepSeek 或六类业务验收。工作区并行实现文件不纳入本设计提交，也不据文件存在追加通过项；规范与代码的差异取舍留待用户后续决定。
-
-
-## 2026-10-31 决策改进实际记录
-
-最终完整离线回归 356 passed（42.22 秒）；7 组 Mock、2 组提示 4.1 live 均核对真实输出及数据库快照。真实正常路径 5 次有效动作，受控抢槽路径 7 次；后者保存19:00冲突后主动重新查询并保存20:00待确认。只有各一次样本，不宣称总体成功率。
-
-详见 [决策契约](24-agent-decision-improvements.md) 与 [实际证据](../examples/decision_improvements_v4_1/README.md)。
+GitHub认证和目标仓库查询均返回HTTP200；目标仓库公开，已有22次历史已正常推送。本轮用户已授权提交/推送交付修正；最终SHA与远程main在操作完成后核对，不伪造上传结果。本人贡献与可观察时间口径见 [AI使用](04-ai-usage.md) 和 [复盘](05-retrospective.md)。

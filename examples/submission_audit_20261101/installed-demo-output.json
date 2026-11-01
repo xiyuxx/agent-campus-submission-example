@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-ccf425f3-c2f5-400f-9f9c-ca833fae4e5b",
+  "request_id": "REQ-DEMO-NEAREST-V2",
+  "mode": "mock",
+  "task_status": "blocked",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T19:00:00+08:00",
+      "confirmation_status": "pending",
+      "pending_items": [
+        {
+          "id": "change_time",
+          "kind": "confirm",
+          "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+        }
+      ],
+      "draft": {
+        "id": "D-a1906f2f-19f1-46c0-9e93-fb7ef320f42e",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-b063b622-0f15-466b-913e-4b259050816e",
+        "OBS-5bf7c43c-c811-45f2-a267-b6a5868f98d4",
+        "OBS-48b07117-7423-4f8f-b8b1-7b7e4161fcd1",
+        "OBS-74d6c336-b2d7-49b1-a054-ed89fe5cc30e",
+        "OBS-d352563e-aa67-49c8-a05e-ea976e545e45",
+        "OBS-31b37cc0-0074-4c99-9bf5-43ab0cf4b357"
+      ],
+      "error": null
+    },
+    {
+      "material_id": "M02",
+      "material_version": 1,
+      "review_status": "needs_info",
+      "risk_reasons": [
+        {
+          "rule_id": "R-COPYRIGHT-MISSING",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "copyright_status",
+          "observed_value": null,
+          "source_id": "materials:M02@1",
+          "message": "缺少版权状态，请补查授权资料"
+        },
+        {
+          "rule_id": "R-COVER-MISSING",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "cover_ref",
+          "observed_value": null,
+          "source_id": "materials:M02@1",
+          "message": "示例业务规则要求提供封面引用"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "missing:copyright_status",
+          "kind": "input",
+          "message": "请补充素材 copyright_status 并显式导入"
+        },
+        {
+          "id": "missing:cover_ref",
+          "kind": "input",
+          "message": "请补充素材 cover_ref 并显式导入"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-7134b473-9341-4220-bd5c-d4fa005b04b9",
+        "OBS-00bfba17-0ab5-42a2-8ca1-d7af88d61bfc"
+      ],
+      "error": null
+    },
+    {
+      "material_id": "M03",
+      "material_version": 1,
+      "review_status": "blocked",
+      "risk_reasons": [
+        {
+          "rule_id": "R-COPYRIGHT-DENIED",
+          "version": 1,
+          "severity": "blocked",
+          "field": "copyright_status",
+          "observed_value": "unauthorized",
+          "source_id": "materials:M03@1",
+          "message": "未授权素材不得进入排期"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "soft",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "blocked",
+      "evidence_ids": [
+        "OBS-dc849172-a83a-4d24-b879-d8bd037bc69b",
+        "OBS-1dea89a0-6e7b-4724-9ddf-ebff2ad2855d"
+      ],
+      "error": null
+    }
+  ]
+}

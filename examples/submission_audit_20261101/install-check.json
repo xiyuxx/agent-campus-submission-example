@@ -1,0 +1,36 @@
+{
+  "wheel_sha256": "564d22290b06df3464a3f35f1cf5b23f0395b8f944bb7fa804fa6ce1be4199af",
+  "checks": [
+    {
+      "check": "wheel",
+      "exit_code": 0
+    },
+    {
+      "check": "venv",
+      "exit_code": 0
+    },
+    {
+      "check": "dependencies",
+      "exit_code": 0
+    },
+    {
+      "check": "package",
+      "exit_code": 0
+    },
+    {
+      "check": "pip-check",
+      "exit_code": 0
+    },
+    {
+      "check": "import",
+      "exit_code": 0
+    },
+    {
+      "check": "installed-wheel-demo",
+      "exit_code": 4,
+      "expected_exit_code": 4,
+      "task_status": "blocked"
+    }
+  ],
+  "method": "fresh venv, exact requirements.lock, built wheel, isolated import and CLI demo"
+}

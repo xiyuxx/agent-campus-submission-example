@@ -1,12 +1,13 @@
 """Reject obvious credentials in staged files without printing secret values."""
 
-from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import sys
+from pathlib import Path, PurePosixPath
 
-
-TOKEN = re.compile(rb"(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,})")
+TOKEN = re.compile(
+    rb"(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,})"
+)
 SECRET_NAME = re.compile(r"(?:KEY|TOKEN|SECRET|PASSWORD|GITHUB_FGT)", re.IGNORECASE)
 
 
@@ -14,7 +15,8 @@ def blocked_path(name: str) -> bool:
     path = PurePosixPath(name)
     base = path.name.lower()
     return (
-        (base == ".env" or base.startswith(".env.")) and base != ".env.example"
+        (base == ".env" or base.startswith(".env."))
+        and base != ".env.example"
         or path.suffix.lower() in {".pem", ".key", ".db", ".sqlite", ".sqlite3"}
         or "runtime" in path.parts
     )

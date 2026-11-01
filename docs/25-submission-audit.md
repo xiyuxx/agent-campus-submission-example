@@ -1,0 +1,42 @@
+# 2026-11-01 GitHub交付审核
+
+## 结论与修正
+
+本地核心实现符合素材审核与发布排期题的六项业务验收，有真实模型消费工具观察的循环和两条不同路径。最终离线360项通过，15次本轮Mock业务运行、2条源码一致的既有live、干净安装及CLI执行可核查。业务符合性与提交信息完整性分开判定；正式题号及精确人工用时仍存在证据缺口。
+
+| 缺口 | 处理结果 |
+| --- | --- |
+| README写71项测试，文档混有未实现、未运行和旧候选契约 | 重整README、五份交付文档、examples索引及.env.example，当前状态与历史分开 |
+| check_evidence递归误读测试套件run.json，且假设旧query=alternatives协议 | 改为选择明确业务目录、只读检查当前源码/输入输出/调用观察/最终事件，按合并查询比较live路径；报告只写新文件 |
+| 缺少当前完整六类验收的集中入口 | 本轮重跑12类场景15次，保存输入/输出/Trace/运行元数据和数据库快照 |
+| 本人贡献与用时仅有占位 | 读取5个既有聊天47轮，归纳用户真实提问/决策与AI工作；区分聊天跨度、AI响应区间和未知人工工时 |
+| 检查脚本格式不一致 | 整理3个脚本的导入和格式，保留原有凭据/提交消息钩子规则 |
+
+源码摘要未改变，因此本轮无需把旧live冒充新调用；证据校验器和文档不影响业务行为。当前以本轮 [证据索引](../examples/submission_audit_20261101/README.md)、[需求映射](01-requirements.md)、[评估](03-evaluation.md) 为评审入口。
+
+## GitHub与待办
+
+用户提供目标仓库：https://github.com/xiyuxx/agent-campus-submission-example 。本地此前未配置origin；用户后续明确授权推送，已配置无凭据origin并成功推送已有22次提交。GitHub凭据只读认证GET /user返回HTTP200；对目标仓库的GET也返回200，确认仓库公开、默认main、Token报告push权限为true。未实际测试写入，不能据此保证推送一定成功；公开仓库无需单独授权评审账号，尚未核查指定评审的实际访问。见 [只读仓库核查](../examples/submission_audit_20261101/github-repository-check.json)。
+
+上一轮按“先不急着提交”保留工作区；本轮用户明确授权提交与推送。已确认远程初始为空，历史1050个blob及22个commit未检出凭据，并原样正常推送main至41136dc。既有22个提交标题符合Conventional Commits，未改写历史或强推。当前交付修正经暂存检查、正常钩子验证后形成新提交并上传；最终SHA在推送后以本地HEAD和远程refs核对，记录于交付回复。此前遗留的旧协议/无关未跟踪材料不混入本次提交。
+
+实际人工用时未精确记录；既有聊天时间跨度不充当用时。贡献证据见 [AI使用](04-ai-usage.md)，时间口径见 [复盘](05-retrospective.md#时间记录)。
+
+## 全部考核要求的再次核验
+
+| 要求 | 判定 | 核对位置与原因 |
+| --- | --- | --- |
+| 用户、目标、输入材料和逐项结果 | 符合本地验收 | docs/01-requirements.md；src/shadow_agent/contracts.py、result.py；审核/风险/建议/待办/保存状态独立输出 |
+| 模型动作→工具→观察→下一动作 | 符合 | src/shadow_agent/agent.py逐轮回传工具观察；docs/03-evaluation.md的两条源码一致live显示保存失败后重查改选，不把Mock作为决策证据 |
+| 至少两条动态路径 | 符合，样本量有限 | examples/decision_improvements_v4_1/live_normal及live_save_race，分别5/7次有效模型动作；抢槽受控注入已标注 |
+| 六项必验场景及改变占用再重复 | 符合本地验收 | examples/submission_audit_20261101/scenarios：正常、缺资料、风险、冲突、重复、保存失败和changed_occupancy；输出及数据库快照均可核对 |
+| hard要求、确认、去重和真实保存 | 符合本地验收 | policy.confirmation_definitions、storage保存/确认事务；test_agent.py含跨进程重复、并发容量、确认与占用变化测试 |
+| 有界执行、失败及未完成 | 符合 | config.py预算与agent.py超时/纠错；test_runtime_limits.py；预算耗尽不报告完成 |
+| CLI复现、离线入口、依赖 | 符合 | README命令、requirements.lock、.env.example；当前wheel全新环境安装与无密钥Mock已实际运行 |
+| 代码/测试/数据/五份文档及至少三组材料 | 符合 | src、tests、data、docs/01–05；本轮15次程序运行覆盖三类且输入/实际输出/Trace齐全 |
+| AI使用及本人贡献如实记录 | 符合现有可核查记录 | docs/04-ai-usage.md依据5个历史聊天47轮，明确需求决策与AI编码，不声称未证实的本人手写/独立执行 |
+| 实际投入时间 | 信息不足，不能完全核实 | docs/05-retrospective.md“时间记录”：只有聊天跨度和AI响应窗口，无法恢复人工阅读、思考、中断时间；不能把27小时跨度或4小时响应当作个人工时。3小时是建议，不把超过建议本身判为不合格 |
+| 题号、GitHub URL、最终SHA | 题号未核实；URL已具备；SHA随推送核对 | README“提交信息”：仅知用户列出的第1项，无法确认平台正式编号；不能擅填。最终SHA由Git返回，在交付回复提供 |
+| 评审可读与凭据排除 | 公开仓库可读；扫描通过 | GitHub仓库private=false，历史和本轮候选文件扫描、.env忽略；不需要私有仓库评审授权，不提交原始私密对话或完整试卷 |
+
+本次未发现新的六项核心验收不符合项；自动化检查不能证明程序不存在其他缺陷。真实视频审核、界面、部署、多Agent、企业鉴权和生产级恢复不属于本题必需项，它们的未实现不列为不符合。未新增真实模型调用。

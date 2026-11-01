@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-d147e3a7-42f7-4e2f-9be0-77ea13c24d6b",
+  "request_id": "REQ-EVIDENCE-receipt_unknown",
+  "mode": "mock",
+  "task_status": "incomplete",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T18:00:00+08:00",
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": "D-539062ed-b3ef-4421-b41c-3d9cf50b2f7f",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "unknown",
+        "error": {
+          "code": "SAVE_UNKNOWN",
+          "message": "回执丢失且核对失败，提交结果未知",
+          "retryable": false
+        }
+      },
+      "task_status": "incomplete",
+      "evidence_ids": [
+        "OBS-a427159b-06ac-49ed-85c6-6cdd259e6257",
+        "OBS-11eed683-6bda-4d40-8ccc-17bff457681c",
+        "OBS-4092d280-aee3-46c6-8307-220fcde44da6",
+        "OBS-4e71ad33-b252-463d-a335-237cce8c4f6a",
+        "OBS-075aeb3b-5f20-49b8-892e-12e921c55337",
+        "OBS-4283584f-296a-42cb-939e-1b84ea7c232b"
+      ],
+      "error": {
+        "code": "SAVE_UNKNOWN",
+        "message": "回执丢失且核对失败，提交结果未知",
+        "retryable": false
+      }
+    }
+  ]
+}

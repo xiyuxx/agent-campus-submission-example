@@ -1,0 +1,58 @@
+{
+  "document_links_checked": 101,
+  "files_scanned_for_credentials": 873,
+  "local_env_ignored": true,
+  "test_count": 360,
+  "failures_errors_skipped": 0,
+  "checks": [
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0,
+      "stdout": "50 files already formatted\n"
+    },
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "scripts/check_evidence.py",
+        "examples/submission_audit_20261101/scenarios",
+        "--live-directory",
+        "examples/decision_improvements_v4_1"
+      ],
+      "exit_code": 0,
+      "stdout": "Validated 17 application runs; live paths checked: True.\n"
+    },
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "scripts/check_decision_examples.py",
+        "examples/decision_improvements_v4_1"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"verified_runs\": 9, \"verified_files\": 65}\n"
+    }
+  ],
+  "git_commit_performed": false,
+  "github_write_performed": false
+}

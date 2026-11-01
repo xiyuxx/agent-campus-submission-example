@@ -1,26 +1,11 @@
-# 运行证据约定
+# 实际运行证据入口
 
-2026-10-31 新协议已有 [本地身份与双向最近节点实际证据](local_binding_nearest_v2/README.md)：6 组 Mock、2 组 live，附完整离线回归与数据库核查。下方早期“当前没有业务执行记录”描述保留为历史准备约定；旧协议记录不能替代本次新协议证据。
+当前交付入口为 [2026-11-01复核](submission_audit_20261101/README.md)：当前源码15次离线业务运行、最终360项测试、干净安装与证据检查报告。
 
-当前没有业务执行记录。数据库设计的实际结构检查记录单独存放于 [design_checks/database-design.txt](design_checks/database-design.txt)，不属于 Agent、Mock/live 或六类业务运行证据。下面是目标结构，不是已经生成的业务证据：
+真实模型优先看 [提示4.1归档](decision_improvements_v4_1/README.md)：7组Mock和2条DeepSeek live。两条live源码摘要与当前一致，本轮只读核查，没有重复调用模型。观察与下一动作的逐步对比见 [评估](../docs/03-evaluation.md#真实模型的两条路径)。
 
-```text
-examples/
-  normal/{input.json,output.json,trace.jsonl,run.json}
-  insufficient/{input.json,output.json,trace.jsonl,run.json}
-  tool_failure/{input.json,output.json,trace.jsonl,run.json}
-  test-results.txt
-```
+其他目录是历史阶段、旧协议、反例与修复证据，应按各自README、run.json和源码摘要解读，不将旧失败或旧成功套到当前源码。设计检查仅验证文档或DDL，不充当Agent运行。Mock仅验证工程流程。
 
-每组证据来自同一次实际执行。`run.json` 记录命令、代码版本、运行模式、模型标识、时间、退出码及配置摘要；不得包含密钥。
-模型支持时记录采样参数，不承诺模型输出逐字确定。
+业务运行包含input.json、output.json、trace.jsonl、run.json、summary.md；记录自动生成，参数和观察只保留必要信息，不包含密钥、原始私密上下文或内部思维过程。测试套件的run.json是另一契约，不能当作业务输入输出。
 
-`trace.jsonl` 事件协议见 `docs/00-engineering-standards.md`。每条记录必须标明 `live` 或 `mock`。
-Mock 记录只说明工程流程可执行，不支持真实模型能力结论。
-
-若模型不可用，保留错误事实并记录缺失证据，不用 Mock 冒充真实路径。
-评估文档只引用真实存在且已审查的文件。
-
-## Agent 规范的设计检查
-
-[design_checks/agent-development.txt](design_checks/agent-development.txt) 记录开发规范及关联文档的实际静态检查：JSON 示例、Markdown 链接/锚点、表格、代码块与示例自一致性。它不裁定规范与代码的取舍、不运行 Agent/CLI、不调用模型，也不能替代六类业务证据。契约/存储已有离线阶段记录见 [实现进度](../docs/16-implementation-progress.md)，与本次设计检查分开报告。
+复现命令和只读检查见 [根README](../README.md)。新运行必须使用新目录，不覆盖历史。数据库快照来自执行当时的真实查询；克隆后检查快照一致性不等于重新访问原数据库。

@@ -1,0 +1,24 @@
+{
+  "kind": "submission-audit",
+  "source": {
+    "base_commit": "41136dca2fb1a77283911dec2baa7a8d014009c3",
+    "source_sha256": "eda8b63468af712cc51f447a499a29b6a785506ef8241d100186727094e58996"
+  },
+  "github": {
+    "credential_configured": true,
+    "authenticated_get_user_http_status": 200,
+    "remote_writes": false
+  },
+  "offline_test_command": ".venv/Scripts/python.exe -m pytest --basetemp=.tmp/submission-audit-unrestricted -q --runxfail --junitxml=runtime/submission-audit/junit.xml",
+  "live_model_calls_this_audit": 0,
+  "initial_attempts": "Default temporary directory was inaccessible; repository-local run was interrupted during restricted asyncio initialization. Full regression was rerun outside that restriction.",
+  "final_offline_test_command": ".venv/Scripts/python.exe -m pytest --basetemp=.tmp/submission-audit-final -q --runxfail --junitxml=examples/submission_audit_20261101/junit-final.xml",
+  "final_offline_result": {
+    "passed": 360,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 44.07
+  },
+  "git_commit_performed": false,
+  "github_write_performed": false
+}

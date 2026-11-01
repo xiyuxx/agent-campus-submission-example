@@ -1,0 +1,44 @@
+{
+  "kind": "project-chat-history-review",
+  "timezone": "Asia/Shanghai",
+  "historical_chats": [
+    {
+      "title": "数据库设计",
+      "turn_count": 12,
+      "start": "2026-10-30 16:38:09",
+      "end": "2026-10-31 17:54:27"
+    },
+    {
+      "title": "Agent循环",
+      "turn_count": 15,
+      "start": "2026-10-30 17:07:24",
+      "end": "2026-10-31 17:40:28"
+    },
+    {
+      "title": "测试",
+      "turn_count": 2,
+      "start": "2026-10-31 09:58:14",
+      "end": "2026-10-31 11:53:10"
+    },
+    {
+      "title": "阅读并梳理实现参考文档",
+      "turn_count": 4,
+      "start": "2026-10-30 16:02:57",
+      "end": "2026-10-30 16:34:03"
+    },
+    {
+      "title": "前置准备",
+      "turn_count": 14,
+      "start": "2026-10-30 14:27:31",
+      "end": "2026-10-30 16:00:23"
+    }
+  ],
+  "unique_turns": 47,
+  "first": "2026-10-30 14:27:31",
+  "last": "2026-10-31 17:54:27",
+  "wall_clock_span_hours": 27.448888888888888,
+  "assistant_turn_union_seconds": 15314,
+  "assistant_duration_sum_seconds": 17122.417,
+  "scope": "Five prior project chats, all returned pages; current audit chat excluded from historical duration. No raw messages or private tool context exported.",
+  "limitation": "Conversation wall-clock span and assistant turn durations do not establish actual personal work hours or hand-written code."
+}

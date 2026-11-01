@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-cbff20dc-ddb8-4957-8626-b8fda99c9c7f",
+  "request_id": "REQ-EVIDENCE-receipt_lost",
+  "mode": "mock",
+  "task_status": "completed",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T18:00:00+08:00",
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": "D-a780336c-40f6-453c-8d11-f0bd7d218827",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "completed",
+      "evidence_ids": [
+        "OBS-467c9c99-9c87-4a70-9605-036f492f3781",
+        "OBS-d3706e2d-f63e-4450-a0ad-7f797b61b0ad",
+        "OBS-2e888446-67d1-4724-be36-c346a28b7d9b",
+        "OBS-05ae0f74-d95a-4ea6-ab6a-ea928608201f",
+        "OBS-fbfbb3a1-7db6-47fc-9326-a5b00bfb382a",
+        "OBS-783d4ca3-80d2-464a-a293-a4ba8f5f55e8"
+      ],
+      "error": null
+    }
+  ]
+}
