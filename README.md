@@ -129,8 +129,8 @@ New-Item -ItemType Directory -Force .tmp | Out-Null
 ## 提交信息
 
 - 题目标识：素材审核与发布排期 Agent（用户再次核对的题目标题；未提供独立数字题号，不杜撰编号）。
-- GitHub URL：[xiyuxx/agent-campus-submission-example](https://github.com/xiyuxx/agent-campus-submission-example)。既有版本已公开；本轮优化执行本地阶段提交，尚未推送。
-- 最终 commit SHA：本地以 `git rev-parse HEAD` 和交付回复为准；提交GitHub前需推送并核对远程SHA。既有历史完整保留，不改写提交；不在commit自身文件内嵌其SHA。
+- GitHub URL：[xiyuxx/agent-campus-submission-example](https://github.com/xiyuxx/agent-campus-submission-example)。本轮优化已按用户授权推送，业务及证据基线 `1a2527d` 已核对远程 main 一致。
+- 最终 commit SHA：以 `git rev-parse HEAD`、远程 main 和交付回复为准；推送状态说明更新随最后文档提交同步。既有历史完整保留，不改写提交；不在commit自身文件内嵌其SHA。
 - 模型：DeepSeek API，实测请求/返回均为 deepseek-flash，thinking 显式 disabled；小样本结论见评估，不外推稳定成功率。
 - 用时估算：约 4–5 小时的 AI 辅助交互与执行时间（含 AI 运行/等待，按既有 47 轮响应窗口合并约 4 小时 15 分粗估）；人工净工时未单独计时，后续本人试用另计，见 [复盘](docs/05-retrospective.md#时间记录)。个人需求修正与 AI 实现范围见 [贡献记录](docs/04-ai-usage.md)。
 

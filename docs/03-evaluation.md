@@ -40,7 +40,7 @@ Ruff检查和格式检查通过。新增覆盖：历史确认回执与当前有�
 
 ## 安装与交付
 
-当前wheel在全新venv安装锁定依赖，pip check、隔离导入、demo及work list共8项检查通过，安装源码摘要与上述一致。见 [安装报告](../examples/task_workflow_v6/install/verification.json) 与同目录实际日志。demo使用明确回放时间，退出4来自合成阻断场景，未隐藏为成功。未对本轮执行GitHub推送或远程克隆复验。
+当前wheel在全新venv安装锁定依赖，pip check、隔离导入、demo及work list共8项检查通过，安装源码摘要与上述一致。见 [安装报告](../examples/task_workflow_v6/install/verification.json) 与同目录实际日志。demo使用明确回放时间，退出4来自合成阻断场景，未隐藏为成功。用户随后明确授权推送，业务及证据基线1a2527d已上传并核对远程main一致；本轮未进行新的远程克隆复验。
 
 ## 已知限制
 
