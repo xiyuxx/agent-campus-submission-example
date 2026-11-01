@@ -1,12 +1,11 @@
 """Assemble the public result from observations and committed database state."""
 
 import sqlite3
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from .common import BusinessError
 from .context import ItemContext
 from .contracts import DraftResult, ItemResult, PendingItem, RequestResult
+from .model_view import local_time
 from .policy import review_is_current
 
 
@@ -81,12 +80,7 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
         )
         confirmation = current["confirmation_status"]
         if current["validity"] == "active":
-            value = datetime.fromisoformat(current["at_utc"])
-            suggested = (
-                value.astimezone(ZoneInfo(requirement.timezone)).isoformat()
-                if requirement.timezone
-                else current["at_utc"]
-            )
+            suggested = local_time(current["at_utc"], requirement.timezone)
             pending += [PendingItem.model_validate(x) for x in current["pending_items"]]
         elif current["validity"] == "rejected":
             pending.append(

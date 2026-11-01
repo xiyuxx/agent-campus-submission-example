@@ -9,7 +9,8 @@ from .contracts import ToolResult
 def local_time(value, timezone):
     if value is None or not timezone:
         return value
-    return datetime.fromisoformat(value).astimezone(ZoneInfo(timezone)).isoformat()
+    zone = None if timezone == "local" else ZoneInfo(timezone)
+    return datetime.fromisoformat(value).astimezone(zone).isoformat()
 
 
 def plan_view(draft, timezone):

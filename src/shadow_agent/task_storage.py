@@ -2,7 +2,7 @@
 
 import json
 
-from .common import BusinessError, dumps, new_id
+from .common import BusinessError, digest, dumps, new_id
 from .contracts import BusinessFacts, Catalog, Material, PublishRequirement, Request, RequestItem
 
 
@@ -363,9 +363,11 @@ class TaskStorage:
                 }
             )
         return {
+            "export_version": "H-" + digest(ready)[:16],
             "generated_at": self.clock(),
             "business_time": self.business_now(),
-            "notice": "仅本地草稿交接清单；未执行真实发布或平台预约。执行前请再次核对。",
+            "notice": "本文件是静态草稿快照；改期或取消后请重新导出并核对版本。"
+            "未执行真实发布或平台预约。",
             "items": ready,
             "excluded_count": len(rows) - len(ready),
         }

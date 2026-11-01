@@ -48,6 +48,10 @@ class PublishRequirement(Contract):
 
     @model_validator(mode="after")
     def validate_timezone(self):
+        if self.timezone == "local":
+            # Absolute instants are already validated. Local is a display/input policy,
+            # not an assertion that a stored offset matches a future host setting.
+            return self
         if self.timezone:
             try:
                 zone = ZoneInfo(self.timezone)

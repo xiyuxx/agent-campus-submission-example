@@ -101,7 +101,7 @@ def test_supplement_and_continue_is_a_single_user_action(repo, tmp_path):
 def test_interactive_flow_hides_ids_and_handles_invalid_selection(repo, tmp_path):
     path = tmp_path / "interactive-export.json"
     stdin = (
-        "99\n1\n1\n2026-11-03T18:00:00+08:00\nAsia/Shanghai\nhard\n"
+        "99\n1\n1\n2026-11-03 18:00\n1\n"
         "2026-11-03T19:00:00+08:00\n1\n4\n1\ne\n" + str(path) + "\n\n"
     )
     result = work(repo, tmp_path, stdin=stdin)
