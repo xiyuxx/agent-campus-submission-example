@@ -229,7 +229,7 @@ def test_skip_does_not_write_and_replay_keeps_historical_result(repo, job, catal
     accepted = decide(saved)
     repo.confirm_draft(accepted)
     changed = catalog.model_copy(deep=True)
-    changed.schedule.entries = []
+    changed.schedule.entries[0].at = job.items[0].publish_requirement.candidate_times[0]
     repo.apply_catalog_snapshot(changed, update=True)
     replay = repo.confirm_draft(accepted)
     assert replay["stored_operation_result"]["confirmation_status"] == "confirmed"

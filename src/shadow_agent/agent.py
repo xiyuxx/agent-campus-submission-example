@@ -69,7 +69,6 @@ def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
         ctx.save_status in ("saved", "updated", "reused")
         and current
         and current["validity"] == "active"
-        and current["catalog_revision"] == ctx.snapshot.catalog_revision
     ):
         if ctx.save_observation_id not in ctx.consumed:
             raise BusinessError("INVALID_FINISH", "必须先消费保存回执")

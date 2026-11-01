@@ -265,7 +265,8 @@ class Repository(TaskStorage):
                 if changed
                 else []
             )
-            changes["staled_drafts"] = [x["draft_id"] for x in active]
+            changes["staled_drafts"] = []
+            changes["invalidation_reasons"] = {}
             manifest = {
                 name: {"sha256": digest(value), "count": len(value)}
                 for name, value in canonical.items()
@@ -352,8 +353,6 @@ class Repository(TaskStorage):
                             import_id,
                         ),
                     )
-                for draft in active:
-                    self._stale(connection, draft, "CATALOG_CHANGED", import_id=import_id)
                 connection.execute(
                     "INSERT INTO catalog_meta VALUES (1,?,?,?,?,?) ON CONFLICT(singleton_id) "
                     "DO UPDATE SET revision=excluded.revision, "
@@ -368,6 +367,16 @@ class Repository(TaskStorage):
                         catalog.schedule.schedule_version,
                         self.clock(),
                     ),
+                )
+                for draft in active:
+                    reason = self._invalid_reason(connection, draft)
+                    if reason:
+                        self._stale(connection, draft, reason, import_id=import_id)
+                        changes["staled_drafts"].append(draft["draft_id"])
+                        changes["invalidation_reasons"][draft["draft_id"]] = reason
+                connection.execute(
+                    "UPDATE catalog_imports SET changes_json=? WHERE import_id=?",
+                    (dumps(changes), import_id),
                 )
         return {
             "import_id": import_id,
@@ -384,6 +393,7 @@ class Repository(TaskStorage):
             name: {} for name in ("materials", "supplements", "rules", "schedule", "allowed_slots")
         }
         active = []
+        reasons = {}
         if self.path.exists():
             connection = self._connect()
             try:
@@ -418,16 +428,14 @@ class Repository(TaskStorage):
                                 else dumps([value["platform"], value["account_id"], value["at"]])
                             )
                             existing[table][key] = digest(value)
-                    active = (
-                        [
-                            x[0]
-                            for x in connection.execute(
-                                "SELECT draft_id FROM drafts WHERE validity='active'"
-                            )
-                        ]
-                        if changed
-                        else []
-                    )
+                    if changed:
+                        for row in connection.execute(
+                            "SELECT * FROM drafts WHERE validity='active'"
+                        ):
+                            reason = self._invalid_reason(connection, dict(row), catalog=catalog)
+                            if reason:
+                                active.append(row["draft_id"])
+                                reasons[row["draft_id"]] = reason
             finally:
                 if connection.in_transaction:
                     connection.execute("ROLLBACK")
@@ -454,6 +462,7 @@ class Repository(TaskStorage):
                 "modified": sorted(k for k in new.keys() & old.keys() if new[k] != old[k]),
             }
         changes["staled_drafts"] = active
+        changes["invalidation_reasons"] = reasons
         return {
             "dry_run": True,
             "previous_revision": previous,
@@ -523,12 +532,17 @@ class Repository(TaskStorage):
         if not row:
             raise BusinessError("MATERIAL_NOT_FOUND", "当前目录未找到该素材，请补充资料并显式导入")
         material = Material.model_validate({k: row[k] for k in Material.model_fields})
+        return self._snapshot(material, meta)
+
+    @staticmethod
+    def _snapshot(material: Material, meta: dict) -> MaterialSnapshot:
         return MaterialSnapshot(
             material=material,
             catalog_revision=meta["revision"],
             import_id=meta["current_import_id"],
             sources={
-                x: f"materials:{material_id}@{material.material_version}" for x in FACT_FIELDS
+                x: f"materials:{material.material_id}@{material.material_version}"
+                for x in FACT_FIELDS
             },
         )
 
@@ -545,6 +559,10 @@ class Repository(TaskStorage):
             "SELECT * FROM supplements WHERE material_id=? AND is_current=1",
             (snapshot.material.material_id,),
         ).fetchone()
+        return self._merge_supplement(snapshot, row)
+
+    @staticmethod
+    def _merge_supplement(snapshot: MaterialSnapshot, row) -> MaterialSnapshot:
         result = snapshot.model_copy(deep=True)
         result.supplemented = True
         if not row:
@@ -800,31 +818,87 @@ class Repository(TaskStorage):
                 draft = {**draft, "validity": "stale"}
         return draft
 
-    def _invalid_reason(self, connection, draft) -> str | None:
+    def _invalid_reason(self, connection, draft, *, catalog: Catalog | None = None) -> str | None:
         if draft["at_utc"] <= self.business_now():
             return "TIME_EXPIRED"
-        if draft["catalog_revision"] != self._meta(connection)["revision"]:
-            return "CATALOG_CHANGED"
         historical = connection.execute(
             "SELECT payload_json FROM draft_history WHERE draft_id=? AND revision=?",
             (draft["draft_id"], draft["revision"]),
         ).fetchone()
         payload = json.loads(historical[0])
-        actual = self._basic(connection, draft["material_id"])
-        if payload["snapshot"]["supplemented"]:
-            actual = self._supplement(connection, actual)
-        review = check_rules(actual, self._rules(connection))
+        try:
+            if catalog is None:
+                actual = self._basic(connection, draft["material_id"])
+                if payload["snapshot"]["supplemented"]:
+                    actual = self._supplement(connection, actual)
+                rules = self._rules(connection)
+            else:
+                material = next(
+                    (m for m in catalog.materials if m.material_id == draft["material_id"]), None
+                )
+                if material is None:
+                    return "MATERIAL_REMOVED"
+                actual = self._snapshot(material, self._meta(connection))
+                if payload["snapshot"]["supplemented"]:
+                    extra = next(
+                        (s for s in catalog.supplements if s.material_id == draft["material_id"]),
+                        None,
+                    )
+                    row = (
+                        {**extra.model_dump(), "fields_json": dumps(extra.fields)}
+                        if extra
+                        else None
+                    )
+                    actual = self._merge_supplement(actual, row)
+                rules = sorted(catalog.rules, key=lambda rule: rule.rule_id)
+        except BusinessError as error:
+            if error.code in ("MATERIAL_NOT_FOUND", "DATA_CONFLICT"):
+                return "MATERIAL_REMOVED" if error.code == "MATERIAL_NOT_FOUND" else error.code
+            raise
+        review = check_rules(actual, rules)
+        previous_review = {k: v for k, v in payload["review"].items() if k != "catalog_revision"}
         if (
             actual.facts_hash() != review.material_sha256
             or actual.facts_hash()
             != MaterialSnapshot.model_validate(payload["snapshot"]).facts_hash()
-            or review.model_dump(mode="json") != payload["review"]
+            or review.model_dump(mode="json", exclude={"catalog_revision"}) != previous_review
         ):
             return "EVIDENCE_CHANGED"
-        if self._occupancy(
-            connection, draft["platform"], draft["account_id"], draft["at_utc"], draft["draft_id"]
-        ):
+        if catalog is None:
+            conflicts = self._occupancy(
+                connection,
+                draft["platform"],
+                draft["account_id"],
+                draft["at_utc"],
+                draft["draft_id"],
+            )
+            permitted = (
+                connection.execute(
+                    "SELECT 1 FROM allowed_slots WHERE platform=? AND account_id=? AND at_utc=?",
+                    (draft["platform"], draft["account_id"], draft["at_utc"]),
+                ).fetchone()
+                is not None
+            )
+        else:
+
+            def same_slot(slot):
+                return (
+                    slot.platform == draft["platform"]
+                    and slot.account_id == draft["account_id"]
+                    and utc(slot.at) == draft["at_utc"]
+                )
+
+            conflicts = any(same_slot(slot) for slot in catalog.schedule.entries)
+            permitted = any(same_slot(slot) for slot in catalog.schedule.allowed_slots)
+        if conflicts:
             return "SLOT_CONFLICT"
+        requirement = payload["original_requirement"]
+        if (
+            draft["at_utc"] != requirement["requested_at"]
+            and requirement["candidate_times"] is None
+            and not permitted
+        ):
+            return "CANDIDATE_REMOVED"
         return None
 
     def revalidate_current_draft(
@@ -986,7 +1060,6 @@ class Repository(TaskStorage):
                 if (
                     existing
                     and existing["validity"] == "active"
-                    and existing["catalog_revision"] == meta["revision"]
                     and existing["semantic_sha256"] == semantic
                 ):
                     return {"save_status": "reused", "draft": self._inspect(connection, existing)}
