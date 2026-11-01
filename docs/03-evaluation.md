@@ -1,47 +1,53 @@
 # 测试、实际结果与限制
 
-当前任务工作流已实现，契约见 [第27号文档](27-task-workflow.md)。[v6证据索引](../examples/task_workflow_v6/README.md) 对应当前源码；v5及更早结果只作历史追溯，不能代替修改后的验证。
+当前契约为 [局部失效与运营体验](28-operator-experience.md)，任务生命周期沿用第27号契约。当前证据见 [v7索引](../examples/operator_experience_v7/README.md)，源码SHA256：ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b。旧v6及更早结果仅作历史追溯。
 
-## 离线验证与失败
+## 离线验证与干净环境
 
-Windows/PowerShell、Python3.13.12，锁文件依赖不变。当前418项不同用例全部有通过记录，未跳过或xfail；**不是一次单进程整套无失败**。最近整套执行409通过/9失败，失败均发生在Windows asyncio本机回环socket初始化，出现WinError10013及未完成初始化的_ssock清理错误。随后对CLI和时间恢复12项定向复核全部通过；任务模块14项也独立通过。逐用例合并覆盖418项，实际JUnit、失败与复核方法见 [验证报告](../examples/task_workflow_v6/phase2/verification.json)。
+当前438项不同用例均有通过记录，未跳过/xfail；**尚无一次整套无失败的干净环境结果**。本轮新增20项，覆盖依赖影响、确认保持、本地时间/夏令时、中文表单、CSV与版本等。阶段一24项存储/依赖检查通过；阶段二35项相关检查和7项完整CLI通过，后续改为跨本机时区断言后7项再次通过。Ruff及格式检查通过。
 
-第一阶段397项整套通过，见 [JUnit](../examples/task_workflow_v6/phase1/junit.xml)。实施中发现旧“拒绝后独立再发”的断言与用户新业务约束冲突，改为显式重新安排原任务，保留容量释放和历史不变断言；迁移DDL说明同步后字节一致性测试通过。其他全量/分模块尝试出现过环境错误，次数记录在验证报告，未把失败日志改成成功。scripts/verify_offline.py提供逐模块隔离入口，不自动重试或跳过测试。
+实际创建两个全新venv，按锁文件安装当前wheel，隔离导入的源码摘要一致。首次wheel构建、锁依赖安装、pip check、隔离导入、demo与work list等8项检查通过。使用新安装解释器完整运行结果：
 
-Ruff检查和格式检查通过。新增覆盖：历史确认回执与当前有效性分离、未来已确认方案复用、候选保存前到期后的模型重查、极端日期返回INVALID_INPUT、任务唯一性、原子替换、修改失败保留旧方案、取消/恢复、旧请求越权、导出复核、补资料版本和迁移歧义。任务记账失败也核对公开结果与最后final事件一致。
+| 实际尝试 | 用例数 | 通过 | 失败 | 说明 |
+| --- | --- | --- | --- | --- |
+| [首次完整](../examples/operator_experience_v7/install/full-tests.xml) | 438 | 424 | 14 | 全部在Windows本机socket初始化出现WinError10013 |
+| [同一新环境重查](../examples/operator_experience_v7/install/full-recheck.xml) | 438 | 379 | 59 | 57项直接socket异常；2项CLI未返回预期业务结构，产生上层KeyError |
+| [第二个新环境完整](../examples/operator_experience_v7/install-final/full-suite.xml) | 438 | 418 | 20 | 全部为本机socket初始化失败 |
 
-## 六项业务与操作优化的实际材料
+按用例核对以上记录，全部438项至少有一次通过，但不能据此把任一整套运行改写为成功。第二个新环境的demo也曾受同类环境错误阻断，记录保留。日志采集首次还遇到混合编码导致采集线程异常，已改为保留不可解码字节的转义表达；最初JUnit完整保留。未修改业务断言、跳过用例或替换事件循环来规避失败。相关原始报告见两个install目录，覆盖汇总见verification.json。
 
-当前生成28次Mock和8条真实模型运行，共36条应用记录；全部包含input/output/summary/trace/run。对比工具观察与后续动作、核验源码摘要及Trace配对的 [只读报告](../examples/task_workflow_v6/evidence-check.json) 已通过。Mock是工程替身；脚本中的用户接受、修改、取消是明确标注的合成测试动作，不是候选人本人试用记录。
+已准备仅手动触发的 [GitHub离线CI](../.github/workflows/offline-verification.yml)，在独立Windows runner构建wheel、安装新venv、完整执行默认测试、核验证据并保留报告。没有模型密钥、真实模型调用或部署步骤。**目前尚未推送或执行，不能声称CI通过。**
 
-| 验收 | 当前实际结果与文件 |
+## 六项必须验收与当前运行材料
+
+当前43次应用运行：35次Mock、8条真实模型，每条都有实际input/output/Trace/run/summary。另有数据库快照、13个任务操作快照、运营中文摘要和实际CSV。Mock与脚本中的接受、补资料、取消均为合成测试动作，不记为本人实际试用。
+
+| 必须验收 | 实际结果与证据 |
 | --- | --- |
-| 正常排期 | [正常18:00 saved/completed](../examples/task_workflow_v6/current-runs/mock_normal/output.json) |
-| 素材信息缺失 | [最低资料缺失needs_info](../examples/task_workflow_v6/current-runs/mock_missing/output.json)、[补查仍不足](../examples/task_workflow_v6/current-runs/mock_insufficient/output.json)、[补查后继续](../examples/task_workflow_v6/current-runs/mock_supplement/trace.jsonl) |
-| 规则风险 | [needs_review并待确认](../examples/task_workflow_v6/current-runs/mock_rule_risk/output.json)、[blocked不保存](../examples/task_workflow_v6/current-runs/mock_blocked/output.json) |
-| 时段冲突 | [18:00占用、19:00抢槽失败、重查20:00并待确认](../examples/task_workflow_v6/current-runs/mock_save_race/trace.jsonl) |
-| 重复提交 | [同ID修订reused](../examples/task_workflow_v6/current-runs/mock_duplicate/output.json)、[换ID阻止新建](../examples/task_workflow_v6/current-runs/mock_cross_request/output.json)、[旧显式再次发布也阻止](../examples/task_workflow_v6/current-runs/mock_explicit_repeat/output.json) |
-| 保存失败 | [failed、未保存提议、零草稿](../examples/task_workflow_v6/current-runs/mock_save_failure/output.json)；[修改失败保留旧有效方案](../examples/task_workflow_v6/task-runs/edit_save_failure-state.json) |
-| 更换占用再提交 | [原草稿revision2，新20:00待确认](../examples/task_workflow_v6/extended-runs/changed_occupancy/output.json) |
-| 确认与到期 | [原要求过期后复用已确认未来草稿](../examples/task_workflow_v6/task-runs/approved_future_reuse/output.json)、[历史回执confirmed而当前stale](../examples/task_workflow_v6/task-runs/expired_confirmation_replay.json) |
-| 用户补资料/修改/取消 | [补资料继续](../examples/task_workflow_v6/task-runs/supplement_and_continue/output.json)、[明确新时间](../examples/task_workflow_v6/task-runs/user_changes_time/output.json)、[取消后无交接项](../examples/task_workflow_v6/task-runs/cancel_confirmed_or_ready.json) |
-| 查询失败与未知回执 | [技术failed](../examples/task_workflow_v6/extended-runs/tool_failure/output.json)、[unknown/incomplete](../examples/task_workflow_v6/current-runs/mock_receipt_unknown/output.json)、[凭据核验恢复](../examples/task_workflow_v6/current-runs/mock_receipt_lost/output.json) |
+| 正常排期 | [18:00 saved/completed](../examples/operator_experience_v7/current-runs/mock_normal/output.json) |
+| 信息缺失 | [最低资料空，不保存](../examples/operator_experience_v7/current-runs/mock_missing/output.json)、[补查后仍不足](../examples/operator_experience_v7/current-runs/mock_insufficient/output.json) |
+| 规则风险 | [needs_review待确认](../examples/operator_experience_v7/current-runs/mock_rule_risk/output.json)、[blocked不保存](../examples/operator_experience_v7/current-runs/mock_blocked/output.json) |
+| 时段冲突 | [18:00占用，19:00保存抢槽失败，重查20:00并待确认](../examples/operator_experience_v7/current-runs/mock_save_race/trace.jsonl) |
+| 重复提交 | [同草稿/修订reused](../examples/operator_experience_v7/current-runs/mock_duplicate/output.json)、[换ID或旧new_publication均阻止第二份](../examples/operator_experience_v7/current-runs/mock_explicit_repeat/output.json) |
+| 保存失败 | [failed，未保存提议，零草稿](../examples/operator_experience_v7/current-runs/mock_save_failure/output.json)、[修改失败保留旧有效方案](../examples/operator_experience_v7/task-runs/edit_save_failure-state.json) |
 
-每份数据库快照表示对应执行时刻。连续场景共享数据库，不能把早期快照当作最终状态。任务操作记录包含输入、实际返回、当时工作清单和重新核验的交接内容；新要求未成功保存、未确认或已失效时不导出。
+更换占用后重跑见extended-runs/changed_occupancy：同草稿revision2，新时段待确认；确认保持和查询失败也重新运行。task-runs重生成8次应用运行及13个操作状态，覆盖未来已确认方案复用、确认到期重放、明确改期、补资料继续、取消和修改失败后重试。
 
-## 两条真实模型路径
+## 本轮运营改进的连续验证
 
-本轮显式DeepSeek live 8条，每场景一次；提示6.0，requested/returned均deepseek-flash，thinking disabled、temperature=0。共36次模型请求，API total_tokens累计68960（含缓存，不作为账单金额）。源码SHA256为d032dfd1363714d2eb2abd9217c10f7f3903570b5ee697be85978cf1243b1b93。详见 [逐步分析](../examples/task_workflow_v6/live-analysis.json)。
+[最终运营样例](../examples/operator_experience_v7/operator-runs-final/journey.json)记录四次实际Mock工具循环：先检查并明确确认M01，再检查M02、按中文缺项补版权/封面、继续M02、取消M02，最后重新检查M01。
 
-- [正常](../examples/task_workflow_v6/current-runs/live_normal/trace.jsonl)：读取→审核→观察18:00可用→模型选择保存18:00→消费回执后finish，5次模型请求、4次工具。
-- [冲突恢复](../examples/task_workflow_v6/current-runs/live_save_race/trace.jsonl)：观察18:00冲突/19:00可用→模型选19:00→真实本地保存返回SLOT_CONFLICT→模型重查→观察20:00可用→保存20:00并待确认，7次模型请求、6次工具。抢槽是明确受控故障，不称真实生产事故。
+实际断言：M02补资料未使M01失效；M01仍可交接、revision1、confirmed；重新检查返回reused/completed，不新增修订或要求再次确认。相同可交接内容JSON/CSV版本一致。两项就绪的CSV与取消后的新CSV版本不同，旧CSV字节保持不变。文件见 [两项CSV](../examples/operator_experience_v7/operator-runs-final/two-materials.csv)、[取消后CSV](../examples/operator_experience_v7/operator-runs-final/after-cancel.csv)、[运营摘要](../examples/operator_experience_v7/operator-runs-final/operator-summary.txt)。前一轮三次运营运行保留于operator-runs，不覆盖历史。
 
-其余真实路径覆盖资料缺失、过期要求、软风险、阻断和保存失败。保存失败模型先提出block，被INVALID_FINISH拒绝后改为finish，最终结构化结果保持failed且零草稿；纠错原文保留，不能宣称每次首答正确。8条单次样本不证明稳定成功率；候选到期恢复、任务修改/取消等新增流程主要由离线集成与CLI测试验证，不冒称全部做过live。
+## 真实模型的观察与下一动作
 
-## 安装与交付
+本轮显式8条DeepSeek live，提示6.0，requested/returned均deepseek-flash，thinking disabled、temperature=0。共36次请求，API total_tokens累计69037（含缓存，不当作账单金额），每场景仅一次。实际逐例统计见 [分析](../examples/operator_experience_v7/live-analysis.json)。
 
-当前wheel在全新venv安装锁定依赖，pip check、隔离导入、demo及work list共8项检查通过，安装源码摘要与上述一致。见 [安装报告](../examples/task_workflow_v6/install/verification.json) 与同目录实际日志。demo使用明确回放时间，退出4来自合成阻断场景，未隐藏为成功。用户随后明确授权推送，业务及证据基线1a2527d已上传并核对远程main一致；本轮未进行新的远程克隆复验。
+- [正常](../examples/operator_experience_v7/current-runs/live_normal/trace.jsonl)：观察18:00可用，模型保存18:00，消费回执后finish；5次模型请求、4次工具。
+- [冲突恢复](../examples/operator_experience_v7/current-runs/live_save_race/trace.jsonl)：观察18:00冲突/19:00可用，选19:00，实际本地保存遭受控SLOT_CONFLICT，模型重查并改选20:00，保存后仍待确认；7次请求、6次工具。
 
-## 已知限制
+其余路径覆盖缺资料、过期要求、软风险、阻断及保存失败。保存失败模型有一次INVALID_FINISH纠错，原事件保留；不能声称每次首答都正确。新增中文输入、依赖保持和CSV主要由离线测试/实际程序验证，不冒称全部进行过真实模型评估。当前源码、工具配对和观察送达校验见evidence-check.json。
 
-Windows本机socket限制尚依赖运行环境允许，整套一次性无失败未验证；分批通过不能隐藏这一点。审核仅元数据/规则，不证明媒体可读或版权合法；没有真实发布、企业鉴权、全局最优、断电恢复或长期高并发保证。目录更新保守地失效所有有效草稿。取消只影响本地任务，交接后外部发布需另行协调。人工净工时未精确记录，本轮AI执行不计为本人独立操作；既有4–5小时估算不包含本轮。
+## 边界
+
+只审核元数据、文案与规则，不核验真实视频和版权；只有本地草稿，未预约平台或发布。规则目前全局适用，规则变化仍需相应审核；运行中观察保留全局版本并发校验。导出版本是内容标识，不是顺序批次；静态文件不会自动撤回，无多人交接回执或团队素材表同步。人工净工时未精确计时，旧4–5小时估算不包含新增阶段。当前最大的未完成验证是独立环境一次整套无失败，等待实际CI执行或允许本机回环的运行环境。

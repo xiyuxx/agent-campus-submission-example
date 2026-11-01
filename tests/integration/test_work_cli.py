@@ -1,8 +1,11 @@
 import json
 import subprocess
 import sys
+from datetime import datetime
 
 import pytest
+
+from shadow_agent.contracts import parse_time
 
 
 def work(repo, tmp_path, *args, stdin=None, at="2026-11-01T00:00:00Z"):
@@ -70,7 +73,7 @@ def test_operator_journey_check_confirm_edit_cancel_export(repo, tmp_path):
     )
     assert edited.returncode == 0, edited.stdout
     item = json.loads(edited.stdout)["runs"][0]["result"]["items"][0]
-    assert item["suggested_at"] == "2026-11-03T20:00:00+08:00"
+    assert parse_time(item["suggested_at"]) == parse_time("2026-11-03T20:00:00+08:00")
     assert item["confirmation_status"] == "not_required"
     assert item["draft"]["id"] != draft["id"]
     assert work(repo, tmp_path, "--action", "cancel", "--material", "M01").returncode == 0
@@ -100,9 +103,16 @@ def test_supplement_and_continue_is_a_single_user_action(repo, tmp_path):
 
 def test_interactive_flow_hides_ids_and_handles_invalid_selection(repo, tmp_path):
     path = tmp_path / "interactive-export.json"
+    original = datetime.fromisoformat("2026-11-03T18:00:00+08:00").astimezone()
+    candidate = datetime.fromisoformat("2026-11-03T19:00:00+08:00").astimezone()
     stdin = (
-        "99\n1\n1\n2026-11-03 18:00\n1\n"
-        "2026-11-03T19:00:00+08:00\n1\n4\n1\ne\n" + str(path) + "\n\n"
+        "99\n1\n1\n"
+        + original.strftime("%Y-%m-%d %H:%M")
+        + "\n1\n"
+        + candidate.strftime("%Y-%m-%d %H:%M")
+        + "\n1\n4\n1\ne\n"
+        + str(path)
+        + "\n\n"
     )
     result = work(repo, tmp_path, stdin=stdin)
     assert result.returncode == 0, result.stdout + result.stderr

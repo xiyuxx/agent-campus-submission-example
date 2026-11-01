@@ -1,0 +1,17 @@
+{
+  "method": "same fresh wheel-installed venv; separate full run, no skips or case retries",
+  "exit_code": 1,
+  "suites": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "59",
+      "skipped": "0",
+      "tests": "438",
+      "time": "71.596",
+      "timestamp": "2026-11-01T20:10:40.282364+08:00",
+      "hostname": "Xiyu_dva"
+    }
+  ],
+  "initial_attempt": "full-tests.xml retains 424 passed / 14 socket-initialization failures"
+}

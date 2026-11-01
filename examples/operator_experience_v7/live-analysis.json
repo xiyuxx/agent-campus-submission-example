@@ -1,0 +1,102 @@
+{
+  "samples": 8,
+  "model_attempts": 36,
+  "tokens": 69037,
+  "records": [
+    {
+      "case": "live_blocked",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "tokens": 5093,
+      "errors": [],
+      "prompt_version": "6.0",
+      "model": "deepseek-flash"
+    },
+    {
+      "case": "live_insufficient",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "tokens": 5153,
+      "errors": [],
+      "prompt_version": "6.0",
+      "model": "deepseek-flash"
+    },
+    {
+      "case": "live_missing",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "tokens": 5158,
+      "errors": [],
+      "prompt_version": "6.0",
+      "model": "deepseek-flash"
+    },
+    {
+      "case": "live_normal",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "tokens": 9957,
+      "errors": [],
+      "prompt_version": "6.0",
+      "model": "deepseek-flash"
+    },
+    {
+      "case": "live_past",
+      "model_attempts": 4,
+      "tool_attempts": 3,
+      "tokens": 6772,
+      "errors": [],
+      "prompt_version": "6.0",
+      "model": "deepseek-flash"
+    },
+    {
+      "case": "live_rule_risk",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "tokens": 10246,
+      "errors": [],
+      "prompt_version": "6.0",
+      "model": "deepseek-flash"
+    },
+    {
+      "case": "live_save_failure",
+      "model_attempts": 6,
+      "tool_attempts": 4,
+      "tokens": 11171,
+      "errors": [
+        {
+          "budget_remaining": {
+            "model_attempts_left": 11,
+            "seconds_left": 175.571,
+            "tool_attempts_left": 12
+          },
+          "elapsed_ms": 4513,
+          "error": {
+            "code": "INVALID_FINISH",
+            "message": "技术失败不能伪装成资料待确认，请 finish 如实停止",
+            "retryable": false
+          },
+          "event_id": "EV-2d9e29b8-c1a1-4d88-906f-a694a089e8f1",
+          "event_type": "error",
+          "material_id": "M01",
+          "mode": "live",
+          "run_id": "RUN-f6f61dcd-e6e5-423b-954c-08626b48a488",
+          "schema_version": "1.0",
+          "step": 10,
+          "timestamp": "2026-11-01T12:14:25.506761Z"
+        }
+      ],
+      "prompt_version": "6.0",
+      "model": "deepseek-flash"
+    },
+    {
+      "case": "live_save_race",
+      "model_attempts": 7,
+      "tool_attempts": 6,
+      "tokens": 15487,
+      "errors": [],
+      "prompt_version": "6.0",
+      "model": "deepseek-flash"
+    }
+  ],
+  "limits": "One synthetic sample per case; no stable success-rate claim. Cache-inclusive tokens are not billed cost."
+}

@@ -1,0 +1,35 @@
+{
+  "export_version": "H-10eaabf804b63dee",
+  "generated_at": "2026-11-01T12:17:20.880309Z",
+  "business_time": "2026-11-01T00:00:00.000000Z",
+  "notice": "本文件是静态草稿快照；改期或取消后请重新导出并核对版本。未执行真实发布或平台预约。",
+  "items": [
+    {
+      "task_id": "TASK-09ee25fd-6d32-44b9-9adb-7a284f4b6df4",
+      "material_id": "M01",
+      "title": "新品功能介绍",
+      "platform": "douyin",
+      "account_id": "brand_main",
+      "suggested_at": "2026-11-03T11:00:00.000000Z",
+      "timezone": "local",
+      "original_requirement": {
+        "requested_at": "2026-11-03T18:00:00+08:00",
+        "timezone": "local",
+        "constraint": "hard",
+        "candidate_times": [
+          "2026-11-03T19:00:00+08:00"
+        ],
+        "reschedule_preference": "nearest"
+      },
+      "review_status": "passed",
+      "risk_reasons": [],
+      "confirmation_status": "confirmed",
+      "pending_items": [],
+      "save_status": "saved",
+      "draft_id": "D-9e40160f-7dcb-49ef-b01d-14194894d76b",
+      "revision": 1
+    }
+  ],
+  "excluded_count": 2,
+  "generated_at_local": "2026-11-01 20:17:20.880309+08:00（本机时间）"
+}

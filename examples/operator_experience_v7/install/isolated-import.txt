@@ -1,0 +1,1 @@
+{"path": "D:\\Code\\smallShadow\\runtime\\operator-install-v7\\venv\\Lib\\site-packages\\shadow_agent\\__init__.py", "source": {"base_commit": "b91fc032ef875e5e8539e55b8eaf7d9028df8300", "source_sha256": "ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b"}}

@@ -11,7 +11,7 @@ from pathlib import Path
 from shadow_agent.service import source_metadata
 
 
-def verify(runtime: Path, output: Path):
+def verify(runtime: Path, output: Path, *, full_tests: bool = False):
     runtime.mkdir(parents=True, exist_ok=False)
     output.mkdir(parents=True, exist_ok=False)
     records = []
@@ -20,22 +20,26 @@ def verify(runtime: Path, output: Path):
         result = subprocess.run(
             command,
             capture_output=True,
-            text=True,
-            encoding="utf-8",
             env={**os.environ, "PYTHONIOENCODING": "utf-8"},
-            timeout=180,
+            timeout=300,
         )
-        (output / (label + ".txt")).write_text(
-            result.stdout + result.stderr, encoding="utf-8", newline="\n"
-        )
+        stdout = result.stdout.decode("utf-8", errors="backslashreplace")
+        stderr = result.stderr.decode("utf-8", errors="backslashreplace")
+        (output / (label + ".txt")).write_text(stdout + stderr, encoding="utf-8", newline="\n")
         records.append(
             {"check": label, "exit_code": result.returncode, "expected_exit_code": expected}
         )
         if result.returncode != expected:
             raise RuntimeError(f"{label} failed; see recorded log")
-        return result.stdout
+        return stdout
 
-    report = {"source": source_metadata(), "checks": records}
+    report = {
+        "source": source_metadata(),
+        "checks": records,
+        "passed": False,
+        "full_tests_requested": full_tests,
+        "log_encoding": "UTF-8; undecodable bytes escaped rather than dropped",
+    }
     try:
         wheels = runtime / "wheels"
         check(
@@ -97,6 +101,24 @@ def verify(runtime: Path, output: Path):
                 "2026-11-01T00:00:00Z",
             ],
         )
+        if full_tests:
+            check(
+                "full-tests",
+                [
+                    str(executable),
+                    "-I",
+                    "-m",
+                    "pytest",
+                    "tests",
+                    "-q",
+                    "--tb=short",
+                    "--basetemp",
+                    str(runtime / "pytest"),
+                    "--junitxml",
+                    str(output / "full-tests.xml"),
+                ],
+            )
+        report["full_tests_requested"] = full_tests
         report["passed"] = True
     finally:
         (output / "verification.json").write_text(
@@ -109,5 +131,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--runtime", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument(
+        "--full-tests", action="store_true", help="使用新安装解释器完整运行离线测试"
+    )
     args = parser.parse_args()
-    verify(args.runtime, args.output)
+    verify(args.runtime, args.output, full_tests=args.full_tests)

@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "request_id": "TASKREQ-6f9c85bd-249d-4cd7-8bcd-ead4e541a4b3",
+  "items": [
+    {
+      "material_id": "M01",
+      "publish_requirement": {
+        "requested_at": "2026-11-03T18:00:00+08:00",
+        "timezone": "local",
+        "constraint": "hard",
+        "candidate_times": [
+          "2026-11-03T19:00:00+08:00"
+        ],
+        "reschedule_preference": "nearest"
+      },
+      "new_publication": false
+    }
+  ]
+}

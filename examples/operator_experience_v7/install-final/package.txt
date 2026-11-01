@@ -1,0 +1,7 @@
+Looking in indexes: https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+Processing d:\code\smallshadow\runtime\operator-install-v7-final\wheels\small_shadow_agent-0.1.0-py3-none-any.whl
+Installing collected packages: small-shadow-agent
+Successfully installed small-shadow-agent-0.1.0
+
+[notice] A new release of pip is available: 25.3 -> 26.2.2
+[notice] To update, run: D:\Code\smallShadow\runtime\operator-install-v7-final\venv\Scripts\python.exe -m pip install --upgrade pip

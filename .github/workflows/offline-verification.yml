@@ -1,0 +1,42 @@
+name: Offline verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-clean-install:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install locked bootstrap dependencies
+        run: python -m pip install -r requirements.lock
+      - name: Install verification tools
+        run: python -m pip install --no-build-isolation --no-deps -e .
+      - name: Lint
+        run: python -m ruff check src tests scripts
+      - name: Format
+        run: python -m ruff format --check src tests scripts
+      - name: Fresh wheel installation and complete offline suite
+        run: python scripts/verify_install.py --runtime runtime/ci-install --output runtime/ci-report --full-tests
+      - name: Verify current source evidence
+        run: python scripts/check_evidence.py examples/operator_experience_v7 --live-directory examples/operator_experience_v7/current-runs
+      - name: Retain installation and test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: offline-verification-${{ github.sha }}
+          path: runtime/ci-report/
+          if-no-files-found: warn
+          retention-days: 30

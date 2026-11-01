@@ -1,0 +1,38 @@
+{
+  "source": {
+    "base_commit": "b91fc032ef875e5e8539e55b8eaf7d9028df8300",
+    "source_sha256": "ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b"
+  },
+  "checked_documents": 14,
+  "missing_relative_targets": [],
+  "workflow": "manual offline Windows verification prepared, not executed",
+  "normalized_text_files": [
+    "install-final/demo.txt",
+    "install-final/full-suite-stderr.txt",
+    "install-final/full-suite-stdout.txt",
+    "install-final/full-suite-verification.json",
+    "install-final/full-suite.xml",
+    "install-final/isolated-import.txt",
+    "install-final/locked-dependencies.txt",
+    "install-final/package.txt",
+    "install-final/pip-check.txt",
+    "install-final/venv.txt",
+    "install-final/verification.json",
+    "install-final/wheel.txt",
+    "install/demo.txt",
+    "install/full-recheck-stderr.txt",
+    "install/full-recheck-stdout.txt",
+    "install/full-recheck.xml",
+    "install/full-tests.xml",
+    "install/recheck-verification.json",
+    "install/venv.txt",
+    "install/verification.json",
+    "phase1/initial-junit.xml",
+    "phase1/junit.xml",
+    "phase2/cli-junit.xml",
+    "phase2/cli-portable.xml",
+    "phase2/operator-junit.xml"
+  ],
+  "raw_backup": "runtime\\operator-archive-originals-v7",
+  "csv_bytes": "preserved unchanged; .gitattributes disables newline conversion for CSV"
+}

@@ -1,137 +1,85 @@
 # 素材审核与发布排期 Agent
 
-发布前准备与确认助手：检查素材和规则、解决排期冲突、处理用户确认，形成可交接的本地草稿。新增统一 CLI 工作台，支持补资料后继续、修改时间、取消/恢复和交接导出。输出契约1.1；仅保存本地草稿，无真实发布能力。实际测试和模型结果见 [评估](docs/03-evaluation.md) 与 [当前证据](examples/task_workflow_v6/README.md)。
+发布前准备与确认 CLI：检查素材、处理风险和时间冲突，形成可确认的本地草稿。**仅保存草稿，不预约平台、不执行真实发布。** 技术栈为 Python 3.13、原生单 Agent、DeepSeek Tool Calls、HTTPX、Pydantic、SQLite。
 
-当前业务契约见 [第27号修订](docs/27-task-workflow.md)。同素材、平台、账号只有一个发布任务；版本或时间变化属于原任务修订。新方案保存成功才原子替换旧方案，失败保留旧有效草稿；新方案重新计算确认，不能沿用旧批准。旧请求及历史仍可查询。数据库版本2；兼容旧 JSON 输入，new_publication 不再授予绕过防重复的权限。
+## 快速运行与评审
 
-## 评审入口
-
-| 材料 | 用途 |
-| --- | --- |
-| [任务工作流](docs/27-task-workflow.md) | 当前任务、修改、取消、迁移及用户操作契约 |
-| [前次审核修复](docs/26-review-remediation.md) | v5历史修复、后续覆盖说明 |
-| [前次交付审核](docs/25-submission-audit.md) | 本轮缺口、修正、验证与尚待提交的信息 |
-| [Agent 开发流程规范](docs/17-agent-development-spec.md) | 实施手册：24 章覆盖提示/消息、上下文、工具、循环、预算、记忆、故障、竞品依据、验收与阶段提交 |
-| [实际实现进度](docs/16-implementation-progress.md) | 已发生的实现、检查结果与未完成部分 |
-| [数据库设计](docs/15-database-design.md) | 13 张表、字段、主外键、索引、完整导入、审计与数据库调用规范；附 DDL |
-| [Git 提交规范](docs/14-git-workflow.md) | 阶段性提交、消息格式、凭据排除和自动检查 |
-| [开发实现参考](docs/13-implementation-reference.md) | 开发首读：模块接口、JSON 契约、状态、事务与验收映射 |
-| [架构与实施基线](docs/10-architecture-baseline.md) | 技术栈、模块、工具、状态和必须交付功能 |
-| [CLI 与框架取舍](docs/12-runtime-decision.md) | 用户确认的运行方式、原生实现理由及边界 |
-| [同类产品与使用体验](docs/11-product-experience.md) | 市场工具、用户旅程、CLI 交互和体验改进 |
-| [工程与验证约定](docs/00-engineering-standards.md) | 项目结构、代码规范、技术选型、测试和提交标准 |
-| [选题比较](docs/06-topic-selection.md) | 四题对比、选择理由及关键风险 |
-| [项目要求原文](docs/08-project-requirements-original.md) | 用户提供的所选项目要求 |
-| [公开工作流程实例](docs/09-real-workflow-examples.md) | 客户案例、产品流程和教学示例 |
-| [需求](docs/01-requirements.md) | 用户、业务目标、验收矩阵 |
-| [方案](docs/02-solution.md) | 模型决策循环、工具协议、边界和取舍 |
-| [评估](docs/03-evaluation.md) | 预期、实际结果和证据索引 |
-| [AI 使用记录](docs/04-ai-usage.md) | AI 辅助范围、本人贡献及验证 |
-| [复盘](docs/05-retrospective.md) | 实际难点、学习、改进及用时 |
-
-## 环境与安装
-
-实测环境：Windows / PowerShell、Python 3.13.12、SQLite 3.51.1；使用 HTTPX 0.28.1、Pydantic 2.14.2、pytest 9.2.0、Ruff 0.17.3。全部运行、验证及构建依赖精确版本见 requirements.lock。其他系统尚未实测。
-
-在仓库根目录创建独立环境并安装：
+在仓库根目录执行（Windows / PowerShell）：
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.lock
 .\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
+.\.venv\Scripts\python.exe -m shadow_agent demo --root runtime/demo-first
 ```
 
-直接调用虚拟环境解释器，不要求修改 PowerShell 执行策略。克隆后按 [Git 规范](docs/14-git-workflow.md) 启用本地钩子。受限 Windows 环境如在 asyncio 初始化处挂起，需要允许本机回环 socket；该行为在纯离线 Mock 中也会发生。
-
-## 使用
-
-日常操作从工作台进入，不需要编写请求/确认 JSON、管理请求 ID 或草稿修订：
+demo离线无需密钥，明确回放合成资料的2026-11-01业务时间；包含阻断场景，所以退出码4是预期结果。Mock只验证流程。日常工作台：
 
 ```powershell
 .\.venv\Scripts\python.exe -m shadow_agent seed --data data --db runtime/work.db
 .\.venv\Scripts\python.exe -m shadow_agent work --db runtime/work.db --mode mock --as-of 2026-11-01T00:00:00Z
 ```
 
-上述时间是合成夹具回放，界面会标明 Mock 只验证流程。真实使用传 `--mode live --env-file .env` 并使用实际未来时间，去掉 `--as-of`。选择素材后可检查/继续、修改时间、补资料、确认、取消、显式恢复或查看技术详情；最多三项批量检查。可交接表示本地草稿有效且确认完毕，未预约或发布。
+选择素材后检查、按问题补资料、确认、改期、取消/恢复，按e导出CSV或JSON。日期输入如 `2026-11-03 22:00`，直接使用电脑本地时区；界面与CSV显示本地日期和偏移，无需填写时区名称或字段JSON。最多三项批量处理。真实使用改为 `--mode live --env-file .env`，去掉回放参数并提供实际未来时间；配置见 [.env.example](.env.example)。
 
-自动化工作入口示例（每次检查会生成新的证据目录；重复业务操作复用任务）：
+| 六项必须验收 | 当前实际输入、输出与Trace |
+| --- | --- |
+| 正常排期 | [正常](examples/operator_experience_v7/current-runs/mock_normal/output.json) |
+| 素材信息缺失 | [缺资料](examples/operator_experience_v7/current-runs/mock_missing/output.json) |
+| 规则风险 | [待确认风险](examples/operator_experience_v7/current-runs/mock_rule_risk/output.json)、[阻断](examples/operator_experience_v7/current-runs/mock_blocked/output.json) |
+| 时段冲突 | [抢槽后重查并待确认](examples/operator_experience_v7/current-runs/mock_save_race/trace.jsonl) |
+| 重复提交 | [复用原草稿](examples/operator_experience_v7/current-runs/mock_duplicate/output.json) |
+| 保存失败 | [失败、未保存提议和数据库快照](examples/operator_experience_v7/current-runs/mock_save_failure/output.json) |
+
+两条真实模型路径：[正常时段可用](examples/operator_experience_v7/current-runs/live_normal/trace.jsonl)、[冲突与保存抢槽后调整](examples/operator_experience_v7/current-runs/live_save_race/trace.jsonl)。测试、纠错、安装和样本边界统一见 [评估](docs/03-evaluation.md) 与 [当前证据](examples/operator_experience_v7/README.md)。
+
+限制：审核仅针对提供的元数据和规则，无视频理解或真实版权核验；本地容量不等于平台预约。改期须明确确认，阻断不能普通确认绕过。CSV/JSON是静态快照，改期/取消后需重新导出并核对版本。模型小样本不证明稳定成功率。本地完整测试仍受Windows回环socket环境限制，独立CI待执行；不能声称一次整套无失败。人工净投入未精确计时，不能声明三小时完成。
+
+## 操作与数据
+
+同素材/平台/账号一个稳定任务，时间和内容变化修订原任务。新方案保存失败保留旧有效草稿；未确认、修改未完成、取消或失效的方案不交接。无关素材补资料保留已有确认；实际依赖改变仍需复查。执行预算保留每项模型/工具各16次、180秒，整批最多三项/540秒，耗尽明确未完成。
+
+CSV包含素材、账号、本地时间、审核/风险、确认、草稿版本、保存状态、交接版本和导出时间。相同内容JSON/CSV版本一致；旧附件不会自动更新，导出不代表已交付或发布。自动化示例：
 
 ```powershell
-.\.venv\Scripts\python.exe -m shadow_agent work --db runtime/work.db --action check --material M01 --at 2026-11-03T18:00:00+08:00 --timezone Asia/Shanghai --constraint hard --candidate 2026-11-03T19:00:00+08:00 --as-of 2026-11-01T00:00:00Z
+.\.venv\Scripts\python.exe -m shadow_agent work --db runtime/work.db --action check --material M01 --at "2026-11-03 18:00" --constraint hard --candidate "2026-11-03 19:00" --as-of 2026-11-01T00:00:00Z
 .\.venv\Scripts\python.exe -m shadow_agent work --db runtime/work.db --action confirm --material M01 --decision accept --as-of 2026-11-01T00:00:00Z
-.\.venv\Scripts\python.exe -m shadow_agent work --db runtime/work.db --action export --file runtime/handoff-first.json --as-of 2026-11-01T00:00:00Z
+.\.venv\Scripts\python.exe -m shadow_agent work --db runtime/work.db --action export --file runtime/handoff-first.csv --as-of 2026-11-01T00:00:00Z
 ```
 
-`--action edit --material M01 --at <新时刻>` 修改原任务；`cancel` 取消本地任务并释放容量，`reopen` 显式重新安排；`supplement --fields <业务字段JSON文件>` 更新资料后继续检查。交接文件必须为新路径，导出重新复核状态，排除失效、未确认和修改未完成的方案。外部发布人员仍需执行及核对真实发布。
+工程JSON入口run/confirm/inspect-draft仍保留；显式IANA时区和带偏移ISO时间仍支持。输入timezone=local表示本机时区，已保存的绝对时刻不随电脑时区改变而改写；夏令时歧义要求明确偏移。文件及运行目录不能覆盖。
 
-已有数据库先备份，再执行 `python -m shadow_agent migrate --db <数据库路径>`。迁移遇到多份同素材/账号有效草稿时整体拒绝，返回冲突 ID，需明确保留方案；不会自动合并或删除。v1历史证据保留原样，不直接当当前版本证据。
+合成data目录用于初始化；日常补资料保存在SQLite，数据库是当前业务状态。`seed --update`是显式四文件完整快照替换，不是日常增量同步，会按导入内容覆盖当前资料；建议先加 `--dry-run`查看实际影响范围。当前未接团队素材表。已有v1数据库备份后执行 `migrate --db <路径>`升级至v2；多份同素材/账号有效草稿会明确拒绝迁移。
 
-一键演示默认 Mock，不需要密钥，资料和数据库隔离于 runtime/demo。重复 demo 使用相同业务请求，可观察草稿复用：
-
-```powershell
-.\.venv\Scripts\python.exe -m shadow_agent demo
-.\.venv\Scripts\python.exe -m shadow_agent review --db runtime/demo/agent.db
-```
-
-demo 明确使用内置2026-11-01业务参考时间回放，实际执行时间不改。包含冲突、缺资料和阻断三项，所以整批退出码为 4 是预期业务结果；已保存部分仍保留。自动化入口：
-
-```powershell
-.\.venv\Scripts\python.exe -m shadow_agent seed --data data --db runtime/agent.db
-.\.venv\Scripts\python.exe -m shadow_agent run --input data/request.json --mode mock --db runtime/agent.db --output runtime/runs/first
-.\.venv\Scripts\python.exe -m shadow_agent inspect-draft --id <实际草稿ID> --db runtime/agent.db
-.\.venv\Scripts\python.exe -m shadow_agent confirm --input confirmation.json --db runtime/agent.db
-```
-
-review 保留为兼容确认菜单，默认暂不处理；confirm 的 JSON 格式见 [确认契约](docs/13-implementation-reference.md#11-用户确认与-review)。不可变 JSON 请求不能改写；日常修改要求通过 work 自动创建原任务的新内部请求。素材也可按下列完整目录入口更新。
-
-```powershell
-.\.venv\Scripts\python.exe -m shadow_agent seed --data data --db runtime/agent.db --update --dry-run
-.\.venv\Scripts\python.exe -m shadow_agent seed --data data --db runtime/agent.db --update
-```
-
-更新是四文件完整目录。缺文件失败；缺席资料退出当前目录，已有排期被新集合替换，历史保留。实际目录变化让旧 active 草稿统一 stale；同内容导入 noop 不失效。预览是检查工具，程序不会猜测文件漏项。
-
-真实模型必须显式 live；只有这个分支加载所指定 .env 中的 DeepSeek 配置，不读取 GitHub 凭据，不自动加载 .env：
-
-```powershell
-.\.venv\Scripts\python.exe -m shadow_agent run --input data/request.json --mode live --env-file .env --db runtime/agent.db --output runtime/runs/live-first
-```
-
-正常 run 使用真实业务时间，过期原要求需要补新时间；已确认且仍有效的未来方案可复用。候选在保存前过期可有界重查，新的偏离仍待确认，不自动顺延 hard 要求。历史数据可显式 `--as-of 2026-11-01T00:00:00Z` 回放，work/confirm/review 同样支持；Mock本身不绕过时间检查。最低要求为 type/title；视频图片还需 media_ref，文字还需 caption。
-
-输出1.1中，`suggested_at` 和 `draft` 表示持久化方案；`proposed_plan` 单列本次建议及未保存/未知/失效状态。未保存方案不能确认。`related_drafts` 提供被拦截的已有草稿引用。旧 `new_publication` 字段仅兼容历史输入，不能再建独立重复任务。
-
-stdout 是 UTF-8 JSON；中文摘要和进度说明走 stderr。退出码：0=完成/查询成功，2=输入或配置错误，3=需用户输入/确认，4=规则阻断，5=未完成，1=技术失败。输出目录不能覆盖；每次输出 input.json、output.json、summary.md、trace.jsonl、run.json。
-
-## 检查与复现
+## 验证与复现
 
 ```powershell
 New-Item -ItemType Directory -Force .tmp | Out-Null
-.\.venv\Scripts\python.exe -m pytest --basetemp=.tmp/pytest -q --runxfail
+.\.venv\Scripts\python.exe -m pytest -q --basetemp .tmp/pytest
 .\.venv\Scripts\python.exe -m ruff check src tests scripts
 .\.venv\Scripts\python.exe -m ruff format --check src tests scripts
-.\.venv\Scripts\python.exe scripts/check_evidence.py examples/task_workflow_v6 --live-directory examples/task_workflow_v6/current-runs
-.\.venv\Scripts\python.exe scripts/check_decision_examples.py examples/task_workflow_v6/current-runs
+.\.venv\Scripts\python.exe scripts/verify_install.py --runtime runtime/install-new --output runtime/install-report-new --full-tests
+.\.venv\Scripts\python.exe scripts/check_evidence.py examples/operator_experience_v7 --live-directory examples/operator_experience_v7/current-runs
 ```
 
-默认测试完全离线。重生成场景证据时使用新目录，不覆盖已归档结果：
+已准备 [手动离线CI](.github/workflows/offline-verification.yml)，当前尚未推送/执行；不会调用模型、读取.env或部署。
+
+默认测试离线；安装脚本在全新venv按锁文件安装wheel，并可完整运行测试。验证结果以实际报告为准。业务资料回放不改变真实日志时间。重生成证据使用新目录：
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/generate_review_examples.py --output runtime/reproduced-mock --as-of 2026-11-01T00:00:00Z
-.\.venv\Scripts\python.exe scripts/generate_review_examples.py --live --env-file .env --output runtime/reproduced-live --as-of 2026-11-01T00:00:00Z
-.\.venv\Scripts\python.exe scripts/generate_task_examples.py --output runtime/reproduced-tasks
+.\.venv\Scripts\python.exe scripts/generate_review_examples.py --output runtime/scenarios-new --as-of 2026-11-01T00:00:00Z
+.\.venv\Scripts\python.exe scripts/generate_review_examples.py --live --env-file .env --output runtime/live-new --as-of 2026-11-01T00:00:00Z
 ```
 
-故障只通过显式 `run --fault` 或场景脚本注入，写入 run.json，模型不能触发。支持 save_before、save_once、receipt_lost、receipt_unknown、read_failure、query_failure。Mock 是工程替身，不作为真实模型能力证据。
+故障只由显式run --fault或合成场景脚本注入并记录，模型不能开启。stdout为UTF-8 JSON，交互/摘要走stderr。退出码0完成/查询成功、2输入配置错误、3需输入/确认、4阻断、5未完成、1技术失败。
 
-限制：本地规划容量不代表平台预约；审核只针对合成元数据与规则；本地确认没有企业鉴权；完整目录更新使其他草稿保守失效；短历史不做自动摘要，体积超限明确 incomplete；没有全局最优或真实发布。取消只作用于本地任务，外部交接后的变更需另行协调。
+## 交付说明
 
-## 提交信息
+[需求](docs/01-requirements.md) · [方案](docs/02-solution.md) · [评估](docs/03-evaluation.md) · [AI使用](docs/04-ai-usage.md) · [复盘](docs/05-retrospective.md) · [当前体验契约](docs/28-operator-experience.md) · [历史设计索引](docs/history-index.md)
 
-- 题目标识：素材审核与发布排期 Agent（用户再次核对的题目标题；未提供独立数字题号，不杜撰编号）。
-- GitHub URL：[xiyuxx/agent-campus-submission-example](https://github.com/xiyuxx/agent-campus-submission-example)。本轮优化已按用户授权推送，业务及证据基线 `1a2527d` 已核对远程 main 一致。
-- 最终 commit SHA：以 `git rev-parse HEAD`、远程 main 和交付回复为准；推送状态说明更新随最后文档提交同步。既有历史完整保留，不改写提交；不在commit自身文件内嵌其SHA。
-- 模型：DeepSeek API，实测请求/返回均为 deepseek-flash，thinking 显式 disabled；小样本结论见评估，不外推稳定成功率。
-- 用时估算：约 4–5 小时的 AI 辅助交互与执行时间（含 AI 运行/等待，按既有 47 轮响应窗口合并约 4 小时 15 分粗估）；人工净工时未单独计时，后续本人试用另计，见 [复盘](docs/05-retrospective.md#时间记录)。个人需求修正与 AI 实现范围见 [贡献记录](docs/04-ai-usage.md)。
+- 题目：素材审核与发布排期 Agent；未获得独立数字题号，不杜撰编号。
+- 仓库：[xiyuxx/agent-campus-submission-example](https://github.com/xiyuxx/agent-campus-submission-example)。前一版本已推送，本轮体验优化按阶段本地提交；最终SHA和推送情况以实际交付回复为准。
+- 精确依赖见requirements.lock；以Windows/Python3.13实测环境为准，不外推其他平台。
+- 用户负责业务修正与取舍，AI辅助实现和验证；本人试用不预写结果。此前4–5小时估算仅涵盖早期47轮交互执行，本次新增阶段另计，人工净工时未精确记录。
 
-仅提交实现所需的合成资料、代码及说明，避免在仓库转载试卷全文、页面或个人信息。
+真实密钥仅存忽略的.env，不提交真实隐私资料或完整试卷。克隆后按 [Git规范](docs/14-git-workflow.md) 启用正常密钥/消息钩子。

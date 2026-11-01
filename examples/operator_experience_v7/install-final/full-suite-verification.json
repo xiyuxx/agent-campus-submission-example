@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-11-01T12:29:48.315505+00:00",
+  "finished_at": "2026-11-01T12:31:20.251515+00:00",
+  "environment": "second freshly installed current wheel; default native Windows event loop",
+  "exit_code": 1,
+  "suites": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "20",
+      "skipped": "0",
+      "tests": "438",
+      "time": "89.375",
+      "timestamp": "2026-11-01T20:29:50.056282+08:00",
+      "hostname": "Xiyu_dva"
+    }
+  ],
+  "skips_or_retries_in_this_run": false
+}

@@ -1,0 +1,588 @@
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 49%]
+........................................................................ [ 65%]
+........................................................................ [ 82%]
+...............................FFFFFFFFFF.F.FFFFF...FFFF................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+___________ test_nullable_export_can_complete_and_replay_one_draft ____________
+tests\integration\test_supplement_unknowns.py:84: in test_nullable_export_can_complete_and_replay_one_draft
+    _, first = run(repo, job)
+               ^^^^^^^^^^^^^^
+tests\integration\test_agent.py:35: in run
+    asyncio.run(run_item(ctx, model or MockModel()))
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+______________ test_worklist_and_task_identity_hide_request_ids _______________
+tests\integration\test_tasks.py:29: in test_worklist_and_task_identity_hide_request_ids
+    first = run(repo, request, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+_______ test_edit_replaces_atomically_and_does_not_inherit_confirmation _______
+tests\integration\test_tasks.py:41: in test_edit_replaces_atomically_and_does_not_inherit_confirmation
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+_ test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan[save_before] _
+tests\integration\test_tasks.py:69: in test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+_ test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan[receipt_lost] _
+tests\integration\test_tasks.py:69: in test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+_ test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan[receipt_unknown] _
+tests\integration\test_tasks.py:69: in test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+__ test_cancel_confirmed_plan_releases_capacity_and_requires_explicit_reopen __
+tests\integration\test_tasks.py:97: in test_cancel_confirmed_plan_releases_capacity_and_requires_explicit_reopen
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+_____ test_old_confirmation_and_old_run_cannot_override_new_requirements ______
+tests\integration\test_tasks.py:114: in test_old_confirmation_and_old_run_cannot_override_new_requirements
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+______________ test_handoff_rechecks_expiry_and_material_change _______________
+tests\integration\test_tasks.py:135: in test_handoff_rechecks_expiry_and_material_change
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+____ test_supplement_updates_version_rechecks_and_preserves_task_identity _____
+tests\integration\test_tasks.py:144: in test_supplement_updates_version_rechecks_and_preserves_task_identity
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+______________ test_migration_backfills_real_drafts_and_confirms ______________
+tests\integration\test_tasks.py:186: in test_migration_backfills_real_drafts_and_confirms
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+______ test_missing_requirements_stay_in_task_until_user_completes_them _______
+tests\integration\test_tasks.py:230: in test_missing_requirements_stay_in_task_until_user_completes_them
+    assert run(repo, request, tmp_path / "first").task_status == "needs_input"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+_____ test_task_record_failure_keeps_trace_and_public_failure_consistent ______
+tests\integration\test_tasks.py:241: in test_task_record_failure_keeps_trace_and_public_failure_consistent
+    result = run(repo, job, tmp_path / "record-failure")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+___________ test_operator_journey_check_confirm_edit_cancel_export ____________
+tests\integration\test_work_cli.py:53: in test_operator_journey_check_confirm_edit_cancel_export
+    assert first.returncode == 3, first.stdout + first.stderr
+E   AssertionError: {"error":{"code":"INVALID_INPUT","message":"\xca\xe4\xc8\xeb/\xc5\xe4\xd6ø\xf1ʽ\xb4\xed\xce\xf3\xbb\xf2\xceļ\xfe\xb2\xbb\xbfɶ\xc1\xa3\xbb\xd2\xd1\xd3\xd0\xd4\xcb\xd0\xd0Ŀ¼\xb2\xbb\xc4ܸ\xb2\xb8\xc7"}}
+E     \xca\xe4\xc8\xeb/\xc5\xe4\xd6ø\xf1ʽ\xb4\xed\xce\xf3\xbb\xf2\xceļ\xfe\xb2\xbb\xbfɶ\xc1\xa3\xbb\xd2\xd1\xd3\xd0\xd4\xcb\xd0\xd0Ŀ¼\xb2\xbb\xc4ܸ\xb2\xb8\xc7
+E     D:\Code\smallShadow\runtime\operator-install-v7-final\venv\Lib\site-packages\shadow_agent\cli.py:239: RuntimeWarning: coroutine 'check_rows' was never awaited
+E       return 2
+E     RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+E     Exception ignored in: <function BaseEventLoop.__del__ at 0x000001229F0071A0>
+E     Traceback (most recent call last):
+E       File "D:\Utils\MiniConda\Lib\asyncio\base_events.py", line 766, in __del__
+E         self.close()
+E       File "D:\Utils\MiniConda\Lib\asyncio\proactor_events.py", line 696, in close
+E         self._close_self_pipe()
+E       File "D:\Utils\MiniConda\Lib\asyncio\proactor_events.py", line 778, in _close_self_pipe
+E         self._ssock.close()
+E     AttributeError: 'ProactorEventLoop' object has no attribute '_ssock'
+E
+E   assert 2 == 3
+E    +  where 2 = CompletedProcess(args=['D:\\Code\\smallShadow\\runtime\\operator-install-v7-final\\venv\\Scripts\\python.exe', '-m', '..._close_self_pipe\n    self._ssock.close()\nAttributeError: \'ProactorEventLoop\' object has no attribute \'_ssock\'\n').returncode
+____________ test_supplement_and_continue_is_a_single_user_action _____________
+tests\integration\test_work_cli.py:86: in test_supplement_and_continue_is_a_single_user_action
+    assert check(repo, tmp_path, "M02").returncode == 3
+E   AssertionError: assert 2 == 3
+E    +  where 2 = CompletedProcess(args=['D:\\Code\\smallShadow\\runtime\\operator-install-v7-final\\venv\\Scripts\\python.exe', '-m', '..._close_self_pipe\n    self._ssock.close()\nAttributeError: \'ProactorEventLoop\' object has no attribute \'_ssock\'\n').returncode
+E    +    where CompletedProcess(args=['D:\\Code\\smallShadow\\runtime\\operator-install-v7-final\\venv\\Scripts\\python.exe', '-m', '..._close_self_pipe\n    self._ssock.close()\nAttributeError: \'ProactorEventLoop\' object has no attribute \'_ssock\'\n') = check(<shadow_agent.storage.Repository object at 0x000001CA4C5BEF90>, WindowsPath('D:/Code/smallShadow/runtime/operator-final-full-suite/test_supplement_and_continue_i0'), 'M02')
+________ test_interactive_flow_hides_ids_and_handles_invalid_selection ________
+tests\integration\test_work_cli.py:119: in test_interactive_flow_hides_ids_and_handles_invalid_selection
+    assert "\xb5\xc8\xc4\xe3ȷ\xc8\xcf" in result.stderr and "\xbfɽ\xbb\xbd\xd3" in result.stderr
+E   assert ('\xb5\xc8\xc4\xe3ȷ\xc8\xcf' in "\xb7\xa2\xb2\xbcǰ׼\xb1\xb8\xb9\xa4\xd7\xf7̨ \xa1\xa4 \xbd\xf6\xb1\xa3\xb4汾\xb5زݸ\xe5\n\xc0\xeb\xcf\xdf Mock\xa3\xba\xd1\xe9֤\xc1\xf7\xb3̣\xac\xb2\xbb֤\xc3\xf7\xd5\xe6ʵģ\xd0;\xf6\xb2ߡ\xa3\nʱ\xbc\xe4ͳһ\xb0\xb4\xb5\xe7\xc4Ա\xbe\xb5\xd8ʱ\xc7\xf8\xcf\xd4ʾ\xa3\xbb\xbd\xa8\xd2\xe9\xb8\xc4\xc6\xdaʼ\xd6\xd5\xd0\xe8Ҫȷ\xc8ϡ\xa3\n1. \xd0\xc2Ʒ\xb9\xa6\xc4ܽ\xe9\xc9\xdc \xa1\xa4 brand_main \xa1\xa4 \xb4\xfd\xb4\xa6\xc0\xed\n2. \xc3ŵ껨\xd0\xf5 \xa1\xa4 brand..., in _close_self_pipe\n    self._ssock.close()\nAttributeError: 'ProactorEventLoop' object has no attribute '_ssock'\n")
+E    +  where "\xb7\xa2\xb2\xbcǰ׼\xb1\xb8\xb9\xa4\xd7\xf7̨ \xa1\xa4 \xbd\xf6\xb1\xa3\xb4汾\xb5زݸ\xe5\n\xc0\xeb\xcf\xdf Mock\xa3\xba\xd1\xe9֤\xc1\xf7\xb3̣\xac\xb2\xbb֤\xc3\xf7\xd5\xe6ʵģ\xd0;\xf6\xb2ߡ\xa3\nʱ\xbc\xe4ͳһ\xb0\xb4\xb5\xe7\xc4Ա\xbe\xb5\xd8ʱ\xc7\xf8\xcf\xd4ʾ\xa3\xbb\xbd\xa8\xd2\xe9\xb8\xc4\xc6\xdaʼ\xd6\xd5\xd0\xe8Ҫȷ\xc8ϡ\xa3\n1. \xd0\xc2Ʒ\xb9\xa6\xc4ܽ\xe9\xc9\xdc \xa1\xa4 brand_main \xa1\xa4 \xb4\xfd\xb4\xa6\xc0\xed\n2. \xc3ŵ껨\xd0\xf5 \xa1\xa4 brand..., in _close_self_pipe\n    self._ssock.close()\nAttributeError: 'ProactorEventLoop' object has no attribute '_ssock'\n" = CompletedProcess(args=['D:\\Code\\smallShadow\\runtime\\operator-install-v7-final\\venv\\Scripts\\python.exe', '-m', '..._close_self_pipe\n    self._ssock.close()\nAttributeError: \'ProactorEventLoop\' object has no attribute \'_ssock\'\n').stderr
+________ test_batch_limit_and_partial_result_survive_a_cancelled_item _________
+tests\integration\test_work_cli.py:166: in test_batch_limit_and_partial_result_survive_a_cancelled_item
+    assert batch.returncode == 3
+E   AssertionError: assert 2 == 3
+E    +  where 2 = CompletedProcess(args=['D:\\Code\\smallShadow\\runtime\\operator-install-v7-final\\venv\\Scripts\\python.exe', '-m', '..._close_self_pipe\n    self._ssock.close()\nAttributeError: \'ProactorEventLoop\' object has no attribute \'_ssock\'\n').returncode
+_ test_confirmation_replay_refreshes_current_but_preserves_historical_receipt _
+tests\integration\test_workflow_fixes.py:30: in test_confirmation_replay_refreshes_current_but_preserves_historical_receipt
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+____________ test_approved_future_plan_survives_original_deadline _____________
+tests\integration\test_workflow_fixes.py:43: in test_approved_future_plan_survives_original_deadline
+    first = run(repo, job, tmp_path / "first")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+_____ test_candidate_expires_model_requeries_and_new_time_remains_pending _____
+tests\integration\test_workflow_fixes.py:68: in test_candidate_expires_model_requeries_and_new_time_remains_pending
+    result = run(repo, job, tmp_path / "run")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_workflow_fixes.py:12: in run
+    return asyncio.run(run_request(job, repo, model or MockModel(), mode="mock", output=folder))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\runners.py:58: in __enter__
+    self._lazy_init()
+D:\Utils\MiniConda\Lib\asyncio\runners.py:137: in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:837: in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\events.py:734: in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\asyncio\windows_events.py:316: in __init__
+    super().__init__(proactor)
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:639: in __init__
+    self._make_self_pipe()
+D:\Utils\MiniConda\Lib\asyncio\proactor_events.py:786: in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+D:\Utils\MiniConda\Lib\socket.py:615: in _fallback_socketpair
+    lsock.bind((host, 0))
+E   PermissionError: [WinError 10013] \xd2\xd4һ\xd6ַ\xc3\xce\xcaȨ\xcf޲\xbb\xd4\xca\xd0\xed\xb5ķ\xbdʽ\xd7\xf6\xc1\xcbһ\xb8\xf6\xb7\xc3\xce\xca\xcc׽\xd3\xd7ֵĳ\xa2\xcaԡ\xa3
+============================== warnings summary ===============================
+tests/integration/test_tasks.py::test_worklist_and_task_identity_hide_request_ids
+tests/integration/test_tasks.py::test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan[save_before]
+tests/integration/test_tasks.py::test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan[receipt_unknown]
+tests/integration/test_tasks.py::test_old_confirmation_and_old_run_cannot_override_new_requirements
+tests/integration/test_tasks.py::test_supplement_updates_version_rechecks_and_preserves_task_identity
+tests/integration/test_tasks.py::test_missing_requirements_stay_in_task_until_user_completes_them
+tests/integration/test_tasks.py::test_task_record_failure_keeps_trace_and_public_failure_consistent
+  D:\Code\smallShadow\runtime\operator-install-v7-final\venv\Lib\site-packages\_pytest\unraisableexception.py:63: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseEventLoop.__del__ at 0x000001CA4BA819E0>
+
+  Traceback (most recent call last):
+    File "D:\Utils\MiniConda\Lib\asyncio\base_events.py", line 766, in __del__
+      self.close()
+      ~~~~~~~~~~^^
+    File "D:\Utils\MiniConda\Lib\asyncio\proactor_events.py", line 696, in close
+      self._close_self_pipe()
+      ~~~~~~~~~~~~~~~~~~~~~^^
+    File "D:\Utils\MiniConda\Lib\asyncio\proactor_events.py", line 778, in _close_self_pipe
+      self._ssock.close()
+      ^^^^^^^^^^^
+  AttributeError: 'ProactorEventLoop' object has no attribute '_ssock'
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/test_supplement_unknowns.py::test_nullable_export_can_complete_and_replay_one_draft
+FAILED tests/integration/test_tasks.py::test_worklist_and_task_identity_hide_request_ids
+FAILED tests/integration/test_tasks.py::test_edit_replaces_atomically_and_does_not_inherit_confirmation
+FAILED tests/integration/test_tasks.py::test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan[save_before]
+FAILED tests/integration/test_tasks.py::test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan[receipt_lost]
+FAILED tests/integration/test_tasks.py::test_change_failure_and_unknown_receipt_do_not_duplicate_or_lose_plan[receipt_unknown]
+FAILED tests/integration/test_tasks.py::test_cancel_confirmed_plan_releases_capacity_and_requires_explicit_reopen
+FAILED tests/integration/test_tasks.py::test_old_confirmation_and_old_run_cannot_override_new_requirements
+FAILED tests/integration/test_tasks.py::test_handoff_rechecks_expiry_and_material_change
+FAILED tests/integration/test_tasks.py::test_supplement_updates_version_rechecks_and_preserves_task_identity
+FAILED tests/integration/test_tasks.py::test_migration_backfills_real_drafts_and_confirms
+FAILED tests/integration/test_tasks.py::test_missing_requirements_stay_in_task_until_user_completes_them
+FAILED tests/integration/test_tasks.py::test_task_record_failure_keeps_trace_and_public_failure_consistent
+FAILED tests/integration/test_work_cli.py::test_operator_journey_check_confirm_edit_cancel_export
+FAILED tests/integration/test_work_cli.py::test_supplement_and_continue_is_a_single_user_action
+FAILED tests/integration/test_work_cli.py::test_interactive_flow_hides_ids_and_handles_invalid_selection
+FAILED tests/integration/test_work_cli.py::test_batch_limit_and_partial_result_survive_a_cancelled_item
+FAILED tests/integration/test_workflow_fixes.py::test_confirmation_replay_refreshes_current_but_preserves_historical_receipt
+FAILED tests/integration/test_workflow_fixes.py::test_approved_future_plan_survives_original_deadline
+FAILED tests/integration/test_workflow_fixes.py::test_candidate_expires_model_requeries_and_new_time_remains_pending
+20 failed, 418 passed, 7 warnings in 89.67s (0:01:29)

@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-d7e9313e-cc5c-4f6c-ab11-e39b24e144e4",
+  "request_id": "TASKREQ-3b47b904-a46f-44ac-a985-775633d9ac30",
+  "mode": "mock",
+  "task_status": "completed",
+  "items": [
+    {
+      "material_id": "M02",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T21:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T21:00:00+08:00",
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": "D-bc5ad538-d2e0-4f6f-9c98-4c2d948412e7",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "completed",
+      "evidence_ids": [
+        "OBS-3508c3f0-cd6f-4b03-b39d-4c1e56e69fd7",
+        "OBS-fd383cb2-95bc-4499-9c47-b7a155a47d88",
+        "OBS-a3042483-61ba-4c7b-a3d7-49f54b276da7",
+        "OBS-ff7e8adf-60ac-46cf-b042-0260754e0fd5"
+      ],
+      "error": null,
+      "proposed_plan": {
+        "suggested_at": "2026-11-03T21:00:00+08:00",
+        "pending_items": [],
+        "persistence_status": "saved",
+        "validity": "current",
+        "error": null
+      },
+      "related_drafts": []
+    }
+  ]
+}

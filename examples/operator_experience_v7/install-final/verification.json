@@ -1,0 +1,48 @@
+{
+  "source": {
+    "base_commit": "b91fc032ef875e5e8539e55b8eaf7d9028df8300",
+    "source_sha256": "ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b"
+  },
+  "checks": [
+    {
+      "check": "wheel",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "venv",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "locked-dependencies",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "package",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "pip-check",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "isolated-import",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "demo",
+      "exit_code": 2,
+      "expected_exit_code": 4
+    }
+  ],
+  "passed": false,
+  "full_tests_requested": true,
+  "log_encoding": "UTF-8; undecodable bytes escaped rather than dropped",
+  "wheel_sha256": "c4223358496cb8cb4ef399ac5136b918cc5f5c21fe85a526ad3a27f4cf405a3b",
+  "installed_source_sha256": "ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b"
+}

@@ -1,0 +1,14 @@
+{"error":{"code":"INVALID_INPUT","message":"输入/配置格式错误或文件不可读；已有运行目录不能覆盖"}}
+输入/配置格式错误或文件不可读；已有运行目录不能覆盖
+D:\Code\smallShadow\runtime\operator-install-v7-final\venv\Lib\site-packages\shadow_agent\cli.py:239: RuntimeWarning: coroutine '_run' was never awaited
+  return 2
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+Exception ignored in: <function BaseEventLoop.__del__ at 0x000001EAC4CF36A0>
+Traceback (most recent call last):
+  File "D:\Utils\MiniConda\Lib\asyncio\base_events.py", line 766, in __del__
+    self.close()
+  File "D:\Utils\MiniConda\Lib\asyncio\proactor_events.py", line 696, in close
+    self._close_self_pipe()
+  File "D:\Utils\MiniConda\Lib\asyncio\proactor_events.py", line 778, in _close_self_pipe
+    self._ssock.close()
+AttributeError: 'ProactorEventLoop' object has no attribute '_ssock'

@@ -1,0 +1,20 @@
+D:\Code\smallShadow\runtime\operator-install-v7\venv\Lib\site-packages\_pytest\unraisableexception.py:29: RuntimeWarning: coroutine 'run_request' was never awaited
+  gc.collect()
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+D:\Code\smallShadow\runtime\operator-install-v7\venv\Lib\site-packages\_pytest\unraisableexception.py:63: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseEventLoop.__del__ at 0x000001F8B8F0DDA0>
+
+Traceback (most recent call last):
+  File "D:\Utils\MiniConda\Lib\asyncio\base_events.py", line 766, in __del__
+    self.close()
+    ~~~~~~~~~~^^
+  File "D:\Utils\MiniConda\Lib\asyncio\proactor_events.py", line 696, in close
+    self._close_self_pipe()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Utils\MiniConda\Lib\asyncio\proactor_events.py", line 778, in _close_self_pipe
+    self._ssock.close()
+    ^^^^^^^^^^^
+AttributeError: 'ProactorEventLoop' object has no attribute '_ssock'
+
+Enable tracemalloc to get traceback where the object was allocated.
+See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+  warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
