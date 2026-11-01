@@ -80,7 +80,7 @@ async def generate(args):
                 "receipt_lost": "receipt_lost",
                 "receipt_unknown": "receipt_unknown",
             }.get(name)
-            repo = Repository(runtime / f"{name}.db", fault=fault)
+            repo = Repository(runtime / f"{name}.db", fault=fault, replay_at=args.as_of)
             seeded = repo.apply_catalog_snapshot(catalog)
             target = args.output / (prefix + name)
             before = None
@@ -196,6 +196,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("mock", "live"), required=True)
     parser.add_argument("--env-file", type=Path)
+    parser.add_argument("--as-of", help="Explicit historical business-time replay")
     parser.add_argument("--output", type=Path, default=Path("examples"))
     parser.add_argument("--cases", nargs="+", choices=CASES, default=list(CASES))
     args = parser.parse_args()

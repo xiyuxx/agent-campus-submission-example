@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-a7da99be-e659-42fb-9881-4e5f742286ce",
+  "request_id": "ACCIDENTAL-NEW-ID",
+  "mode": "mock",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "publication:reuse",
+          "kind": "input",
+          "message": "同素材版本和账号已有有效草稿；请使用原请求复用。确需再次发布请显式设置 new_publication=true"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-ea992f5f-980e-498b-9bc2-6b805b994f5f",
+        "OBS-91ff974a-1e28-45d3-a630-b0d35a154086",
+        "OBS-0709564c-33b6-474e-b7b9-ec6b1e43d88a"
+      ],
+      "error": {
+        "code": "DUPLICATE_PUBLICATION",
+        "message": "同素材版本和账号已有有效草稿；请使用原请求复用。确需再次发布请显式设置 new_publication=true",
+        "retryable": false
+      },
+      "proposed_plan": null,
+      "related_drafts": [
+        {
+          "draft_id": "D-4c3a3303-e05e-4ecc-946f-22658e73ef6c",
+          "request_id": "REVIEW-normal",
+          "revision": 1,
+          "at_utc": "2026-11-03T10:00:00.000000Z"
+        }
+      ]
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from shadow_agent.common import dumps
-from shadow_agent.contracts import Request, RequestResult, ToolResult
+from shadow_agent.contracts import ItemResult, Request, RequestResult, ToolResult
 from shadow_agent.result import exit_code
 from shadow_agent.service import source_metadata
 
@@ -19,7 +19,7 @@ def events_at(root):
     return [json.loads(line) for line in (root / "trace.jsonl").read_text("utf-8").splitlines()]
 
 
-def analyze(root: Path) -> dict:
+def analyze(root: Path, *, allow_historical: bool = False) -> dict:
     metadata = load(root / "run.json")
     request = Request.model_validate(load(root / "input.json"))
     result = RequestResult.model_validate(load(root / "output.json"))
@@ -28,7 +28,8 @@ def analyze(root: Path) -> dict:
     assert result.run_id == metadata["run_id"]
     assert metadata["state"] == "finished" and not metadata["evidence_error"]
     assert metadata["exit_code"] == exit_code(result)
-    assert metadata["source_sha256"] == source_metadata()["source_sha256"], root
+    source_matches = metadata["source_sha256"] == source_metadata()["source_sha256"]
+    assert source_matches or allow_historical, root
     for name in metadata["files"]:
         path = (root / name).resolve()
         assert path.is_relative_to(root.resolve()) and path.is_file(), (root, name)
@@ -58,13 +59,14 @@ def analyze(root: Path) -> dict:
     assert calls == paired
     for item in result.items:
         assert all(observations[x] == item.material_id for x in item.evidence_ids)
-        assert finals[item.material_id] == item.model_dump(mode="json")
+        assert ItemResult.model_validate(finals[item.material_id]) == item
     return {
         "directory": root.as_posix(),
         "run_id": result.run_id,
         "mode": result.mode,
         "task_status": result.task_status,
         "source_sha256": metadata["source_sha256"],
+        "source_matches_current": source_matches,
         "base_commit": metadata["base_commit"],
         "model_attempts": metadata["model_attempts"],
         "tool_attempts": metadata["tool_attempts"],
@@ -134,6 +136,11 @@ def main():
     parser.add_argument("directory", type=Path)
     parser.add_argument("--live-directory", type=Path)
     parser.add_argument(
+        "--allow-historical",
+        action="store_true",
+        help="Explicit historical validation; does not claim source matches current",
+    )
+    parser.add_argument(
         "--output", type=Path, help="Write a new validation report; never overwrite"
     )
     args = parser.parse_args()
@@ -141,11 +148,13 @@ def main():
     # application evidence tree rather than silently skipping malformed application runs.
     folders = sorted(p.parent for p in args.directory.rglob("run.json"))
     assert folders, "No application runs in selected directory"
-    records = [analyze(folder) for folder in folders]
+    records = [analyze(folder, allow_historical=args.allow_historical) for folder in folders]
     paths = None
     if args.live_directory:
         for name in ("live_normal", "live_save_race"):
-            records.append(analyze(args.live_directory / name))
+            folder = args.live_directory / name
+            if folder not in folders:
+                records.append(analyze(folder, allow_historical=args.allow_historical))
         paths = live_paths(args.live_directory)
     report = {"kind": "read-only-evidence-validation", "actual_runs": records, "live_paths": paths}
     if args.output:

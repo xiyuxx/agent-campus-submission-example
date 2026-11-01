@@ -1,0 +1,47 @@
+{
+  "source": {
+    "base_commit": "ee5bf4a62cadfa32fbae3d491f5fac43c24076ee",
+    "source_sha256": "3bf99cc483bd3bb223b42e1598c9053a61e4dbbc4f55b7be425548ba6336b50a"
+  },
+  "installed_source_sha256": "3bf99cc483bd3bb223b42e1598c9053a61e4dbbc4f55b7be425548ba6336b50a",
+  "wheel_sha256": "809c4b674077914c0a06879fc31753a9a03617142dcd97b7a817545ad1ef8b8b",
+  "checks": [
+    {
+      "check": "wheel",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "venv",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "locked-dependencies",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "package",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "pip-check",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "isolated-import",
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "check": "demo",
+      "exit_code": 4,
+      "expected_exit_code": 4
+    }
+  ],
+  "demo_business_clock": "explicit built-in fixture replay; actual execution timestamps are real",
+  "method": "new venv, exact requirements.lock, current wheel, isolated imports and CLI"
+}

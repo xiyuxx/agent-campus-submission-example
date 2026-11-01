@@ -5,7 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 
-from shadow_agent.contracts import RequestResult, ToolResult
+from shadow_agent.common import utc
+from shadow_agent.contracts import RequestResult, ToolResult, parse_time
 
 
 def check(root):
@@ -53,11 +54,15 @@ def check(root):
                     successful_saves.add(observation.observation_id)
         assert successful_saves <= delivered
         db = json.loads((folder / "database_check.json").read_text("utf-8"))
-        assert db["counts"]["drafts"] == (1 if item.draft.id else 0)
+        if "counts" in record:
+            assert db["counts"] == record["counts"]
+        else:
+            assert db["counts"]["drafts"] == (1 if item.draft.id else 0)
         if item.draft.id:
             assert db["current"]["draft_id"] == item.draft.id
             assert db["current"]["revision"] == item.draft.revision
-            assert db["current"]["at_utc"] == db["selected_at_utc"]
+            if item.suggested_at:
+                assert db["current"]["at_utc"] == utc(parse_time(item.suggested_at))
     print(json.dumps({"verified_runs": len(index["runs"]), "verified_files": len(manifest)}))
 
 

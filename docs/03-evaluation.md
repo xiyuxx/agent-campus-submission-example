@@ -1,49 +1,50 @@
 # 测试、实际结果与限制
 
-2026-11-01 交付复核：当前源码的六类必验场景及确认/变占用等扩展场景通过；最终完整离线回归 **360 passed，44.07秒，0失败/xfail**。这是工程测试结果，不是模型任务成功率。完整材料见 [本轮证据索引](../examples/submission_audit_20261101/README.md)。
+2026-11-01分享审核修复已实施。最低完整性、业务时间、跨请求重复和失败提议的当前契约见 [第26号文档](26-review-remediation.md)，当前实际证据见 [v5索引](../examples/review_remediation_v5/README.md)。旧360项及提示4.1是历史基线，不代表新源码效果。
 
-## 配置与执行范围
+## 离线结果与环境
 
-Windows/PowerShell、Python 3.13.12；依赖精确版本见 requirements.lock。原业务356项完整回归先通过（42.13秒），修复交付检查器并增加4个证据篡改反例后，最终360项全部通过。命令和源码标识见 [audit.json](../examples/submission_audit_20261101/audit.json)，原始 [pytest输出](../examples/submission_audit_20261101/pytest-final.txt) 与 [JUnit](../examples/submission_audit_20261101/junit-final.xml) 可核对。
+Windows/PowerShell、Python3.13.12、依赖沿用requirements.lock。当前完整回归 **392 passed，65.78秒，0失败/xfail**，包含原360项和32项新边界。见 [pytest](../examples/review_remediation_v5/phase3/pytest.txt)、[JUnit](../examples/review_remediation_v5/phase3/junit.xml)、[源码及测试摘要](../examples/review_remediation_v5/phase3/verification.json)。证据检查器随后适配1.1/历史核查，四项篡改反例另行重跑通过。
 
-初次默认临时目录不可写，改用仓库 .tmp 后又受限于本机回环 socket；中止这些尝试后在允许回环的环境完成离线回归。初次失败和中止不计为通过。
+初轮完整性/时间回归375通过、1失败：旧M03缺新要求的媒体引用；补齐合成夹具引用，保留旧审核失效断言后380通过。跨请求阶段初轮389通过、1失败：旧用例把新请求视为独立发布，现显式声明new_publication，原容量断言保留；新增默认换ID拦截与并发用例。初轮失败和最终输出均保留，不用预期失败冒充通过。归档仅统一LF及尾空格，原始输出保留本地runtime。
 
-全新 venv 按 requirements.lock 安装依赖、构建并安装当前 wheel、pip check、隔离导入及CLI demo全部通过。demo退出4是其中未授权素材被阻断的预期结果，正常素材确实保存了待确认草稿。见 [安装报告](../examples/submission_audit_20261101/install-check.json) 和 [实际输出](../examples/submission_audit_20261101/installed-demo-output.json)。
+全新venv按锁文件安装当前wheel、pip check、隔离导入和CLI demo均通过；安装源码摘要与当前一致。demo明确使用夹具业务时间回放，实际日志时间不改。见 [安装报告](../examples/review_remediation_v5/install-check.json)。README测试前先创建.tmp，修复新checkout嵌套basetemp缺父目录问题。
 
-## 六类验收及扩展场景
+## 真实程序材料
 
-[场景目录](../examples/submission_audit_20261101/scenarios) 包含12类场景、15次实际Mock程序运行；重复、确认、变占用另保留before运行。每次都有输入、输出、Trace和运行元数据；最终场景另有目录快照及数据库查询结果。
+当前源码生成20次Mock业务运行和8条live，共28次，均有input/output/trace/run/summary；另有执行后实际数据库快照及合成目录。重复和确认的连续场景共用场景数据库，每份快照表示该次执行当时的状态，不是最终数据库的统一快照。
 
-| 场景 | 预期 | 实际结果与证据 |
-| --- | --- | --- |
-| 正常 | 审核通过、原时间保存 | [passed/saved/completed，18:00](../examples/submission_audit_20261101/scenarios/normal/output.json) |
-| 信息不足 | 列出缺项、不编造 | [needs_info/needs_input，未保存](../examples/submission_audit_20261101/scenarios/insufficient/output.json) |
-| 规则风险 | 软风险待确认，阻断不得保存 | [软风险saved/pending](../examples/submission_audit_20261101/scenarios/rule_risk/output.json)、[未授权blocked](../examples/submission_audit_20261101/scenarios/blocked/output.json) |
-| 时段冲突 | 原18:00不变，建议19:00待确认 | [hard仍保留，saved/pending](../examples/submission_audit_20261101/scenarios/slot_conflict/output.json) |
-| 重复提交 | 同ID/修订，仅一份草稿 | [reused](../examples/submission_audit_20261101/scenarios/duplicate/output.json)、[一份草稿一条历史](../examples/submission_audit_20261101/scenarios/duplicate/database_state.json) |
-| 保存失败 | 明确failed，无成功行 | [failed](../examples/submission_audit_20261101/scenarios/save_failure/output.json)、[数据库零草稿](../examples/submission_audit_20261101/scenarios/save_failure/database_state.json) |
-| 工具查询失败 | 技术失败不得伪装无候选 | [failed/未保存](../examples/submission_audit_20261101/scenarios/tool_failure/output.json) |
-| 改占用再提交 | 同草稿新修订，旧确认失效 | [revision2，新建议20:00/pending](../examples/submission_audit_20261101/scenarios/changed_occupancy/output.json) |
-| 显式确认 | 当前修订有效接受，重跑保留 | [reused/confirmed](../examples/submission_audit_20261101/scenarios/confirmation/output.json) |
-| 回执丢失/未知 | 可核实时恢复；否则未完成 | [恢复saved](../examples/submission_audit_20261101/scenarios/receipt_lost/output.json)、[unknown/incomplete](../examples/submission_audit_20261101/scenarios/receipt_unknown/output.json) |
+| 场景 | 当前实际结果 |
+| --- | --- |
+| 正常 | [18:00 saved/completed](../examples/review_remediation_v5/current-runs/mock_normal/output.json) |
+| 同请求重复 | [同ID/修订reused](../examples/review_remediation_v5/current-runs/mock_duplicate/output.json) |
+| 换请求ID重复 | [needs_input，返回related_drafts，无第二份草稿](../examples/review_remediation_v5/current-runs/mock_cross_request/output.json) |
+| 显式再次发布及再次重跑 | [第二份saved](../examples/review_remediation_v5/current-runs/mock_explicit_repeat/output.json)、[复用第二份](../examples/review_remediation_v5/current-runs/mock_explicit_repeat_again/output.json) |
+| 最低资料全空 | [needs_info，不保存](../examples/review_remediation_v5/current-runs/mock_missing/output.json) |
+| 补查后完整 | [needs_info→补查→passed→saved](../examples/review_remediation_v5/current-runs/mock_supplement/trace.jsonl) |
+| 仍缺资料 | [needs_input，不保存](../examples/review_remediation_v5/current-runs/mock_insufficient/output.json) |
+| 过去hard要求 | [REQUEST_EXPIRED，不顺延、不保存](../examples/review_remediation_v5/current-runs/mock_past/output.json) |
+| 软风险/阻断 | [needs_review并待确认](../examples/review_remediation_v5/current-runs/mock_rule_risk/output.json)、[blocked不保存](../examples/review_remediation_v5/current-runs/mock_blocked/output.json) |
+| 保存失败 | [failed，保留19:00未保存提议，零草稿](../examples/review_remediation_v5/current-runs/mock_save_failure/output.json) |
+| 抢槽 | [19:00失败→重查→20:00待确认，一份草稿](../examples/review_remediation_v5/current-runs/mock_save_race/trace.jsonl) |
+| 回执丢失/未知 | [核对恢复](../examples/review_remediation_v5/current-runs/mock_receipt_lost/output.json)、[unknown/incomplete](../examples/review_remediation_v5/current-runs/mock_receipt_unknown/output.json) |
+| 变占用后重新提交 | [同草稿revision2、新20:00待确认](../examples/review_remediation_v5/extended-runs/changed_occupancy/output.json) |
+| 确认保持 | [重跑reused/confirmed](../examples/review_remediation_v5/extended-runs/confirmation/output.json) |
+| 查询失败 | [技术failed，不伪装无候选](../examples/review_remediation_v5/extended-runs/tool_failure/output.json) |
 
-跨进程去重、版本冲突、确认重放、拒绝后重跑、规则更新、异常响应、并发抢槽、预算和超时等由tests/integration覆盖。新增4个反例验证检查器拒绝未来观察、输出篡改、源码不符及缺文件。最近节点另有128个独立oracle占用组合。不得把旧报告的xfail计为当前通过，历史缺陷及修复见 [复测](20-retest-and-test-design.md)、[核实](21-test-report-verification.md)、[修复](22-defect-fix-results.md)。
+时间等值、查询后到期、确认前到期、候选到期、两写者并发、旧草稿与新失败提议分离、无依据模型时间、确认重放、预算及协议边界由可执行测试覆盖。没有将“可保留提议”改写为保存成功；proposed_plan的未保存状态不可直接confirm。
 
 ## 真实模型的两条路径
 
-本轮新增真实模型调用为0。复核的是2026-10-31归档的提示4.1两条DeepSeek live，源码摘要与当前源码完全相同：eda8b63468af712cc51f447a499a29b6a785506ef8241d100186727094e58996。配置为deepseek-flash、thinking disabled、temperature=0；返回模型、响应ID、usage及预算见各run.json。两条均为单次样本，不能外推稳定成功率。
+本轮显式运行8条DeepSeek live，提示5.0，requested/returned均deepseek-flash，thinking disabled、temperature=0。每场景各一次，共37次模型请求，API返回total_tokens累计68099（包含缓存用量，不作为账单费用）。真实请求/返回标识和usage见各run.json；源码摘要为3bf99cc483bd3bb223b42e1598c9053a61e4dbbc4f55b7be425548ba6336b50a。
 
-1. [正常Trace](../examples/decision_improvements_v4_1/live_normal/trace.jsonl)：step6查询观察表明18:00可用；step7模型消费该观察，选择save_draft(18:00)；step8保存成功；step9消费回执后finish。5次有效模型动作、4次工具调用。
-2. [抢槽Trace](../examples/decision_improvements_v4_1/live_save_race/trace.jsonl)：step6原18:00冲突，返回17:00和19:00；step7模型依据prefer_after选择19:00；step8实际保存时返回SLOT_CONFLICT；step9消费错误后选择query_slots；step10新观察显示19:00已占、20:00可用；step11改存20:00；step12保存成功；step13消费回执后needs_input。7次有效模型动作、6次工具调用，最终只有一份待确认草稿。
+- [正常live](../examples/review_remediation_v5/current-runs/live_normal/trace.jsonl)：读取→审核passed→观察18:00可用→模型保存18:00→消费保存回执后finish；5次请求、4次工具。
+- [抢槽live](../examples/review_remediation_v5/current-runs/live_save_race/trace.jsonl)：观察18:00冲突、19:00可用→模型选19:00→工具实际保存遭SLOT_CONFLICT→模型重查→观察20:00可用→保存20:00→消费回执后needs_input；7次请求、6次工具。占用由脚本在首次保存前受控注入，不称生产事故。
 
-占用由脚本在首次保存前受控注入，是真实工具失败观察，但不是生产并发事故；重查及候选选择来自模型实际响应。Trace含工具参数、返回和简短依据，不保存内部思维过程。逐步机器比较见 [evidence-check.json](../examples/submission_audit_20261101/evidence-check.json)，完整9组归档的65个文件哈希也由check_decision_examples核对通过。
+其余live分别验证最低资料空、仍缺资料、过期要求、软风险、明确阻断和保存失败，最终状态均符合本次预期。**两例需要终态纠错**：最低资料空时模型先申请needs_input，但缺少真实规则检查，被拒绝后执行审核；保存失败时模型先申请block，被要求按技术失败finish后正确结束failed。最低资料空的首个模型说明还提及非必需许可资料，公开结构化缺项由可信规则产生，不能据此把该说明当准确必填清单。完整动作及纠错见 [逐步分析](../examples/review_remediation_v5/live-analysis.json)。
 
-## 仍未证明的部分
+8条小样本不能证明稳定模型成功率。终态正确依赖程序校验及有限纠错，不能宣称模型每次首答都正确，也不能用392项离线通过率代替live质量。
 
-合成样本和少量live不能证明真实视频审核能力、总体模型成功率、成本或温度参数收益。没有长期并发、断电/进程强杀、大数据量性能或跨系统原子性验证。本地确认没有企业身份鉴权。其他操作系统未实测。
+## 限制
 
-GitHub认证和目标仓库查询均返回HTTP200；目标仓库公开，已有22次历史已正常推送。本轮用户已授权提交/推送交付修正；最终SHA与远程main在操作完成后核对，不伪造上传结果。本人贡献与可观察时间口径见 [AI使用](04-ai-usage.md) 和 [复盘](05-retrospective.md)。
-
-## GitHub推送后复验
-
-2026-11-01，提交f3e7b9d已推送并从GitHub重新克隆，使用既有干净安装的锁定wheel环境执行：360 passed，46.95秒；Ruff、17次业务运行、9组既有归档和两份manifest均通过，277个文档文件链接无缺失。本段为新增独立复验，与此前44.07秒的本地回归分开记录。详见 [克隆复验记录](../examples/submission_push_20261101/README.md)。无新业务代码或真实模型调用。
+审核只覆盖元数据和文案，synthetic引用不证明真实媒体可读或版权合法；没有视频理解、真实发布、企业鉴权、全局最优排期或已确认草稿通用撤回。new_publication只声明再次发布，不取消或替代已有草稿。业务时钟回放只用于显式历史验证，Mock不自动绕过时间限制。个人实际净工时未独立计时，约4–5小时仅此前交互执行粗估，后续本人试用仍未发生。

@@ -38,3 +38,7 @@ RequestItem新增new_publication: bool=false，仅由用户输入，模型工具
 ## 阶段三实际结果
 
 默认跨请求防重复、显式new_publication、并发保存守卫和proposed_plan输出已实现。输出版本1.1，兼容读取历史1.0。完整392项通过（65.78秒），含32项新测试。初轮389通过/1失败为旧“新请求独立发布”用例，改为显式再次发布后保留原容量断言；默认换ID拦截另有新用例。阶段二失败归档只规范LF和尾空格，原始日志留runtime。证据见 [阶段三](../examples/review_remediation_v5/phase3/verification.json)。尚未生成新live，本阶段不宣称模型效果。
+
+## 阶段四实际结果
+
+新源码已生成20次Mock与8条live，按实际配置执行且均达到对应最终状态；两例终态纠错如实保留。37次模型请求、返回total_tokens累计68099，不能据此推断费用或稳定成功率。正常与抢槽路径重新留证，不复用旧source摘要。新wheel全新venv安装、隔离导入、依赖及demo通过。当前评估和五份交付文档已同步，详见 [当前证据](../examples/review_remediation_v5/README.md)。

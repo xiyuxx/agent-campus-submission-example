@@ -1,13 +1,7 @@
 # 实际运行证据入口
 
-[GitHub推送后克隆复验](submission_push_20261101/README.md)记录远程基线、360项独立回归与归档核对。
+当前以 [v5审核修复](review_remediation_v5/README.md) 为准：392项离线回归、20次Mock业务运行、8条新live、当前wheel安装和完整性/时间/去重/失败提议证据。
 
-当前交付入口为 [2026-11-01复核](submission_audit_20261101/README.md)：当前源码15次离线业务运行、最终360项测试、干净安装与证据检查报告。
+旧目录保存各阶段真实结果，仅按当时源码摘要与协议解释，不能代表当前源码。原4.1 live、360项交付核验和远程克隆复验均为历史。显式--allow-historical可只读核查，结果不宣称源码与当前相同。
 
-真实模型优先看 [提示4.1归档](decision_improvements_v4_1/README.md)：7组Mock和2条DeepSeek live。两条live源码摘要与当前一致，本轮只读核查，没有重复调用模型。观察与下一动作的逐步对比见 [评估](../docs/03-evaluation.md#真实模型的两条路径)。
-
-其他目录是历史阶段、旧协议、反例与修复证据，应按各自README、run.json和源码摘要解读，不将旧失败或旧成功套到当前源码。设计检查仅验证文档或DDL，不充当Agent运行。Mock仅验证工程流程。
-
-业务运行包含input.json、output.json、trace.jsonl、run.json、summary.md；记录自动生成，参数和观察只保留必要信息，不包含密钥、原始私密上下文或内部思维过程。测试套件的run.json是另一契约，不能当作业务输入输出。
-
-复现命令和只读检查见 [根README](../README.md)。新运行必须使用新目录，不覆盖历史。数据库快照来自执行当时的真实查询；克隆后检查快照一致性不等于重新访问原数据库。
+每次业务运行含input/output/trace/run/summary，输出实际生成，数据库JSON来自当时实际查询。Mock不证明模型决策，live不保存内部思维过程、密钥或完整原始上下文；不得手写或覆盖历史日志。复现使用新目录，命令见根README和v5索引。

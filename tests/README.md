@@ -1,6 +1,6 @@
 # 测试入口
 
-当前基线为360项离线测试；新审核修复的范围与实际结果见 [第26号契约](../docs/26-review-remediation.md)（实施过程中计数据实更新）。默认不调用付费模型。
+当前完整回归392项离线测试通过（原360+新增32）；审核修复的范围与实际结果见 [第26号契约](../docs/26-review-remediation.md)，实际输出见 [v5证据](../examples/review_remediation_v5/README.md)。默认不调用付费模型。
 
 全新checkout先按根README安装，再执行：
 

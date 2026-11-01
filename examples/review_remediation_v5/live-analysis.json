@@ -1,0 +1,504 @@
+{
+  "scope": "eight one-off samples; no stability-rate claim",
+  "runs": [
+    {
+      "case": "live_blocked",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "errors": [],
+      "model_actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "tool": "read_material",
+              "args": {
+                "detail": "basic",
+                "reason_summary": "先读取素材基本信息以进行审核"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "tool": "check_rules",
+              "args": {
+                "reason_summary": "审核已读取的素材"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 5,
+          "calls": [],
+          "final": {
+            "action": "block",
+            "reason_summary": "素材版权状态为未授权（copyright_status=unauthorized），规则明确未授权素材不得进入排期，审核阻断，无法保存草稿或排期。"
+          }
+        }
+      ],
+      "tokens": 4881
+    },
+    {
+      "case": "live_insufficient",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "errors": [],
+      "model_actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "tool": "read_material",
+              "args": {
+                "detail": "basic",
+                "reason_summary": "先读取素材基本信息以进行审核"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "tool": "check_rules",
+              "args": {
+                "reason_summary": "审核已读取的素材"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 5,
+          "calls": [],
+          "final": {
+            "action": "needs_input",
+            "reason_summary": "素材缺少版权状态与封面引用（无补充来源可查），需用户提供；补齐前无法查询时段或保存草稿。"
+          }
+        }
+      ],
+      "tokens": 4935
+    },
+    {
+      "case": "live_missing",
+      "model_attempts": 4,
+      "tool_attempts": 2,
+      "errors": [
+        {
+          "step": 4,
+          "code": "INVALID_FINISH"
+        }
+      ],
+      "model_actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "tool": "read_material",
+              "args": {
+                "detail": "basic",
+                "reason_summary": "先读取素材基本信息以进行审核"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 3,
+          "calls": [],
+          "final": {
+            "action": "needs_input",
+            "reason_summary": "素材缺少 type、title、媒体引用等必填项，且无补充来源，无法审核或保存；请补充素材类型、标题与媒体文件（及授权/许可信息）。"
+          }
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "tool": "check_rules",
+              "args": {
+                "reason_summary": "对已读取素材执行规则检查以确认缺项"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 7,
+          "calls": [],
+          "final": {
+            "action": "needs_input",
+            "reason_summary": "规则检查显示素材缺少 type、title 等最低必填项，且无补充来源，无法审核或保存；请补充素材类型、标题及媒体引用等资料。"
+          }
+        }
+      ],
+      "tokens": 6804
+    },
+    {
+      "case": "live_normal",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "errors": [],
+      "model_actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "tool": "read_material",
+              "args": {
+                "detail": "basic",
+                "reason_summary": "先读取素材基本信息以进行审核"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "tool": "check_rules",
+              "args": {
+                "reason_summary": "基于已读基本信息检查规则"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "tool": "query_slots",
+              "args": {
+                "reason_summary": "查询原定时间是否可用"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 7,
+          "calls": [
+            {
+              "tool": "save_draft",
+              "args": {
+                "suggested_at": "2026-11-03T18:00:00+08:00",
+                "reason_summary": "审核通过，原时间可用，保存草稿"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 9,
+          "calls": [],
+          "final": {
+            "action": "finish",
+            "reason_summary": "素材审核通过（license_ref为可选缺项，不阻止），原时间2026-11-03T18:00:00+08:00可用，草稿已保存，无需确认，未发布。"
+          }
+        }
+      ],
+      "tokens": 9556
+    },
+    {
+      "case": "live_past",
+      "model_attempts": 4,
+      "tool_attempts": 3,
+      "errors": [],
+      "model_actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "tool": "read_material",
+              "args": {
+                "detail": "basic",
+                "reason_summary": "先读取素材基本信息以进行审核"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "tool": "check_rules",
+              "args": {
+                "reason_summary": "基于已读基本信息检查规则"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "tool": "query_slots",
+              "args": {
+                "reason_summary": "查询原时间是否可用"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 7,
+          "calls": [],
+          "final": {
+            "action": "needs_input",
+            "reason_summary": "素材审核已通过（license_ref为可选缺项，不阻止）。但原发布时间2000-01-01T18:00:00+08:00已过期，系统不会自动顺延，请指定新的发布时间。"
+          }
+        }
+      ],
+      "tokens": 6445
+    },
+    {
+      "case": "live_rule_risk",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "errors": [],
+      "model_actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "tool": "read_material",
+              "args": {
+                "detail": "basic",
+                "reason_summary": "先读取素材基本信息以进行审核"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "tool": "check_rules",
+              "args": {
+                "reason_summary": "审核已读取的素材"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "tool": "query_slots",
+              "args": {
+                "reason_summary": "查询原定时间是否可用"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 7,
+          "calls": [
+            {
+              "tool": "save_draft",
+              "args": {
+                "reason_summary": "原时间冲突，按prefer_after推荐19:00候选，保存带风险草稿",
+                "suggested_at": "2026-11-03T19:00:00+08:00"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 9,
+          "calls": [],
+          "final": {
+            "action": "needs_input",
+            "reason_summary": "原时间18:00冲突，已按prefer_after保存19:00草稿（未发布）；需确认改期及人工核实文案“示例最强效果”依据。"
+          }
+        }
+      ],
+      "tokens": 9859
+    },
+    {
+      "case": "live_save_failure",
+      "model_attempts": 6,
+      "tool_attempts": 4,
+      "errors": [
+        {
+          "step": 10,
+          "code": "INVALID_FINISH"
+        }
+      ],
+      "model_actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "tool": "read_material",
+              "args": {
+                "detail": "basic",
+                "reason_summary": "先读取素材基本信息以进行审核"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "tool": "check_rules",
+              "args": {
+                "reason_summary": "检查素材规则证据"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "tool": "query_slots",
+              "args": {
+                "reason_summary": "查询原定时间是否可用"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 7,
+          "calls": [
+            {
+              "tool": "save_draft",
+              "args": {
+                "reason_summary": "原时间冲突，按prefer_after选用19:00候选保存草稿",
+                "suggested_at": "2026-11-03T19:00:00+08:00"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 9,
+          "calls": [],
+          "final": {
+            "action": "block",
+            "reason_summary": "素材审核已通过，原定18:00时段冲突，19:00候选可用；但保存草稿发生不可重试的技术失败且事务已回滚，未生成草稿，无法继续。"
+          }
+        },
+        {
+          "step": 11,
+          "calls": [],
+          "final": {
+            "action": "finish",
+            "reason_summary": "素材审核已通过，原定18:00时段冲突，19:00候选可用；但保存草稿发生不可重试的技术失败且事务已回滚，未生成草稿，如实停止。"
+          }
+        }
+      ],
+      "tokens": 10685
+    },
+    {
+      "case": "live_save_race",
+      "model_attempts": 7,
+      "tool_attempts": 6,
+      "errors": [],
+      "model_actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "tool": "read_material",
+              "args": {
+                "detail": "basic",
+                "reason_summary": "先读取素材基本信息以进行审核"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "tool": "check_rules",
+              "args": {
+                "reason_summary": "基于已读基本信息检查规则"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "tool": "query_slots",
+              "args": {
+                "reason_summary": "查询原定时间是否可用"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 7,
+          "calls": [
+            {
+              "tool": "save_draft",
+              "args": {
+                "reason_summary": "原时间冲突，按prefer_after推荐19:00候选并保存草稿",
+                "suggested_at": "2026-11-03T19:00:00+08:00"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 9,
+          "calls": [
+            {
+              "tool": "query_slots",
+              "args": {
+                "reason_summary": "保存冲突，重新查询时段获取新候选"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 11,
+          "calls": [
+            {
+              "tool": "save_draft",
+              "args": {
+                "reason_summary": "19:00已被占用，按prefer_after保存20:00候选草稿",
+                "suggested_at": "2026-11-03T20:00:00+08:00"
+              }
+            }
+          ],
+          "final": null
+        },
+        {
+          "step": 13,
+          "calls": [],
+          "final": {
+            "action": "needs_input",
+            "reason_summary": "素材审核通过（license_ref为可选缺项，不阻断）。原时间18:00冲突，19:00候选保存时被占用，已按prefer_after保存20:00草稿；需你确认是否接受20:00替代原要求。"
+          }
+        }
+      ],
+      "tokens": 14934
+    }
+  ]
+}

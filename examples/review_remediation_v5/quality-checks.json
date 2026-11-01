@@ -1,0 +1,59 @@
+{
+  "checks": [
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0,
+      "stdout": "52 files already formatted\n"
+    },
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "scripts/check_evidence.py",
+        "examples/review_remediation_v5",
+        "--live-directory",
+        "examples/review_remediation_v5/current-runs"
+      ],
+      "exit_code": 0,
+      "stdout": "Validated 28 application runs; live paths checked: True.\n"
+    },
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "scripts/check_decision_examples.py",
+        "examples/review_remediation_v5/current-runs"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"verified_runs\": 23, \"verified_files\": 162}\n"
+    }
+  ],
+  "evidence_checker_regression": "4 passed in 1.82s",
+  "current_document_file_links_checked_before_final_archive": 135,
+  "credential_scanned_files_before_final_archive": 1112,
+  "business_source_unchanged_since_phase3": true,
+  "new_model_samples": 8,
+  "live_model_attempts": 37,
+  "total_tokens_reported": 68099,
+  "limitation": "One-off samples; two INVALID_FINISH corrections; no stability-rate claim"
+}
