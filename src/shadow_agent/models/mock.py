@@ -57,7 +57,13 @@ class MockModel:
                 function = retry["tool_calls"][0]["function"]
                 args = json.loads(function["arguments"])
                 return call(function["name"], **args)
-            if last["code"] in ("DRAFT_REJECTED", "MATERIAL_NOT_FOUND", "DATA_CONFLICT"):
+            if last["code"] in (
+                "DRAFT_REJECTED",
+                "MATERIAL_NOT_FOUND",
+                "DATA_CONFLICT",
+                "REQUEST_EXPIRED",
+                "SLOT_EXPIRED",
+            ):
                 return finish("needs_input", "需要用户补充资料或发起独立请求")
             return finish("finish", "工具失败，停止并保留已完成检查")
         if last["tool"] == "read_material":

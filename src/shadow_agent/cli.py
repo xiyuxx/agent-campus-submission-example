@@ -34,6 +34,7 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--output", type=Path, required=True)
     run.add_argument("--mode", choices=("mock", "live"), required=True)
     run.add_argument("--env-file", type=Path)
+    run.add_argument("--as-of", help="显式业务时间回放，ISO8601含时区；不修改实际执行时间")
     run.add_argument("--max-model-attempts", type=int, default=16)
     run.add_argument("--max-tool-attempts", type=int, default=16)
     run.add_argument("--item-seconds", type=float, default=180)
@@ -53,15 +54,22 @@ def parser() -> argparse.ArgumentParser:
     confirm = commands.add_parser("confirm", help="记录明确用户决定，不调用模型")
     confirm.add_argument("--input", type=Path, required=True)
     confirm.add_argument("--db", type=Path, required=True)
+    confirm.add_argument("--as-of", help="显式业务时间回放")
     inspect = commands.add_parser("inspect-draft", help="查看数据库当前状态和历史")
     inspect.add_argument("--id", required=True)
     inspect.add_argument("--db", type=Path, required=True)
     review = commands.add_parser("review", help="交互处理当前草稿的未决确认项")
     review.add_argument("--db", type=Path, required=True)
+    review.add_argument("--as-of", help="显式业务时间回放")
     demo = commands.add_parser("demo", help="隔离目录的一键演示，默认 Mock")
     demo.add_argument("--mode", choices=("mock", "live"), default="mock")
     demo.add_argument("--root", type=Path, default=Path("runtime/demo"))
     demo.add_argument("--env-file", type=Path)
+    demo.add_argument(
+        "--as-of",
+        default="2026-11-01T00:00:00Z",
+        help="演示夹具回放参考时间，默认2026-11-01；实际日志时间不变",
+    )
     return root
 
 
@@ -80,7 +88,10 @@ async def _run(args, request: Request, *, repo=None, output=None):
         )
         result = await run_request(
             request,
-            repo or Repository(args.db, fault=getattr(args, "fault", None)),
+            repo
+            or Repository(
+                args.db, fault=getattr(args, "fault", None), replay_at=getattr(args, "as_of", None)
+            ),
             model,
             mode=args.mode,
             output=output or args.output,
@@ -172,7 +183,7 @@ def main(argv=None) -> int:
             return asyncio.run(_run(args, Request.model_validate(read_json(args.input))))
         elif args.command == "demo":
             resources = files("shadow_agent").joinpath("fixtures")
-            repo = Repository(args.root / "agent.db")
+            repo = Repository(args.root / "agent.db", replay_at=args.as_of)
             repo.apply_catalog_snapshot(load_catalog(Path(str(resources))), update=True)
             request = Request.model_validate_json(
                 resources.joinpath("request.json").read_text(encoding="utf-8")
@@ -181,13 +192,13 @@ def main(argv=None) -> int:
                 _run(args, request, repo=repo, output=args.root / "runs" / new_id("run"))
             )
         elif args.command == "confirm":
-            result = Repository(args.db).confirm_draft(
+            result = Repository(args.db, replay_at=args.as_of).confirm_draft(
                 Confirmation.model_validate(read_json(args.input))
             )
         elif args.command == "inspect-draft":
             result = Repository(args.db).inspect_draft(args.id)
         else:
-            result = review_drafts(Repository(args.db))
+            result = review_drafts(Repository(args.db, replay_at=args.as_of))
         print(dumps(result))
         return 0
     except BusinessError as error:

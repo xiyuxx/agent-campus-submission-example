@@ -6,6 +6,18 @@ from shadow_agent.contracts import Request
 from shadow_agent.storage import Repository, load_catalog
 
 
+@pytest.fixture(autouse=True)
+def fixed_business_time(monkeypatch):
+    """Legacy fixtures use historical dates; freeze only the business clock, not audit time."""
+    original = Repository.__init__
+
+    def initialize(self, *args, **kwargs):
+        kwargs.setdefault("business_clock", lambda: "2020-01-01T00:00:00Z")
+        original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Repository, "__init__", initialize)
+
+
 @pytest.fixture
 def catalog():
     return load_catalog(Path(__file__).resolve().parents[1] / "data")

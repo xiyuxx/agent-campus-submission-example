@@ -5,6 +5,8 @@ from pathlib import Path
 
 
 def cli(*args, stdin=None):
+    if args[0] in ("run", "confirm", "review"):
+        args = (*args, "--as-of", "2020-01-01T00:00:00Z")
     return subprocess.run(
         [sys.executable, "-m", "shadow_agent", *map(str, args)],
         input=stdin,

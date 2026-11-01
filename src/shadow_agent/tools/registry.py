@@ -269,6 +269,8 @@ def execute(
             ctx.save_error = {"code": result.code, "message": result.data["message"]}
     except (BusinessError, sqlite3.Error) as exc:
         error = ctx.repo.database_error(exc) if isinstance(exc, sqlite3.Error) else exc
+        if error.code in ("REQUEST_EXPIRED", "SLOT_EXPIRED"):
+            ctx.input_issue = error.as_dict()
         if error.retryable and attempted:
             key = retry_key(name, args, ctx)
             ctx.retry_counts[key] = ctx.retry_counts.get(key, 0) + 1

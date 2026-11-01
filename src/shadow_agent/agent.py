@@ -24,6 +24,16 @@ def validate_finish(ctx: ItemContext, proposal: FinalProposal) -> None:
             )
         ctx.forced_status = "failed"
         return
+    if ctx.input_issue:
+        if proposal.action != "needs_input":
+            raise BusinessError("INVALID_FINISH", "需要用户修正业务输入，请 needs_input")
+        return
+    ctx.repo.revalidate_current_draft(ctx.request.request_id, ctx.material_id, run_id=ctx.run_id)
+    if ctx.draft_state and ctx.draft_state["at_utc"] <= ctx.repo.business_now():
+        ctx.input_issue = {"code": "TIME_EXPIRED", "message": "草稿时间已经到期，请重新指定"}
+        if proposal.action != "needs_input":
+            raise BusinessError("INVALID_FINISH", "草稿已过期，需要用户输入")
+        return
     if ctx.schedule_refresh_required:
         raise BusinessError("INVALID_FINISH", "保存冲突尚未解决，需要重新查询排期")
     state = ctx.repo.runtime_state(ctx.request.request_id, ctx.material_id)

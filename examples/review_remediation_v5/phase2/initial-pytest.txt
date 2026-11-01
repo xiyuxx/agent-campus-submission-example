@@ -1,0 +1,60 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 76%]
+......F................................................................. [ 95%]
+................                                                         [100%]
+================================== FAILURES ===================================
+________ test_running_agent_cannot_finish_with_old_rule_after_refresh _________
+
+repo = <shadow_agent.storage.Repository object at 0x000001C9E5ED7AD0>
+catalog = Catalog(materials=[Material(source_asset_id='VIDEO-001', title='��Ʒ���ܽ���', type='video', media_ref='synthetic://video/M0...2026, 11, 3, 18, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=28800))), entry_id='S01', material_id='M00')]))
+job = Request(schema_version='1.0', request_id='REQ-1', items=[RequestItem(material_id='M01', publish_requirement=PublishReq...(2026, 11, 3, 19, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=28800)))], reschedule_preference='nearest'))])
+tmp_path = WindowsPath('D:/Code/smallShadow/.tmp/remediation-phase2/test_running_agent_cannot_fini0')
+
+    def test_running_agent_cannot_finish_with_old_rule_after_refresh(repo, catalog, job, tmp_path):
+        value = job.model_dump(mode="json")
+        value["items"][0]["material_id"] = "M03"
+        request = Request.model_validate(value)
+    
+        class OldVerdictAfterRefresh(MockModel):
+            changed = False
+    
+            async def next_action(self, messages, schemas):
+                results = [json.loads(x["content"]) for x in messages if x["role"] == "tool"]
+                if results and results[-1]["tool"] == "check_rules" and not self.changed:
+                    updated = catalog.model_copy(deep=True)
+                    updated.rules = [x for x in updated.rules if x.rule_id != "R-COPYRIGHT-DENIED"]
+                    repo.apply_catalog_snapshot(updated, update=True)
+                    self.changed = True
+                    call = {
+                        "id": "refresh-basic",
+                        "type": "function",
+                        "function": {"name": "read_material", "arguments": '{"detail":"basic"}'},
+                    }
+                    return ModelTurn(
+                        {"role": "assistant", "content": None, "tool_calls": [call]}, calls=[call]
+                    )
+                if self.changed:
+                    proposal = FinalProposal(action="block", reason_summary="���þ���˽���")
+                    return ModelTurn(
+                        {"role": "assistant", "content": proposal.model_dump_json()}, proposal=proposal
+                    )
+                return await super().next_action(messages, schemas)
+    
+        output = tmp_path / "rule-refresh"
+        result = asyncio.run(
+            run_request(request, repo, OldVerdictAfterRefresh(), mode="mock", output=output)
+        )
+        fresh = repo.read_rule_snapshot(repo.read_material_basic("M03"))
+        (output / "database_check.json").write_text(fresh.model_dump_json(indent=2), encoding="utf-8")
+>       assert fresh.review_status == "passed"
+E       AssertionError: assert 'needs_info' == 'passed'
+E         
+E         - passed
+E         + needs_info
+
+tests\integration\test_retest_edge_cases.py:226: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/integration/test_retest_edge_cases.py::test_running_agent_cannot_finish_with_old_rule_after_refresh
+1 failed, 375 passed in 57.04s

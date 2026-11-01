@@ -198,6 +198,8 @@ class Catalog(Contract):
 
     @model_validator(mode="after")
     def relations(self):
+        if any(rule.rule_id.startswith("SYS-MINIMUM-") for rule in self.rules):
+            raise ValueError("SYS-MINIMUM- 是系统最低完整性规则的保留前缀")
         for entries, key in (
             (self.materials, lambda x: x.material_id),
             (self.supplements, lambda x: x.material_id),

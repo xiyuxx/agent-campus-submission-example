@@ -24,7 +24,7 @@ def available_tools(ctx, *, include_pending: bool = False) -> set[str]:
     # Pending observations are in the next request, but become usable for execution
     # only after that request has produced a valid response.
     delivered = ctx.consumed | (set(ctx.observations) if include_pending else set())
-    if ctx.forced_status or ctx.save_status == "unknown":
+    if ctx.forced_status or ctx.save_status == "unknown" or ctx.input_issue:
         return set()
     if ctx.technical_error and not ctx.technical_error.get("retryable", False):
         return set()

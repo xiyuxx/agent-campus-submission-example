@@ -13,6 +13,9 @@ from .policy import review_is_current
 def assemble_result(ctx: ItemContext) -> ItemResult:
     requirement = ctx.item.publish_requirement
     try:
+        ctx.repo.revalidate_current_draft(
+            ctx.request.request_id, ctx.material_id, run_id=ctx.run_id
+        )
         state = ctx.repo.runtime_state(ctx.request.request_id, ctx.material_id)
         current = state["draft"]
     except (BusinessError, sqlite3.Error) as error:
@@ -25,6 +28,10 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
         PendingItem(id=f"missing:{x}", kind="input", message=f"请在新请求中补充 {x}")
         for x in requirement.missing()
     ]
+    if ctx.input_issue:
+        pending.append(
+            PendingItem(id="schedule:new_time", kind="input", message=ctx.input_issue["message"])
+        )
     review = ctx.review
     stale = bool(
         state
@@ -127,7 +134,7 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
         draft=draft,
         task_status=status,
         evidence_ids=list(ctx.observations),
-        error=ctx.technical_error,
+        error=ctx.technical_error or ctx.input_issue,
     )
 
 

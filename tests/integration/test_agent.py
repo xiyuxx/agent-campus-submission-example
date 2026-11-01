@@ -227,6 +227,8 @@ def test_cross_process_duplicate_and_output_no_overwrite(repo, job, tmp_path):
         "-m",
         "shadow_agent",
         "run",
+        "--as-of",
+        "2020-01-01T00:00:00Z",
         "--input",
         str(input_path),
         "--db",

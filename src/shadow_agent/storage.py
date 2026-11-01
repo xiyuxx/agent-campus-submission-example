@@ -21,8 +21,9 @@ from .contracts import (
     RuleCheck,
     ScheduleOptions,
     SlotObservation,
+    parse_time,
 )
-from .policy import check_rules, confirmation_definitions, semantic_hash
+from .policy import check_rules, confirmation_definitions, effective_rules, semantic_hash
 
 
 def load_catalog(directory: Path) -> Catalog:
@@ -46,12 +47,24 @@ class Repository:
         fault: str | None = None,
         busy_ms: int = 2000,
         auditor: Auditor | None = None,
+        business_clock: Callable[[], str] | None = None,
+        replay_at: str | None = None,
     ):
         self.path = Path(path)
         self.clock = clock
         self.fault = fault
         self.busy_ms = min(max(busy_ms, 0), 2000)
         self.auditor = auditor or LocalMetadataAuditor()
+        self.replay_at = utc(parse_time(replay_at)) if replay_at is not None else None
+        self.business_clock = business_clock or now
+        self.clock_mode = "replay" if replay_at else "injected" if business_clock else "realtime"
+
+    def business_now(self) -> str:
+        return self.replay_at or utc(parse_time(self.business_clock()))
+
+    def require_future(self, at: str, code: str = "SLOT_EXPIRED") -> None:
+        if at <= self.business_now():
+            raise BusinessError(code, "发布时间已经到期，请明确提供新的发布时间；不会自动顺延")
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.path, autocommit=True, timeout=self.busy_ms / 1000)
@@ -538,7 +551,7 @@ class Repository:
             not isinstance(report, RuleCheck)
             or report.material_sha256 != snapshot.facts_hash()
             or report.catalog_revision != snapshot.catalog_revision
-            or report.rules != rules
+            or report.rules != effective_rules(snapshot, rules)
         ):
             raise BusinessError("INVALID_AUDIT", "审核报告与本次素材或规则不匹配")
         return report
@@ -631,6 +644,7 @@ class Repository:
         requirement = item.publish_requirement
         if requirement.missing():
             raise BusinessError("PRECONDITION_FAILED", "缺少原时间、时区或 hard/soft，不能查询")
+        self.require_future(utc(requirement.requested_at), "REQUEST_EXPIRED")
         meta = self._meta(connection)
         if meta["revision"] != snapshot.catalog_revision:
             raise BusinessError("STALE_EVIDENCE", "资料已变，请刷新素材")
@@ -651,7 +665,13 @@ class Repository:
                 at,
                 self_id,
             )
-            return {"at": at, "available": not conflicts, "conflicts": conflicts}
+            expired = at <= self.business_now()
+            return {
+                "at": at,
+                "available": not conflicts and not expired,
+                "conflicts": conflicts,
+                **({"unavailable_reason": "expired"} if expired else {}),
+            }
 
         checked, slots = [], []
         if query == "requested":
@@ -689,6 +709,8 @@ class Repository:
         )
 
     def _invalid_reason(self, connection, draft) -> str | None:
+        if draft["at_utc"] <= self.business_now():
+            return "TIME_EXPIRED"
         if draft["catalog_revision"] != self._meta(connection)["revision"]:
             return "CATALOG_CHANGED"
         historical = connection.execute(
@@ -845,6 +867,8 @@ class Repository:
                 requirement = item.publish_requirement
                 if requirement.missing() or review.review_status not in ("passed", "needs_review"):
                     raise BusinessError("PRECONDITION_FAILED", "缺少必要要求或审核不允许保存")
+                self.require_future(utc(requirement.requested_at), "REQUEST_EXPIRED")
+                self.require_future(suggested_at)
                 observed = {x["at"] for x in slot.slots if x["available"]}
                 if suggested_at not in observed:
                     raise BusinessError("PRECONDITION_FAILED", "建议时段未被本轮观察为可用")

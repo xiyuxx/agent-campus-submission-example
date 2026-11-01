@@ -60,6 +60,8 @@ async def run_request(
         "model": getattr(getattr(model, "settings", None), "model", "MockModel"),
         "command": "run",
         "request_id": request.request_id,
+        "clock_mode": "replay" if repo.replay_at else repo.clock_mode,
+        "reference_time": repo.replay_at,
         "resources": asdict(ResourceLimits()),
         "prompt_version": PROMPT_VERSION,
         "prompt_sha256": hashlib.sha256(SYSTEM.encode()).hexdigest(),

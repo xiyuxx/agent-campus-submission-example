@@ -4,6 +4,27 @@ from .common import BusinessError, digest, utc
 from .contracts import MaterialSnapshot, RequestItem, Rule, RuleCheck
 
 
+def effective_rules(snapshot: MaterialSnapshot, rules: list[Rule]) -> list[Rule]:
+    """Public minimum requirements precede catalog extensions; all enter audit evidence."""
+    fields = ["type", "title"]
+    if snapshot.material.type in ("video", "image"):
+        fields.append("media_ref")
+    elif snapshot.material.type == "text":
+        fields.append("caption")
+    return [
+        Rule(
+            rule_id=f"SYS-MINIMUM-{field.upper()}",
+            version=1,
+            field=field,
+            operator="missing",
+            value=None,
+            severity="needs_info",
+            message=f"最低可审核资料缺少 {field}",
+        )
+        for field in fields
+    ] + rules
+
+
 def review_is_current(snapshot: MaterialSnapshot, review: RuleCheck, catalog_revision: int) -> bool:
     return (
         review.catalog_revision == snapshot.catalog_revision == catalog_revision
@@ -17,6 +38,7 @@ def check_rules(snapshot: MaterialSnapshot, rules: list[Rule]) -> RuleCheck:
     matches = []
     rank = {"passed": 0, "needs_review": 1, "needs_info": 2, "blocked": 3}
     status = "passed"
+    rules = effective_rules(snapshot, rules)
     for rule in rules:
         value = getattr(snapshot.material, rule.field)
         matched = (
