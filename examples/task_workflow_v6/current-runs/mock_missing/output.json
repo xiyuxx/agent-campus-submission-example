@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-9b3e3dba-fe86-4813-b846-afe1b6c5a851",
+  "request_id": "REVIEW-missing",
+  "mode": "mock",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "needs_info",
+      "risk_reasons": [
+        {
+          "rule_id": "SYS-MINIMUM-TYPE",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "type",
+          "observed_value": null,
+          "source_id": "materials:M01@2",
+          "message": "最低可审核资料缺少 type"
+        },
+        {
+          "rule_id": "SYS-MINIMUM-TITLE",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "title",
+          "observed_value": null,
+          "source_id": "materials:M01@2",
+          "message": "最低可审核资料缺少 title"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "missing:title",
+          "kind": "input",
+          "message": "请补充素材 title 并显式导入"
+        },
+        {
+          "id": "missing:type",
+          "kind": "input",
+          "message": "请补充素材 type 并显式导入"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-3b7ec7c1-5f78-47ae-a0d3-5200eef68379",
+        "OBS-b874ca53-0777-4679-a1e8-c8c0a4c3307b"
+      ],
+      "error": null,
+      "proposed_plan": null,
+      "related_drafts": []
+    }
+  ]
+}

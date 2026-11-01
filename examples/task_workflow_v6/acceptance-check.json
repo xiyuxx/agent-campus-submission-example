@@ -1,0 +1,12 @@
+{
+  "six_required_scenarios": "passed actual-output assertions",
+  "additional_checks": [
+    "changed occupancy preserves draft identity and invalidates confirmation",
+    "legacy new_publication cannot bypass duplicate guard",
+    "failed task edit keeps old confirmed valid draft but excludes handoff",
+    "cancelled tasks excluded from handoff",
+    "historical confirmation and current validity separated"
+  ],
+  "evidence": "current-runs, extended-runs, task-runs; generated synthetic records",
+  "scope": "local draft only; no publishing integration"
+}

@@ -1,6 +1,6 @@
 # 实现进度与阶段验证
 
-2026-11-01当前审核修复与实际状态以 [第26号契约](26-review-remediation.md) 和 [v5证据](../examples/review_remediation_v5/README.md) 为准；下方阶段描述保留历史语境。数据库列未迁移，新字段在请求JSON/历史payload中保存。
+2026-11-01当前任务工作流与实际状态以 [第27号契约](27-task-workflow.md) 和 [v6证据](../examples/task_workflow_v6/README.md) 为准。已增加数据库v2、稳定任务和work操作入口。418项用例均有通过记录，但单进程整套存在Windows socket环境失败，详见评估。下方阶段描述保留历史语境。
 ## 2026-10-31：合并查询与后续决策改动兼容复验
 
 原时间与冲突时替代候选在同一读事务完成，一次 query_slots 返回；该实现已随用户另一阶段的 0866446 提交，本轮保留其动态权限、偏好和恢复改动，没有覆盖回旧版本。初次完整 342 passed；在后续基线 1e16f93、提示 4.1 上重新完整 --runxfail 为 356 passed、0 failed/error/xfail，包含合并查询 18 项和独立 oracle 128 项。Ruff 两项通过；只读核对现有提示 4.1 证据 9 组/65 文件通过，源码摘要相同，无新 live 调用。归档脚本补收七组查询场景并统一 LF，实际材料与历史版本区分见 [合并查询索引](../examples/automatic_slots_v3/README.md)。本轮本地提交仅收尾脚本、文档和证据，不收入原有 README 和旧未提交材料。

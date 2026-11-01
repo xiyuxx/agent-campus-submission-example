@@ -1,47 +1,44 @@
 # 需求与验收
 
-当前交付为素材审核与发布排期 Agent，使用 CLI、原生单 Agent 与本地合成资料。2026-11-01 已实施 [分享审核修复](26-review-remediation.md)，当前392项离线与8条live均有记录；实际结果见 [评估](03-evaluation.md) 和 [本轮审核](25-submission-audit.md)。用户再次核对的题目标题为“素材审核与发布排期 Agent”，未提供独立数字题号，不能把排列顺序冒充正式编号。
+当前交付为“素材审核与发布排期 Agent”。用户只提供题目标题，未提供独立数字题号，不杜撰编号。硬验收与产品优化的关系见 [任务契约](27-task-workflow.md)，实际结果见 [评估](03-evaluation.md)。
 
-## 用户、目标与范围
+## 用户、工作流和范围
 
-内容团队需要找出待处理素材，识别资料缺口、规则风险及发布冲突，得到可由负责人确认的排期草稿。素材 ID 表示指定版本、平台和账号的一次发布单元。审核对象是提供的元数据、文案及规则，不识别真实视频或核验真实版权。
+内容团队完成素材制作后，用程序查找待处理素材、检查资料和风险、协调时段、处理确认，随后把本地排期草稿交给发布人员。审核对象是合成元数据、文案和规则；不判断真实视频、不核验真实版权、不预约平台或发布。
 
-输入包括素材及补充资料、审核规则、已有排期、预设时间节点，以及包含 request_id、material_id、发布时间要求的 JSON。每次 1–3 项逐项处理；同批部分成功保留，不承诺批次最优或整体原子性。
+素材 ID、元数据、原始时间要求、已有排期与规则是业务输入。日常 work 入口自动管理内部请求和运行目录；保留 JSON run/confirm 供工程评审。每次最多三项，逐项事务，部分成功保留，不承诺整批最优。
 
-输出1.1新增proposed_plan，保留合法的未保存建议及其失效/待重查状态；draft和顶层suggested_at仍描述持久化状态，未保存建议不能confirm。输出逐项提供审核状态、风险原因、原始要求、建议时段、确认状态、待办、草稿保存状态、ID/修订、任务状态和证据引用。仅保存本地草稿，未接入真实发布或平台预约。
+同 material_id/platform/account_id 只有一个稳定任务；素材版本和时间变化属于原任务修订。用户明确修改要求才生成不可变内部请求，新方案成功保存才替换旧方案。取消释放本地容量并保留历史，恢复必须明确选择。旧 new_publication 字段不授予再次发布权限。
 
-## 不可越过的边界
+## 硬条件
 
-- 原始 hard/soft 时间要求保留；偏离原时刻一律产生 change_time 待确认项。偏好不是批准，模型不能代用户同意。
-- 最低可审核资料为type/title，视频图片还需media_ref，文字还需caption；规则证据明确列出最低规则。缺必要资料返回 needs_input；明确阻断返回 blocked。软风险可以保存待确认草稿，不能用普通确认绕过阻断。
-- query_slots 在一个读事务检查原时间；冲突时自动返回合法范围内前后各一个最近可用节点，允许跨日。显式 [] 不回退，省略/null 使用平台账号预设节点。模型消费观察后推荐。
-- 原要求及候选必须在未来；过去hard要求请求重新指定，保存与接受确认复核时间。历史回放显式记录业务参考时间。
-- 同 request_id + material_id 仅一份草稿；相同方案复用 ID 和修订，当前确认保留。原输入改变需新 request_id；默认新请求若撞上同素材版本/平台/账号的有效未来草稿则阻止创建，返回related_drafts；用户显式new_publication才允许再次发布，仍不替代旧请求。
-- 资料、规则或占用改变后重新评估；方案修订使旧确认失效。查询和保存排除自身，但计入其他请求的有效草稿。
-- confirm 绑定具体草稿及 revision，来自用户显式输入，不调用模型。拒绝只适用于有效方案的未决可确认项，同请求重跑不能恢复已拒绝方案。
-- 保存前事务复核依据和容量。明确失败报告 failed；提交结果无法核实报告 unknown/incomplete，禁止盲目重试或虚报成功。
-- 每项模型/工具各最多 16 次、180 秒；整批最多 540 秒，临时失败最多额外重试一次，协议反馈最多两次，保存冲突重查最多两次。预算耗尽明确 incomplete。
+- 四类业务工具：素材读取 basic/supplement、规则检查、时段查询、排期草稿保存。
+- 模型实际读取工具观察，决定补查、候选选择、重新查询、请求确认或阻断。工作清单和用户操作服务不能替代这个循环。
+- 每项返回审核状态、风险原因、建议时段、待确认项、确认状态、草稿保存状态，并区分未保存拟议方案和数据库方案。
+- 原 hard/soft 要求保留，任何模型建议的偏离均产生 change_time，候选和偏好不代表用户同意；blocked 不能普通确认绕过。
+- 所有素材要求 type/title；视频图片还需 media_ref，文字还需 caption。最低规则公开进入审核和保存证据。资料不足可补查，仍不足则 needs_input。
+- 时段查询在同一事务检查原时间，必要时返回授权范围前后各一个最近空闲节点，可跨日；显式 [] 不回退到默认节点。模型不能扩大范围。
+- 默认真实业务时钟，目标严格在未来。原要求到期但已确认未来方案仍有效，可复用该方案；候选保存前过期可有界重查，不能自动接受改期。显式 --as-of 只回放业务时间。
+- 保存事务复核素材、规则、时段和修订；重复请求复用，跨请求不能创建第二个任务。修改失败保留旧有效方案，不能继承旧批准到新方案。
+- 确认绑定具体草稿修订，由明确用户动作记录；回执重放保留历史结果并刷新当前有效性。取消或已有新要求时不能批准旧方案。
+- 保存明确失败返回 failed；无法核实为 unknown/incomplete，核验后再继续，不能虚报成功。
+- 每项最多16次模型/工具尝试、180秒；最多三项、总540秒；临时失败额外重试最多一次，协议纠错和时段重查最多两次。耗尽明确 incomplete。
 
-详细契约以 [实现参考](13-implementation-reference.md)、[本地绑定](19-local-model-boundary.md)、[合并查询](23-automatic-slot-options.md) 、[决策契约](24-agent-decision-improvements.md) 和 [当前修复契约](26-review-remediation.md) 为准。
+## 验收映射
 
-## 需求—实现—测试—证据
+下列均须实现、测试并有实际运行证据；当前证据链接见 [v6索引](../examples/task_workflow_v6/README.md)，历史 v5/v4 只用于追溯。
 
-下表保留前次验收映射；当前源码全部结果以 [新评估矩阵](03-evaluation.md#真实程序材料) 和 [v5证据](../examples/review_remediation_v5/README.md) 为准。以下历史目录均保存实际程序生成的 input、output、trace、run；同目录数据库快照由执行后查询产生。Mock 验证工程流程，live 单列，不能互相替代。
+| 验收 | 实现与可执行测试 | 当前证据目录（均含实际输入/输出/Trace） |
+| --- | --- | --- |
+| 正常排期 | storage/registry/agent；test_agent、test_automatic_slot_options | current-runs/mock_normal、live_normal |
+| 素材缺信息 | policy 与补查；test_supplement_unknowns、test_review_remediation | current-runs/mock_missing、mock_insufficient、mock_supplement |
+| 规则风险 | 分清 needs_review/blocked；test_adversarial_workflows | current-runs/mock_rule_risk、mock_blocked |
+| 时段冲突 | 合并查询、抢槽恢复；test_decision_improvements | current-runs/mock_save_race、live_save_race |
+| 重复提交 | 请求复用、任务唯一、并发守卫；test_storage、test_tasks | current-runs/mock_duplicate、mock_cross_request |
+| 保存失败 | 回滚、提议保留、旧方案保留；test_tasks、test_review_remediation | current-runs/mock_save_failure；task-runs/edit_save_failure |
+| 更换占用后重跑 | 当前方案重核、修订、旧确认失效；test_decision_improvements | extended-runs/changed_occupancy |
+| 确认与时间 | test_workflow_fixes、test_tasks、test_work_cli | task-runs/approved_future_reuse、expired_confirmation_replay.json |
+| 模型决策循环 | 原生 Agent、DeepSeek；test_provider、test_runtime_limits | 两条以上 live 与 evidence-check.json 的观察/后续动作 |
+| 交付完整性 | README、五份文档、锁依赖、离线 Mock、源码证据校验 | v6测试、安装、清单和评估记录 |
 
-| ID | 要求及核对结果 | 实现/测试 | 实际证据 |
-| --- | --- | --- | --- |
-| B01 | 正常排期：passed，18:00，saved/completed | registry.py、storage.py；test_agent.py | [正常](../examples/submission_audit_20261101/scenarios/normal/output.json) |
-| B02 | 资料不足：needs_info，列缺口，无草稿 | policy.py；test_supplement_unknowns.py | [缺资料](../examples/submission_audit_20261101/scenarios/insufficient/output.json) |
-| B03 | 规则风险需确认；未授权阻断且不保存 | policy.py；test_adversarial_workflows.py | [软风险](../examples/submission_audit_20261101/scenarios/rule_risk/output.json)、[阻断](../examples/submission_audit_20261101/scenarios/blocked/output.json) |
-| B04 | 原18:00冲突，建议19:00待确认，hard不变 | storage.py、agent.py；test_automatic_slot_options.py | [冲突](../examples/submission_audit_20261101/scenarios/slot_conflict/output.json) |
-| B05 | 重复提交只有一份草稿，ID/修订相同，reused | storage.py；test_agent.py 跨进程用例 | [重复](../examples/submission_audit_20261101/scenarios/duplicate/database_state.json) |
-| B06 | 注入保存前失败，failed，无草稿或历史 | registry.py；test_agent.py | [保存失败](../examples/submission_audit_20261101/scenarios/save_failure/output.json)、[数据库](../examples/submission_audit_20261101/scenarios/save_failure/database_state.json) |
-| B07 | 改占用再提交，修订同一草稿，新建议待确认 | storage.py；test_decision_improvements.py | [变占用](../examples/submission_audit_20261101/scenarios/changed_occupancy/output.json) |
-| B08 | 用户确认后复用保留确认，版本/阻断不可绕过 | storage.py、cli.py；test_cli.py | [确认](../examples/submission_audit_20261101/scenarios/confirmation/output.json) |
-| B09 | 同ID不同输入拒绝，不覆盖原草稿 | storage.py；test_cli.py、test_storage.py | [本轮360项结果](../examples/submission_audit_20261101/junit-final.xml) |
-| G01/G02 | 真实模型消费观察，正常与抢槽后动作不同 | agent.py、deepseek.py | [两条live及逐步比较](03-evaluation.md#真实模型的两条路径) |
-| G03 | 正常、资料不足、工具失败三组完整材料 | service.py、trace.py | [证据索引](../examples/submission_audit_20261101/README.md) |
-| G04/G05 | 预算、异常、未完成与无密钥Mock | config.py；test_runtime_limits.py | [全部测试结果](../examples/submission_audit_20261101/pytest-final.txt) |
-| G06 | 锁依赖、全新环境安装、五份文档 | pyproject.toml、requirements.lock | [安装核查](../examples/submission_audit_20261101/install-check.json) |
-
-表中源码在 src/shadow_agent/，测试在 tests/integration/。本地功能和证据已核对，已有历史已推送至公开 GitHub 仓库；本轮交付修改随新提交上传。最终远程 SHA 以推送后核对结果为准。正式题号仍待核实，公开仓库无需单独授权评审账号。
+新优化验收还包括：一次补资料后继续、修改成功原子替换、失败保留旧方案、取消释放容量、恢复需明确操作、旧请求不得覆盖新要求、导出再次核验和迁移歧义拒绝。对应 test_tasks 与 test_work_cli。所有运行只使用合成资料；本人试用尚无独立结果。

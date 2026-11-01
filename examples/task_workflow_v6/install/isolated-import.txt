@@ -1,0 +1,1 @@
+{"path": "D:\\Code\\smallShadow\\runtime\\task-install-v6\\venv\\Lib\\site-packages\\shadow_agent\\__init__.py", "source": {"base_commit": "dab483c404c657b79e1ac4e09cf9d11663b95d58", "source_sha256": "d032dfd1363714d2eb2abd9217c10f7f3903570b5ee697be85978cf1243b1b93"}}

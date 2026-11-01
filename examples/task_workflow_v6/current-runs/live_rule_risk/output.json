@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-ea414199-6a71-460f-bd80-6acb544b589b",
+  "request_id": "REVIEW-rule_risk",
+  "mode": "live",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "needs_review",
+      "risk_reasons": [
+        {
+          "rule_id": "R-CAPTION-REVIEW",
+          "version": 1,
+          "severity": "needs_review",
+          "field": "caption",
+          "observed_value": "示例最强效果，需要核实",
+          "source_id": "materials:M01@2",
+          "message": "示例品牌规则要求人工核实该表述依据"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T19:00:00+08:00",
+      "confirmation_status": "pending",
+      "pending_items": [
+        {
+          "id": "change_time",
+          "kind": "confirm",
+          "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+        },
+        {
+          "id": "risk:R-CAPTION-REVIEW",
+          "kind": "confirm",
+          "message": "示例品牌规则要求人工核实该表述依据"
+        }
+      ],
+      "draft": {
+        "id": "D-412932d8-872a-4efc-9f54-6983275b2013",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-a19555df-e38a-404a-92a6-41e2ffdcf6e6",
+        "OBS-4613c8fb-15a9-468a-b309-52fa7d50eb93",
+        "OBS-1c88e411-5a61-4af8-907b-b4e704f5fa80",
+        "OBS-00f22ea1-3bae-4ad7-8cb5-5bedf6859999"
+      ],
+      "error": null,
+      "proposed_plan": {
+        "suggested_at": "2026-11-03T19:00:00+08:00",
+        "pending_items": [
+          {
+            "id": "change_time",
+            "kind": "confirm",
+            "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+          },
+          {
+            "id": "risk:R-CAPTION-REVIEW",
+            "kind": "confirm",
+            "message": "示例品牌规则要求人工核实该表述依据"
+          }
+        ],
+        "persistence_status": "saved",
+        "validity": "current",
+        "error": null
+      },
+      "related_drafts": []
+    }
+  ]
+}

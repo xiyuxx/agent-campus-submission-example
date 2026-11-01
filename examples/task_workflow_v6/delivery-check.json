@@ -1,0 +1,10 @@
+{
+  "checked_documents": 13,
+  "missing_relative_targets": [],
+  "format_normalized_files": [
+    "examples/task_workflow_v6/install/verification.json",
+    "examples/task_workflow_v6/phase2/full-attempt.xml",
+    "examples/task_workflow_v6/install/demo.txt"
+  ],
+  "note": "Only LF and trailing whitespace normalized; original test logs retained in .tmp, install logs in runtime/task-install-v6/raw-report."
+}

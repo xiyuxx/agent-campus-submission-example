@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-d23244aa-e5b9-48aa-99df-127d9f8ed102",
+  "request_id": "REVIEW-blocked",
+  "mode": "mock",
+  "task_status": "blocked",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "blocked",
+      "risk_reasons": [
+        {
+          "rule_id": "R-COPYRIGHT-DENIED",
+          "version": 1,
+          "severity": "blocked",
+          "field": "copyright_status",
+          "observed_value": "unauthorized",
+          "source_id": "materials:M01@2",
+          "message": "未授权素材不得进入排期"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "blocked",
+      "evidence_ids": [
+        "OBS-b3eadbb1-950b-40d9-ba30-c9b18ca7ad51",
+        "OBS-cb95d36d-e7ea-4695-96cb-f99320ea0bdb"
+      ],
+      "error": null,
+      "proposed_plan": null,
+      "related_drafts": []
+    }
+  ]
+}

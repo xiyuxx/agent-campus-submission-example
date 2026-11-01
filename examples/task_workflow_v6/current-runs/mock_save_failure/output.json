@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-3ac6b110-8a31-4a9c-b698-9fc9da294e7e",
+  "request_id": "REVIEW-save_failure",
+  "mode": "mock",
+  "task_status": "failed",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "failed",
+        "error": {
+          "code": "SAVE_FAILED",
+          "message": "显式注入的提交前失败，事务已回滚",
+          "retryable": false
+        }
+      },
+      "task_status": "failed",
+      "evidence_ids": [
+        "OBS-0eb46fdd-2811-4f3f-b749-6a7ff7ee78da",
+        "OBS-6111a9bd-1aca-4a6b-9b0d-dfb5a7d8b6f5",
+        "OBS-449d6bb9-a48b-40de-9478-5afb888d70f9",
+        "OBS-95ae35c8-05c6-467d-a337-0ebe27744e5a"
+      ],
+      "error": {
+        "code": "SAVE_FAILED",
+        "message": "显式注入的提交前失败，事务已回滚",
+        "retryable": false
+      },
+      "proposed_plan": {
+        "suggested_at": "2026-11-03T19:00:00+08:00",
+        "pending_items": [
+          {
+            "id": "change_time",
+            "kind": "confirm",
+            "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+          }
+        ],
+        "persistence_status": "not_saved",
+        "validity": "requires_recheck",
+        "error": {
+          "code": "SAVE_FAILED",
+          "message": "显式注入的提交前失败，事务已回滚",
+          "retryable": false
+        }
+      },
+      "related_drafts": []
+    }
+  ]
+}

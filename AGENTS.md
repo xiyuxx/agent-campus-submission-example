@@ -2,7 +2,7 @@
 
 本文件约束本仓库中的后续 AI 辅助开发。详细规范见 `docs/00-engineering-standards.md`。
 
-1. 已选择“素材审核与发布排期 Agent”，核心实现已完成；当前审核修复契约见 `docs/26-review-remediation.md`，执行状态以实际证据为准。总体架构见 `docs/10-architecture-baseline.md`；详细开发以 `docs/13-implementation-reference.md` 为准，按其中契约、事务和验收实现。选择理由见 `docs/06-topic-selection.md`；业务验收见 `docs/01-requirements.md`。以用户当前授权的工作范围推进。
+1. 已选择“素材审核与发布排期 Agent”，核心实现已完成；当前任务工作流契约见 `docs/27-task-workflow.md`，覆盖第26号文档中显式再次发布及早期不可修改/取消的约定，执行状态以实际证据为准。总体架构见 `docs/10-architecture-baseline.md`；详细开发以 `docs/13-implementation-reference.md` 及后续修订为准，按其中契约、事务和验收实现。选择理由见 `docs/06-topic-selection.md`；业务验收见 `docs/01-requirements.md`。以用户当前授权的工作范围推进。
 2. 业务需求和实际验收要求优先于暂定技术方案；不为使用框架而引入框架。
 3. 确定 Python 3.13 + CLI + 原生单 Agent + DeepSeek Tool Calls + HTTPX + Pydantic + SQLite；模型与工具通过小型接口隔离。依赖版本在实测后锁定。
 4. 模型必须消费真实工具观察，再选择动作或结束。固定分支、自动重试及脚本化 Mock 只能作为工程验证。

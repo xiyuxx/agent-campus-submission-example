@@ -1,0 +1,460 @@
+{
+  "samples": 8,
+  "model_attempts": 36,
+  "total_tokens": 68960,
+  "records": [
+    {
+      "case": "live_blocked",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "model": "deepseek-flash",
+      "prompt_version": "6.0",
+      "tokens": 5091,
+      "errors": [],
+      "actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "arguments": "{\"detail\": \"basic\", \"reason_summary\": \"先读取素材基本信息以进行审核\"}",
+              "name": "read_material"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"基于已读基本信息检查规则\"}",
+              "name": "check_rules"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 5,
+          "calls": [],
+          "proposal": {
+            "action": "block",
+            "reason_summary": "素材版权状态为未授权，规则判定为阻断项，不得进入排期；补充授权信息也无法覆盖该冲突。"
+          }
+        }
+      ]
+    },
+    {
+      "case": "live_insufficient",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "model": "deepseek-flash",
+      "prompt_version": "6.0",
+      "tokens": 5151,
+      "errors": [],
+      "actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "arguments": "{\"detail\": \"basic\", \"reason_summary\": \"先读取素材基本信息以进行审核\"}",
+              "name": "read_material"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"审核已读取的素材\"}",
+              "name": "check_rules"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 5,
+          "calls": [],
+          "proposal": {
+            "action": "needs_input",
+            "reason_summary": "素材缺少版权状态与封面引用（无补充来源可查），需用户提供；补齐前无法查时段或保存草稿。"
+          }
+        }
+      ]
+    },
+    {
+      "case": "live_missing",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "model": "deepseek-flash",
+      "prompt_version": "6.0",
+      "tokens": 5159,
+      "errors": [],
+      "actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "arguments": "{\"detail\": \"basic\", \"reason_summary\": \"先读取素材基本信息以进行审核\"}",
+              "name": "read_material"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"检查当前素材规则证据\"}",
+              "name": "check_rules"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 5,
+          "calls": [],
+          "proposal": {
+            "action": "needs_input",
+            "reason_summary": "素材缺少 type、title 等最低完整性字段，且无补充来源可查，无法审核或保存草稿；请补充素材类型、标题及媒体引用等资料。"
+          }
+        }
+      ]
+    },
+    {
+      "case": "live_normal",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "model": "deepseek-flash",
+      "prompt_version": "6.0",
+      "tokens": 9969,
+      "errors": [],
+      "actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "arguments": "{\"detail\": \"basic\", \"reason_summary\": \"先读取素材基本信息以进行审核\"}",
+              "name": "read_material"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"基于已读基本信息检查规则\"}",
+              "name": "check_rules"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"审核已通过，查询原时间2026-11-03T19:00是否可用\"}",
+              "name": "query_slots"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 7,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"审核通过，原时间2026-11-03T18:00可用，保存草稿\", \"suggested_at\": \"2026-11-03T18:00:00+08:00\"}",
+              "name": "save_draft"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 9,
+          "calls": [],
+          "proposal": {
+            "action": "finish",
+            "reason_summary": "素材审核通过（license_ref为可选缺项，不阻断），原时间2026-11-03T18:00可用，草稿已保存且无需确认，未发布。"
+          }
+        }
+      ]
+    },
+    {
+      "case": "live_past",
+      "model_attempts": 4,
+      "tool_attempts": 3,
+      "model": "deepseek-flash",
+      "prompt_version": "6.0",
+      "tokens": 6752,
+      "errors": [],
+      "actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "arguments": "{\"detail\": \"basic\", \"reason_summary\": \"先读取素材基本信息以进行审核\"}",
+              "name": "read_material"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"基于已读基本信息检查规则\"}",
+              "name": "check_rules"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"查询原请求时间是否可用\"}",
+              "name": "query_slots"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 7,
+          "calls": [],
+          "proposal": {
+            "action": "needs_input",
+            "reason_summary": "素材审核已通过（license_ref为可选缺项，不阻止）。原请求时间2000-01-01T18:00已过期，系统不会自动顺延，请指定新的发布时间；候选时间2026-11-03T19:00/20:00需您确认后才会使用。"
+          }
+        }
+      ]
+    },
+    {
+      "case": "live_rule_risk",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "model": "deepseek-flash",
+      "prompt_version": "6.0",
+      "tokens": 10272,
+      "errors": [],
+      "actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "arguments": "{\"detail\": \"basic\", \"reason_summary\": \"先读取素材基本信息以进行审核\"}",
+              "name": "read_material"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"基于已读基本信息检查规则\"}",
+              "name": "check_rules"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"查询原时间2026-11-03T19:00是否可用\"}",
+              "name": "query_slots"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 7,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"原请求18:00冲突，按prefer_after选用19:00可用节点保存草稿\", \"suggested_at\": \"2026-11-03T19:00:00+08:00\"}",
+              "name": "save_draft"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 9,
+          "calls": [],
+          "proposal": {
+            "action": "needs_input",
+            "reason_summary": "草稿已保存（2026-11-03T19:00+08:00，替代冲突的原18:00，按prefer_after选最近可用节点）。待确认：是否接受该改期；以及文案“示例最强效果”需人工核实依据。"
+          }
+        }
+      ]
+    },
+    {
+      "case": "live_save_failure",
+      "model_attempts": 6,
+      "tool_attempts": 4,
+      "model": "deepseek-flash",
+      "prompt_version": "6.0",
+      "tokens": 11138,
+      "errors": [
+        {
+          "budget_remaining": {
+            "model_attempts_left": 11,
+            "seconds_left": 175.107,
+            "tool_attempts_left": 12
+          },
+          "elapsed_ms": 4976,
+          "error": {
+            "code": "INVALID_FINISH",
+            "message": "技术失败不能伪装成资料待确认，请 finish 如实停止",
+            "retryable": false
+          },
+          "event_id": "EV-2e69886e-f672-4d07-8cf9-61d37220fe48",
+          "event_type": "error",
+          "material_id": "M01",
+          "mode": "live",
+          "run_id": "RUN-035c28bc-2468-4e47-af3e-e6b2e7288001",
+          "schema_version": "1.0",
+          "step": 10,
+          "timestamp": "2026-11-01T08:46:44.582185Z"
+        }
+      ],
+      "actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "arguments": "{\"detail\": \"basic\", \"reason_summary\": \"先读取素材基本信息以进行审核\"}",
+              "name": "read_material"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"基于已读基本信息检查规则\"}",
+              "name": "check_rules"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"查询原定时间是否可用\"}",
+              "name": "query_slots"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 7,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"原时间冲突，按prefer_after推荐19:00候选，保存待确认草稿\", \"suggested_at\": \"2026-11-03T19:00:00+08:00\"}",
+              "name": "save_draft"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 9,
+          "calls": [],
+          "proposal": {
+            "action": "block",
+            "reason_summary": "素材审核已通过，但原定18:00时段冲突，推荐19:00候选；保存草稿时发生不可重试的技术失败并已回滚，未保存成功，需稍后重试。"
+          }
+        },
+        {
+          "step": 11,
+          "calls": [],
+          "proposal": {
+            "action": "finish",
+            "reason_summary": "素材审核已通过，原定18:00时段冲突，推荐19:00候选；保存草稿发生不可重试的技术失败并已回滚，未保存成功，如实停止。"
+          }
+        }
+      ]
+    },
+    {
+      "case": "live_save_race",
+      "model_attempts": 7,
+      "tool_attempts": 6,
+      "model": "deepseek-flash",
+      "prompt_version": "6.0",
+      "tokens": 15428,
+      "errors": [],
+      "actions": [
+        {
+          "step": 1,
+          "calls": [
+            {
+              "arguments": "{\"detail\": \"basic\", \"reason_summary\": \"先读取素材基本信息以进行审核\"}",
+              "name": "read_material"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 3,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"基于已读基本信息检查规则\"}",
+              "name": "check_rules"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 5,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"审核通过，查询原时间是否可用\"}",
+              "name": "query_slots"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 7,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"原时间冲突，按prefer_after推荐并保存19:00候选\", \"suggested_at\": \"2026-11-03T19:00:00+08:00\"}",
+              "name": "save_draft"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 9,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"保存冲突，重新查询原授权范围获取新候选\"}",
+              "name": "query_slots"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 11,
+          "calls": [
+            {
+              "arguments": "{\"reason_summary\": \"按prefer_after保存新候选20:00\", \"suggested_at\": \"2026-11-03T20:00:00+08:00\"}",
+              "name": "save_draft"
+            }
+          ],
+          "proposal": null
+        },
+        {
+          "step": 13,
+          "calls": [],
+          "proposal": {
+            "action": "needs_input",
+            "reason_summary": "素材审核通过（license_ref为可选缺项，不阻断）。原时间18:00冲突，19:00候选保存时被占用，已重新查询并按prefer_after保存20:00草稿；需用户确认是否接受该改期。"
+          }
+        }
+      ]
+    }
+  ],
+  "limits": "one synthetic sample per case; not a stable success-rate estimate; cache-inclusive tokens are not billed cost"
+}
