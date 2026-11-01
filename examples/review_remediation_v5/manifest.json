@@ -56,6 +56,7 @@
   "current-runs/live_save_race/run.json": "a5ebc0ddd3997e21a568b5778bb06442cc25106264d4dfcc853531d1cd7d60ef",
   "current-runs/live_save_race/summary.md": "c640ee6b18cd5782fd71f756d20b91b49f628e4e250ce41cfed30508b1fedfe4",
   "current-runs/live_save_race/trace.jsonl": "d765ed23c79d9900ecb522e3a56283adc14ef52fe8de00cc6e34af8dbbe3e4db",
+  "current-runs/manifest.json": "8171bdd4c15401ac2c11dd01665fa52ba13b5cf1951034c3bbfa562338a8d29d",
   "current-runs/mock_blocked/catalog.json": "6de0e28f9e8b2ddc7654a9fd779460eaa5a921447913d0a0d74be30b955b83e0",
   "current-runs/mock_blocked/database_check.json": "ad2ac0b1d2e55b0fbb5c88a494d696490beb76be248769abf63fad9db24cf124",
   "current-runs/mock_blocked/input.json": "bcaf736647149cfaa27c2a3afdf59b145cfbecd51e2abccbe0abf1f45fd2d9b0",
@@ -224,6 +225,12 @@
   "phase3/pytest.txt": "0a3a223eb8529596e3bcd7281aaade4dfb5996dc67068f97f1797c253603d6c4",
   "phase3/verification.json": "84eb177661554ea1590b7f84256aabded69e5ad6996d6b7485db51a5bb199cbe",
   "quality-checks.json": "78cfd751f06a30dd7def3fbc5af0e535b75da98e57ec7f0cbd965d7d5e0d2665",
-  "README.md": "76a954e1cb4ba4b92b5dde77a57bb2843eb00d3dc6767e30398f0c79d1610093",
-  "current-runs/manifest.json": "8171bdd4c15401ac2c11dd01665fa52ba13b5cf1951034c3bbfa562338a8d29d"
+  "README.md": "8d0b41a5b98a14033cd20fd93024a4036de8c0fb32ea055cd39885ca6e6bf595",
+  "remote-verification/archive-check.txt": "40ae9904fcc068643a3d2835cb936fd0d699e38c5d98788ca443a356bf92a4e7",
+  "remote-verification/evidence-check.txt": "1fbe3ca6a5b2f8beb622db976a1c2e74b2bf58152717627cc8f54eb448b01129",
+  "remote-verification/junit.xml": "51c540c3d371a8d772f9d7323b7058fd0404c4a0623ae1e0ad37d7f51f1151cd",
+  "remote-verification/pytest.txt": "a3cff1ee9f7609fbb53a854a5cc4b897f362370673badbd97a7da1458862af9a",
+  "remote-verification/ruff-check.txt": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+  "remote-verification/ruff-format.txt": "aec51819fa2b338a1a7896d7f3fa3a16c30fdb3b01d724c485d984ae83b87a06",
+  "remote-verification/verification.json": "071a56715463edab0b6d8342d6988d864c8d7bbfc25d15bf9f9d962ed32fec04"
 }

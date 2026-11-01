@@ -1,0 +1,76 @@
+{
+  "manifest_checks": "PASS",
+  "markdown_file_links": 308,
+  "readme_tmp_prerequisite_verified": true,
+  "checks": [
+    {
+      "arguments": [
+        "-I",
+        "-m",
+        "pytest",
+        "--basetemp=.tmp/pytest",
+        "-q",
+        "--runxfail",
+        "--junitxml=D:\\Code\\smallShadow\\runtime\\remediation-remote-junit.xml"
+      ],
+      "exit_code": 0,
+      "output": "........................................................................ [ 18%]\n........................................................................ [ 36%]\n........................................................................ [ 55%]\n........................................................................ [ 73%]\n........................................................................ [ 91%]\n................................                                         [100%]\n392 passed in 65.11s (0:01:05)\n"
+    },
+    {
+      "arguments": [
+        "-I",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "arguments": [
+        "-I",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0,
+      "output": "52 files already formatted\n"
+    },
+    {
+      "arguments": [
+        "-I",
+        "scripts/check_evidence.py",
+        "examples/review_remediation_v5",
+        "--live-directory",
+        "examples/review_remediation_v5/current-runs"
+      ],
+      "exit_code": 0,
+      "output": "Validated 28 application runs; live paths checked: True.\n"
+    },
+    {
+      "arguments": [
+        "-I",
+        "scripts/check_decision_examples.py",
+        "examples/review_remediation_v5/current-runs"
+      ],
+      "exit_code": 0,
+      "output": "{\"verified_runs\": 23, \"verified_files\": 162}\n"
+    }
+  ],
+  "tested_commit": "aa8b325f62a779c010f0a3ac8549edc61101e590",
+  "source_sha256": "3bf99cc483bd3bb223b42e1598c9053a61e4dbbc4f55b7be425548ba6336b50a",
+  "method": "Fresh GitHub clone; README .tmp prerequisite; isolated interpreter from newly installed current locked wheel.",
+  "result": {
+    "passed": 392,
+    "failed": 0,
+    "seconds": 65.11
+  },
+  "scope": "Later commit only records these results; no further business source, data, tests or dependency changes."
+}

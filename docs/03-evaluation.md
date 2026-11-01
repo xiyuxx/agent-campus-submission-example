@@ -48,3 +48,7 @@ Windows/PowerShell、Python3.13.12、依赖沿用requirements.lock。当前完�
 ## 限制
 
 审核只覆盖元数据和文案，synthetic引用不证明真实媒体可读或版权合法；没有视频理解、真实发布、企业鉴权、全局最优排期或已确认草稿通用撤回。new_publication只声明再次发布，不取消或替代已有草稿。业务时钟回放只用于显式历史验证，Mock不自动绕过时间限制。个人实际净工时未独立计时，约4–5小时仅此前交互执行粗估，后续本人试用仍未发生。
+
+## 当前远程克隆复验
+
+新提交aa8b325推送后从GitHub重新克隆，使用新安装当前wheel的隔离解释器执行全部测试：392 passed，65.11秒。README的.tmp前置步骤、Ruff、28次业务证据和归档清单核查均通过，见 [实际记录](../examples/review_remediation_v5/remote-verification/verification.json)。最后仅归档结果，无新增业务源码、数据、测试或依赖修改。
