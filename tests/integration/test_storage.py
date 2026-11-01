@@ -110,9 +110,10 @@ def test_reject_terminal_and_operation_replay(repo, job, catalog):
     assert count(repo, "draft_history") == 1
 
 
-def test_new_request_does_not_exclude_other_request(repo, job):
+def test_explicit_new_publication_does_not_exclude_other_request(repo, job):
     first = save(repo, job)["draft"]
-    second = job.model_copy(update={"request_id": "REQ-2"})
+    second = job.model_copy(update={"request_id": "REQ-2"}, deep=True)
+    second.items[0].new_publication = True
     repo.register_request(second)
     snapshot = repo.read_material_basic("M01")
     own = repo.query_occupancy(job.request_id, job.items[0], snapshot, "alternatives")

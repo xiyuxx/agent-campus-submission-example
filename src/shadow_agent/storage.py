@@ -612,6 +612,35 @@ class Repository:
                 "draft": self._inspect(connection, draft) if draft else None,
             }
 
+    def _guard_publication(self, connection, request_id, item, snapshot) -> None:
+        if item.new_publication:
+            return
+        related = [
+            dict(row)
+            for row in connection.execute(
+                "SELECT d.draft_id,d.request_id,d.revision,d.at_utc FROM drafts d "
+                "JOIN draft_history h ON h.draft_id=d.draft_id AND h.revision=d.revision "
+                "WHERE d.material_id=? AND d.platform=? AND d.account_id=? "
+                "AND h.material_version=? AND d.validity='active' AND d.at_utc>? "
+                "AND d.request_id<>? ORDER BY d.draft_id",
+                (
+                    item.material_id,
+                    snapshot.material.platform,
+                    snapshot.material.account_id,
+                    snapshot.material.material_version,
+                    self.business_now(),
+                    request_id,
+                ),
+            )
+        ]
+        if related:
+            raise BusinessError(
+                "DUPLICATE_PUBLICATION",
+                "同素材版本和账号已有有效草稿；请使用原请求复用。"
+                "确需再次发布请显式设置 new_publication=true",
+                details={"related_drafts": related},
+            )
+
     def query_occupancy(
         self, request_id: str, item: RequestItem, snapshot: MaterialSnapshot, query: str
     ) -> SlotObservation:
@@ -648,6 +677,7 @@ class Repository:
         meta = self._meta(connection)
         if meta["revision"] != snapshot.catalog_revision:
             raise BusinessError("STALE_EVIDENCE", "资料已变，请刷新素材")
+        self._guard_publication(connection, request_id, item, snapshot)
         draft = self._draft(connection, request_id, item.material_id)
         self_id = draft["draft_id"] if draft else None
         if query == "requested":
@@ -869,6 +899,7 @@ class Repository:
                     raise BusinessError("PRECONDITION_FAILED", "缺少必要要求或审核不允许保存")
                 self.require_future(utc(requirement.requested_at), "REQUEST_EXPIRED")
                 self.require_future(suggested_at)
+                self._guard_publication(connection, request.request_id, item, actual)
                 observed = {x["at"] for x in slot.slots if x["available"]}
                 if suggested_at not in observed:
                     raise BusinessError("PRECONDITION_FAILED", "建议时段未被本轮观察为可用")

@@ -1,0 +1,38 @@
+{
+  "source": {
+    "base_commit": "b1aa3c6689a81613dae920eb430f6d568fee81c6",
+    "source_sha256": "3bf99cc483bd3bb223b42e1598c9053a61e4dbbc4f55b7be425548ba6336b50a"
+  },
+  "result": {
+    "passed": 392,
+    "failed": 0,
+    "seconds": 65.78
+  },
+  "initial_result": {
+    "passed": 389,
+    "failed": 1,
+    "reason": "Old independent-request occupancy test now requires explicit new_publication; original capacity assertions retained."
+  },
+  "new_tests_total": 32,
+  "output_schema_version": "1.1",
+  "archive_text_normalization": "LF and trailing whitespace only; raw originals under ignored runtime",
+  "test_sources_sha256": {
+    "tests/conftest.py": "88f78ab875f037c77f5a9a39f84fc36d69f338604f5560899aa75bcdded75de7",
+    "tests/integration/test_adversarial_workflows.py": "685aab0b6a827b49ab1aa514c616bf1ae439a51d742637b709bb00eed5a095ff",
+    "tests/integration/test_agent.py": "f470328e6d1b79ae9cf1127470452e2b9c836ed02f10c2bb03cc27ba2c74b768",
+    "tests/integration/test_automatic_slot_options.py": "b7740f5b4e3ceb84bbee8f6c9a35c6d7185164bf4b410989c81d885af84f88eb",
+    "tests/integration/test_cli.py": "ee1f81d9b88884d39a4e8285f9bc2a9d76c7bd1a6d4a160d8d466a040b19dc1d",
+    "tests/integration/test_decision_improvements.py": "e340461dac214072498a0ea1ddd50bf236fcc04d85530a388e43ce1e3293dfdc",
+    "tests/integration/test_evidence_validation.py": "355e684abb0b867c598dcf421eec29985bc993237c6c883fb272068074244d47",
+    "tests/integration/test_local_binding_nearest.py": "98c1351f0babe0775ce3d75c6286d265da56f35c1e4c4912b855b1b34eb7bea0",
+    "tests/integration/test_provider.py": "6674839ddbb048fa62c8636b69962bc027a27ce1f91696539e6b2ce8baeb52c6",
+    "tests/integration/test_provider_structure.py": "604da1548cb1ed63e38304be8033a1d4461d00a44a9ddffd812550a2136e7a98",
+    "tests/integration/test_retest_edge_cases.py": "fed84a86544ba119f10c61de3cff06571fdbc07575b266b71853811253d243e3",
+    "tests/integration/test_review_freshness.py": "1a49c6a4a53fdab966fd23b1694befe2c64c14af6a92f760e0b3bd84178b11a5",
+    "tests/integration/test_review_remediation.py": "582091bece76414e8cbc41d12d9e599fb3b238637da2c63ada48511d87849c52",
+    "tests/integration/test_runtime_limits.py": "3c8c0e8107968a72dc2cdf2167ae791e63d755270cde105c5d6e2b8d92447adf",
+    "tests/integration/test_storage.py": "0aad70d1a6049225eac7ca64bd4cb5e1887670c488692ff6dc993ffd6d7d4b9e",
+    "tests/integration/test_supplement_unknowns.py": "d82c9012c2d5a17d422fb8d845d9a28b24f6ce67777f0ecd0c51a54fe7746ca7",
+    "tests/unit/test_contracts.py": "a4f32b35c4b7b7b18966309c78a95fe0d4cf2316b2c2d88198a765ad14424c5b"
+  }
+}

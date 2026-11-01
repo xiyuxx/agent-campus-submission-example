@@ -33,5 +33,6 @@
     "tests/integration/test_storage.py": "910f9fc3b5358b1fcbf437a7369d56e63015909a12347ce08fb80a0b5f0b7f30",
     "tests/integration/test_supplement_unknowns.py": "d82c9012c2d5a17d422fb8d845d9a28b24f6ce67777f0ecd0c51a54fe7746ca7",
     "tests/unit/test_contracts.py": "a4f32b35c4b7b7b18966309c78a95fe0d4cf2316b2c2d88198a765ad14424c5b"
-  }
+  },
+  "archive_text_normalization": "LF and trailing whitespace normalization only; original raw process outputs retained under ignored runtime."
 }

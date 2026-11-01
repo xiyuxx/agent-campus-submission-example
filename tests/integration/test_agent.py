@@ -266,7 +266,10 @@ def test_two_writers_recheck_capacity(repo, job):
 
     def worker(request_id):
         repository = Repository(repo.path)
-        own = job.model_copy(update={"request_id": request_id})
+        own = job.model_copy(update={"request_id": request_id}, deep=True)
+        own.items[
+            0
+        ].new_publication = True  # Explicit independent publications still compete for capacity.
         repository.register_request(own)
         snapshot = repository.read_supplement(repository.read_material_basic("M01"))
         review = repository.read_rule_snapshot(snapshot)

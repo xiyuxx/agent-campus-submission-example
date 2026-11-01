@@ -18,7 +18,7 @@ RequestItem新增new_publication: bool=false，仅由用户输入，模型工具
 
 ## 拟议方案与持久化结果
 
-ItemResult新增可空proposed_plan及related_drafts。proposed_plan记录真实已消费审核/时段观察支撑的最后一次合法保存提议：suggested_at、pending_items、persistence_status（not_saved/saved/unknown）、validity（requires_recheck/current/invalidated）和error。无依据或畸形参数不产生有效提议。
+输出RequestResult升级schema_version=1.1（读取兼容历史1.0）；输入和Trace版本保留1.0。ItemResult新增可空proposed_plan及related_drafts。proposed_plan记录真实已消费审核/时段观察支撑的最后一次合法保存提议：suggested_at、pending_items、persistence_status（not_saved/saved/unknown）、validity（requires_recheck/current/invalidated）和error。无依据或畸形参数不产生有效提议。
 
 顶层suggested_at和confirmation_status继续描述当前持久化草稿；proposed_plan独立展示本次建议。明确保存失败保留提议但标requires_recheck/not_saved；抢槽、过期、过期资料则invalidated；回执未知为unknown。旧有效草稿与新失败提议同时展示，不能混淆。未保存方案不能调用confirm。摘要清楚标注未保存及需重新核实，不凭历史查询声称当前可用。终态仍failed/incomplete，不能因保留建议改成成功或普通待确认。
 
@@ -34,3 +34,7 @@ ItemResult新增可空proposed_plan及related_drafts。proposed_plan记录真实
 ## 阶段二实际结果
 
 最低完整性和业务时间已实现，无数据库结构迁移。20项新边界与既有回归共380项通过（52.46秒），Ruff通过。初轮375通过/1失败，因旧M03无新要求media_ref，补齐合成媒体引用后保留原审核失效断言通过。证据见 [阶段二](../examples/review_remediation_v5/phase2/verification.json)。此时尚未完成跨请求防重复、新失败输出或新live。
+
+## 阶段三实际结果
+
+默认跨请求防重复、显式new_publication、并发保存守卫和proposed_plan输出已实现。输出版本1.1，兼容读取历史1.0。完整392项通过（65.78秒），含32项新测试。初轮389通过/1失败为旧“新请求独立发布”用例，改为显式再次发布后保留原容量断言；默认换ID拦截另有新用例。阶段二失败归档只规范LF和尾空格，原始日志留runtime。证据见 [阶段三](../examples/review_remediation_v5/phase3/verification.json)。尚未生成新live，本阶段不宣称模型效果。

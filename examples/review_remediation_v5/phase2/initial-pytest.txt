@@ -16,10 +16,10 @@ tmp_path = WindowsPath('D:/Code/smallShadow/.tmp/remediation-phase2/test_running
         value = job.model_dump(mode="json")
         value["items"][0]["material_id"] = "M03"
         request = Request.model_validate(value)
-    
+
         class OldVerdictAfterRefresh(MockModel):
             changed = False
-    
+
             async def next_action(self, messages, schemas):
                 results = [json.loads(x["content"]) for x in messages if x["role"] == "tool"]
                 if results and results[-1]["tool"] == "check_rules" and not self.changed:
@@ -41,7 +41,7 @@ tmp_path = WindowsPath('D:/Code/smallShadow/.tmp/remediation-phase2/test_running
                         {"role": "assistant", "content": proposal.model_dump_json()}, proposal=proposal
                     )
                 return await super().next_action(messages, schemas)
-    
+
         output = tmp_path / "rule-refresh"
         result = asyncio.run(
             run_request(request, repo, OldVerdictAfterRefresh(), mode="mock", output=output)
@@ -50,7 +50,7 @@ tmp_path = WindowsPath('D:/Code/smallShadow/.tmp/remediation-phase2/test_running
         (output / "database_check.json").write_text(fresh.model_dump_json(indent=2), encoding="utf-8")
 >       assert fresh.review_status == "passed"
 E       AssertionError: assert 'needs_info' == 'passed'
-E         
+E
 E         - passed
 E         + needs_info
 

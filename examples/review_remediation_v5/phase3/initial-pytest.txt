@@ -1,0 +1,69 @@
+........................................................................ [ 18%]
+........................................................................ [ 36%]
+........................................................................ [ 55%]
+........................................................................ [ 73%]
+.................................................................F...... [ 92%]
+..............................                                           [100%]
+================================== FAILURES ===================================
+_______________ test_new_request_does_not_exclude_other_request _______________
+
+repo = <shadow_agent.storage.Repository object at 0x00000156AF5759A0>
+job = Request(schema_version='1.0', request_id='REQ-1', items=[RequestItem(material_id='M01', publish_requirement=PublishReq...info=datetime.timezone(datetime.timedelta(seconds=28800)))], reschedule_preference='nearest'), new_publication=False)])
+
+    def test_new_request_does_not_exclude_other_request(repo, job):
+        first = save(repo, job)["draft"]
+        second = job.model_copy(update={"request_id": "REQ-2"})
+        repo.register_request(second)
+        snapshot = repo.read_material_basic("M01")
+        own = repo.query_occupancy(job.request_id, job.items[0], snapshot, "alternatives")
+>       other = repo.query_occupancy(second.request_id, second.items[0], snapshot, "alternatives")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\test_storage.py:119:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\shadow_agent\storage.py:647: in query_occupancy
+    return self._query_occupancy(connection, request_id, item, snapshot, query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\shadow_agent\storage.py:679: in _query_occupancy
+    self._guard_publication(connection, request_id, item, snapshot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <shadow_agent.storage.Repository object at 0x00000156AF5759A0>
+connection = <sqlite3.Connection object at 0x00000156AF6631F0>
+request_id = 'REQ-2'
+item = RequestItem(material_id='M01', publish_requirement=PublishRequirement(requested_at=datetime.datetime(2026, 11, 3, 18, ...tzinfo=datetime.timezone(datetime.timedelta(seconds=28800)))], reschedule_preference='nearest'), new_publication=False)
+snapshot = MaterialSnapshot(material=Material(source_asset_id='VIDEO-001', title='��Ʒ���ܽ���', type='video', media_ref='synthetic://v... 'copyright_status': 'materials:M01@2', 'license_ref': 'materials:M01@2'}, supplement_version=None, supplemented=False)
+
+    def _guard_publication(self, connection, request_id, item, snapshot) -> None:
+        if item.new_publication:
+            return
+        related = [
+            dict(row)
+            for row in connection.execute(
+                "SELECT d.draft_id,d.request_id,d.revision,d.at_utc FROM drafts d "
+                "JOIN draft_history h ON h.draft_id=d.draft_id AND h.revision=d.revision "
+                "WHERE d.material_id=? AND d.platform=? AND d.account_id=? "
+                "AND h.material_version=? AND d.validity='active' AND d.at_utc>? "
+                "AND d.request_id<>? ORDER BY d.draft_id",
+                (
+                    item.material_id,
+                    snapshot.material.platform,
+                    snapshot.material.account_id,
+                    snapshot.material.material_version,
+                    self.business_now(),
+                    request_id,
+                ),
+            )
+        ]
+        if related:
+>           raise BusinessError(
+                "DUPLICATE_PUBLICATION",
+                "ͬ�زİ汾���˺�������Ч�ݸ壻��ʹ��ԭ�����ã�ȷ���ٴη�������ʽ���� new_publication=true",
+                details={"related_drafts": related},
+            )
+E           shadow_agent.common.BusinessError: ͬ�زİ汾���˺�������Ч�ݸ壻��ʹ��ԭ�����ã�ȷ���ٴη�������ʽ���� new_publication=true
+
+src\shadow_agent\storage.py:637: BusinessError
+=========================== short test summary info ===========================
+FAILED tests/integration/test_storage.py::test_new_request_does_not_exclude_other_request
+1 failed, 389 passed in 61.36s (0:01:01)

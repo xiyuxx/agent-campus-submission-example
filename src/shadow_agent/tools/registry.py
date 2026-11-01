@@ -8,8 +8,18 @@ from pydantic import ValidationError
 from ..common import BusinessError, dumps, new_id, utc
 from ..config import ResourceLimits
 from ..context import ItemContext
-from ..contracts import FACT_FIELDS, MaterialArgs, ReadArgs, SaveArgs, SlotArgs, ToolResult
+from ..contracts import (
+    FACT_FIELDS,
+    MaterialArgs,
+    PendingItem,
+    ProposedPlan,
+    ReadArgs,
+    SaveArgs,
+    SlotArgs,
+    ToolResult,
+)
 from ..model_view import tool_view
+from ..policy import confirmation_definitions
 from .availability import available_tools, read_details
 
 ARGUMENTS = {
@@ -74,6 +84,7 @@ def execute(
     observation_id = new_id("OBS")
     attempted = False
     executed = False
+    proposal_created = False
     previous = (ctx.snapshot, ctx.review, ctx.review_id, dict(ctx.slots))
     try:
         if ctx.forced_status:
@@ -197,6 +208,11 @@ def execute(
                 or suggested not in {x["at"] for x in slot.slots if x["available"]}
             ):
                 raise BusinessError("PRECONDITION_FAILED", "建议必须来自最新已回传的可用时段结果")
+            ctx.proposed_plan = ProposedPlan(
+                suggested_at=args.suggested_at.isoformat(),
+                pending_items=confirmation_definitions(ctx.item, ctx.review, suggested),
+            )
+            proposal_created = True
             ctx.trace.check_writable()
             executed = True
             ctx.repo.revalidate_current_draft(
@@ -220,6 +236,13 @@ def execute(
             ctx.save_status, ctx.save_error = saved["save_status"], None
             ctx.save_observation_id = observation_id
             draft = saved["draft"]
+            ctx.proposed_plan.persistence_status = "saved"
+            ctx.proposed_plan.validity = "current"
+            ctx.proposed_plan.pending_items = [
+                # Persisted confirmation facts may already resolve a reused proposal.
+                PendingItem.model_validate(x)
+                for x in draft["pending_items"]
+            ]
             ctx.draft_state = draft
             ctx.expected_revision = draft["revision"]
             ctx.save_receipt = {
@@ -269,8 +292,9 @@ def execute(
             ctx.save_error = {"code": result.code, "message": result.data["message"]}
     except (BusinessError, sqlite3.Error) as exc:
         error = ctx.repo.database_error(exc) if isinstance(exc, sqlite3.Error) else exc
-        if error.code in ("REQUEST_EXPIRED", "SLOT_EXPIRED"):
+        if error.code in ("REQUEST_EXPIRED", "SLOT_EXPIRED", "DUPLICATE_PUBLICATION"):
             ctx.input_issue = error.as_dict()
+            ctx.related_drafts = (error.details or {}).get("related_drafts", [])
         if error.retryable and attempted:
             key = retry_key(name, args, ctx)
             ctx.retry_counts[key] = ctx.retry_counts.get(key, 0) + 1
@@ -306,6 +330,24 @@ def execute(
             )
             ctx.save_error = error.as_dict()
             ctx.save_observation_id = observation_id
+            if proposal_created:
+                ctx.proposed_plan.persistence_status = (
+                    "unknown" if ctx.save_status == "unknown" else "not_saved"
+                )
+                ctx.proposed_plan.validity = (
+                    "invalidated"
+                    if error.code
+                    in (
+                        "SLOT_CONFLICT",
+                        "STALE_EVIDENCE",
+                        "REVISION_CONFLICT",
+                        "SLOT_EXPIRED",
+                        "REQUEST_EXPIRED",
+                        "DUPLICATE_PUBLICATION",
+                    )
+                    else "requires_recheck"
+                )
+                ctx.proposed_plan.error = error.as_dict()
         if error.code in (
             "READ_FAILED",
             "QUERY_FAILED",

@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from .config import Budget
 from .contracts import (
     MaterialSnapshot,
+    ProposedPlan,
     Request,
     RequestItem,
     RuleCheck,
@@ -45,6 +46,8 @@ class ItemContext:
     schedule_requeries: int = 0
     supplement_available: bool = False
     input_issue: dict | None = None
+    proposed_plan: ProposedPlan | None = None
+    related_drafts: list[dict] = field(default_factory=list)
 
     def refresh_draft(self) -> None:
         self.draft_state = self.repo.current_draft(self.request.request_id, self.material_id)

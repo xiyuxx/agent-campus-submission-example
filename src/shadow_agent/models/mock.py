@@ -63,6 +63,7 @@ class MockModel:
                 "DATA_CONFLICT",
                 "REQUEST_EXPIRED",
                 "SLOT_EXPIRED",
+                "DUPLICATE_PUBLICATION",
             ):
                 return finish("needs_input", "需要用户补充资料或发起独立请求")
             return finish("finish", "工具失败，停止并保留已完成检查")

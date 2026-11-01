@@ -76,6 +76,7 @@ class PublishRequirement(Contract):
 class RequestItem(Contract):
     material_id: Identifier
     publish_requirement: PublishRequirement
+    new_publication: bool = False
 
 
 class Request(Contract):
@@ -97,6 +98,7 @@ class Request(Contract):
                 {
                     "material_id": x.material_id,
                     "publish_requirement": x.publish_requirement.canonical(),
+                    **({"new_publication": True} if x.new_publication else {}),
                 }
                 for x in sorted(self.items, key=lambda x: x.material_id)
             ],
@@ -303,6 +305,14 @@ class DraftResult(Contract):
     error: dict | None = None
 
 
+class ProposedPlan(Contract):
+    suggested_at: str
+    pending_items: list[PendingItem] = Field(default_factory=list)
+    persistence_status: Literal["not_saved", "saved", "unknown"] = "not_saved"
+    validity: Literal["requires_recheck", "current", "invalidated"] = "requires_recheck"
+    error: dict | None = None
+
+
 class ItemResult(Contract):
     material_id: str
     material_version: int | None = None
@@ -317,10 +327,12 @@ class ItemResult(Contract):
     task_status: TaskStatus
     evidence_ids: list[str] = Field(default_factory=list)
     error: dict | None = None
+    proposed_plan: ProposedPlan | None = None
+    related_drafts: list[dict] = Field(default_factory=list)
 
 
 class RequestResult(Contract):
-    schema_version: Literal["1.0"] = "1.0"
+    schema_version: Literal["1.0", "1.1"] = "1.1"
     run_id: str
     request_id: str
     mode: Literal["mock", "live"]

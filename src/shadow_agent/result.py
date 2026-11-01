@@ -30,7 +30,13 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
     ]
     if ctx.input_issue:
         pending.append(
-            PendingItem(id="schedule:new_time", kind="input", message=ctx.input_issue["message"])
+            PendingItem(
+                id="publication:reuse"
+                if ctx.input_issue["code"] == "DUPLICATE_PUBLICATION"
+                else "schedule:new_time",
+                kind="input",
+                message=ctx.input_issue["message"],
+            )
         )
     review = ctx.review
     stale = bool(
@@ -119,6 +125,9 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
         status = "completed"
     else:
         status = "incomplete"
+    proposed = ctx.proposed_plan.model_copy(deep=True) if ctx.proposed_plan else None
+    if proposed and (stale or changed):
+        proposed.validity = "invalidated"
     return ItemResult(
         material_id=ctx.material_id,
         material_version=ctx.snapshot.material.material_version if ctx.snapshot else None,
@@ -135,6 +144,8 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
         task_status=status,
         evidence_ids=list(ctx.observations),
         error=ctx.technical_error or ctx.input_issue,
+        proposed_plan=proposed,
+        related_drafts=ctx.related_drafts,
     )
 
 
@@ -177,6 +188,20 @@ def render_summary(result: RequestResult) -> str:
         ]
         lines += [f"- 风险：{r['rule_id']} / {r['message']}" for r in item.risk_reasons]
         lines += [f"- 待办（{x.kind}）：{x.id} / {x.message}" for x in item.pending_items]
+        if item.proposed_plan:
+            plan = item.proposed_plan
+            lines.append(
+                f"- 本次拟议：{plan.suggested_at}；持久化：{plan.persistence_status}；"
+                f"有效性：{plan.validity}"
+            )
+            if plan.persistence_status != "saved":
+                lines.append("- 拟议方案未核实保存成功；需重新核实时段，未保存方案不能确认。")
+                lines += [f"- 拟议待办：{x.message}" for x in plan.pending_items]
+        for related in item.related_drafts:
+            lines.append(
+                f"- 已有草稿：{related['draft_id']}；原请求：{related['request_id']}；"
+                f"时刻：{related['at_utc']}（不是本次保存回执）"
+            )
         if item.error or item.draft.error:
             error = item.error or item.draft.error
             lines.append(f"- 错误：{error['code']} / {error['message']}")

@@ -30,11 +30,14 @@ def new_id(prefix: str) -> str:
 
 
 class BusinessError(Exception):
-    def __init__(self, code: str, message: str, *, retryable: bool = False):
+    def __init__(
+        self, code: str, message: str, *, retryable: bool = False, details: dict | None = None
+    ):
         super().__init__(message)
         self.code = code
         self.message = message
         self.retryable = retryable
+        self.details = details
 
     def as_dict(self) -> dict:
         return {"code": self.code, "message": self.message, "retryable": self.retryable}
