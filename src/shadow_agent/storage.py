@@ -613,21 +613,18 @@ class Repository:
             }
 
     def _guard_publication(self, connection, request_id, item, snapshot) -> None:
-        if item.new_publication:
-            return
         related = [
             dict(row)
             for row in connection.execute(
                 "SELECT d.draft_id,d.request_id,d.revision,d.at_utc FROM drafts d "
                 "JOIN draft_history h ON h.draft_id=d.draft_id AND h.revision=d.revision "
                 "WHERE d.material_id=? AND d.platform=? AND d.account_id=? "
-                "AND h.material_version=? AND d.validity='active' AND d.at_utc>? "
+                "AND d.validity='active' AND d.at_utc>? "
                 "AND d.request_id<>? ORDER BY d.draft_id",
                 (
                     item.material_id,
                     snapshot.material.platform,
                     snapshot.material.account_id,
-                    snapshot.material.material_version,
                     self.business_now(),
                     request_id,
                 ),
@@ -636,8 +633,7 @@ class Repository:
         if related:
             raise BusinessError(
                 "DUPLICATE_PUBLICATION",
-                "同素材版本和账号已有有效草稿；请使用原请求复用。"
-                "确需再次发布请显式设置 new_publication=true",
+                "同素材和账号已有有效草稿；请复用或修改原发布任务",
                 details={"related_drafts": related},
             )
 
@@ -673,7 +669,9 @@ class Repository:
         requirement = item.publish_requirement
         if requirement.missing():
             raise BusinessError("PRECONDITION_FAILED", "缺少原时间、时区或 hard/soft，不能查询")
-        self.require_future(utc(requirement.requested_at), "REQUEST_EXPIRED")
+        approved = self._approved_future(connection, request_id, item.material_id)
+        if not approved:
+            self.require_future(utc(requirement.requested_at), "REQUEST_EXPIRED")
         meta = self._meta(connection)
         if meta["revision"] != snapshot.catalog_revision:
             raise BusinessError("STALE_EVIDENCE", "资料已变，请刷新素材")
@@ -686,6 +684,8 @@ class Repository:
             if query != "alternatives":
                 raise BusinessError("INVALID_QUERY", "不支持的本地时段查询")
             times, source = self._candidate_times(connection, item, snapshot)
+            if utc(requirement.requested_at) <= self.business_now() and approved:
+                times = [approved["at_utc"]]
 
         def inspect(at):
             conflicts = self._occupancy(
@@ -737,6 +737,25 @@ class Repository:
         self._event(
             connection, draft, "staled", "stale", reason, import_id=import_id, run_id=run_id
         )
+
+    def _approved_future(self, connection, request_id, material_id):
+        draft = self._draft(connection, request_id, material_id)
+        if (
+            draft
+            and draft["validity"] == "active"
+            and not self._invalid_reason(connection, draft)
+            and not self._inspect(connection, draft)["pending_items"]
+        ):
+            return draft
+        return None
+
+    def _fresh(self, connection, draft):
+        if draft and draft["validity"] == "active":
+            reason = self._invalid_reason(connection, draft)
+            if reason:
+                self._stale(connection, draft, reason)
+                draft = {**draft, "validity": "stale"}
+        return draft
 
     def _invalid_reason(self, connection, draft) -> str | None:
         if draft["at_utc"] <= self.business_now():
@@ -809,18 +828,18 @@ class Repository:
         }
 
     def current_draft(self, request_id: str, material_id: str) -> dict | None:
-        with self.transaction() as connection:
-            draft = self._draft(connection, request_id, material_id)
+        with self.transaction(write=True) as connection:
+            draft = self._fresh(connection, self._draft(connection, request_id, material_id))
             return self._inspect(connection, draft) if draft else None
 
     def inspect_draft(self, draft_id: str) -> dict:
-        with self.transaction() as connection:
+        with self.transaction(write=True) as connection:
             row = connection.execute(
                 "SELECT * FROM drafts WHERE draft_id=?", (draft_id,)
             ).fetchone()
             if not row:
                 raise BusinessError("DRAFT_NOT_FOUND", "草稿不存在")
-            result = self._inspect(connection, dict(row))
+            result = self._inspect(connection, self._fresh(connection, dict(row)))
             result["history"] = [
                 {**dict(x), "payload_json": json.loads(x["payload_json"])}
                 for x in connection.execute(
@@ -838,9 +857,9 @@ class Repository:
             return result
 
     def list_drafts(self) -> list[dict]:
-        with self.transaction() as connection:
+        with self.transaction(write=True) as connection:
             return [
-                self._inspect(connection, dict(row))
+                self._inspect(connection, self._fresh(connection, dict(row)))
                 for row in connection.execute("SELECT * FROM drafts ORDER BY created_at,draft_id")
             ]
 
@@ -897,7 +916,9 @@ class Repository:
                 requirement = item.publish_requirement
                 if requirement.missing() or review.review_status not in ("passed", "needs_review"):
                     raise BusinessError("PRECONDITION_FAILED", "缺少必要要求或审核不允许保存")
-                self.require_future(utc(requirement.requested_at), "REQUEST_EXPIRED")
+                approved = self._approved_future(connection, request.request_id, item.material_id)
+                if not approved or approved["at_utc"] != suggested_at:
+                    self.require_future(utc(requirement.requested_at), "REQUEST_EXPIRED")
                 self.require_future(suggested_at)
                 self._guard_publication(connection, request.request_id, item, actual)
                 observed = {x["at"] for x in slot.slots if x["available"]}
@@ -1114,7 +1135,7 @@ class Repository:
                 return {
                     "replayed": True,
                     "stored_operation_result": json.loads(old["result_json"]),
-                    "current_draft": self._inspect(connection, dict(row)),
+                    "current_draft": self._inspect(connection, self._fresh(connection, dict(row))),
                 }
             row = connection.execute(
                 "SELECT * FROM drafts WHERE draft_id=?", (decision.draft_id,)

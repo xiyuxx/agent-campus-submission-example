@@ -261,17 +261,24 @@ def test_cross_process_duplicate_and_output_no_overwrite(repo, job, tmp_path):
     assert (tmp_path / "one/output.json").read_bytes() == previous
 
 
-def test_two_writers_recheck_capacity(repo, job):
+def test_two_writers_recheck_capacity(repo, job, catalog):
+    catalog.materials.append(
+        catalog.materials[0].model_copy(update={"material_id": "M99"}, deep=True)
+    )
+    catalog.supplements.append(
+        catalog.supplements[0].model_copy(update={"material_id": "M99"}, deep=True)
+    )
+    repo.apply_catalog_snapshot(catalog, update=True)
     barrier = Barrier(2)
 
     def worker(request_id):
         repository = Repository(repo.path)
         own = job.model_copy(update={"request_id": request_id}, deep=True)
-        own.items[
-            0
-        ].new_publication = True  # Explicit independent publications still compete for capacity.
+        own.items[0].material_id = "M01" if request_id == "A" else "M99"
         repository.register_request(own)
-        snapshot = repository.read_supplement(repository.read_material_basic("M01"))
+        snapshot = repository.read_supplement(
+            repository.read_material_basic(own.items[0].material_id)
+        )
         review = repository.read_rule_snapshot(snapshot)
         slots = repository.query_occupancy(request_id, own.items[0], snapshot, "alternatives")
         barrier.wait(timeout=5)

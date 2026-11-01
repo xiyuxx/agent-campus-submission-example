@@ -204,17 +204,16 @@ def test_new_request_id_does_not_create_second_publication(repo, job, tmp_path):
     assert len(repo.list_drafts()) == 1
 
 
-def test_explicit_new_publication_and_repeat_of_that_intent(repo, job, tmp_path):
+def test_legacy_new_publication_cannot_bypass_duplicate_guard(repo, job, tmp_path):
     execute_run(repo, job, tmp_path / "first")
     other = job.model_copy(deep=True, update={"request_id": "INTENDED-SECOND"})
     other.items[0].new_publication = True
     other.items[0].publish_requirement.candidate_times = [parse_time("2026-11-03T20:00:00+08:00")]
     second = execute_run(repo, other, tmp_path / "second")
     repeat = execute_run(repo, other, tmp_path / "repeat")
-    assert second.items[0].draft.save_status == "saved"
-    assert repeat.items[0].draft.save_status == "reused"
-    assert repeat.items[0].draft.id == second.items[0].draft.id
-    assert len(repo.list_drafts()) == 2
+    assert second.items[0].error["code"] == "DUPLICATE_PUBLICATION"
+    assert repeat.items[0].error["code"] == "DUPLICATE_PUBLICATION"
+    assert len(repo.list_drafts()) == 1
 
 
 def test_publication_intent_is_part_of_input_identity(job):

@@ -1,7 +1,7 @@
 """One set of input, tool and result contracts; model text never becomes trusted state."""
 
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -26,6 +26,10 @@ def parse_time(value: Any) -> datetime:
         value = datetime.fromisoformat(value)
     if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
         raise ValueError("时间必须是带 UTC 偏移的 ISO 8601 时间")
+    try:
+        value.astimezone(UTC)
+    except OverflowError as exc:
+        raise ValueError("时间超出可表示的 UTC 范围") from exc
     return value
 
 
@@ -50,8 +54,13 @@ class PublishRequirement(Contract):
             except ZoneInfoNotFoundError as exc:
                 raise ValueError("未知 IANA 时区；请确认 tzdata 已安装") from exc
             for value in [self.requested_at, *(self.candidate_times or [])]:
-                if value and value.utcoffset() != value.astimezone(zone).utcoffset():
-                    raise ValueError("时间偏移与指定日期的 IANA 时区不一致")
+                if value:
+                    try:
+                        offset = value.astimezone(zone).utcoffset()
+                    except OverflowError as exc:
+                        raise ValueError("时间超出指定时区可表示范围") from exc
+                    if value.utcoffset() != offset:
+                        raise ValueError("时间偏移与指定日期的 IANA 时区不一致")
         return self
 
     def missing(self) -> list[str]:

@@ -117,10 +117,11 @@ def test_explicit_new_publication_does_not_exclude_other_request(repo, job):
     repo.register_request(second)
     snapshot = repo.read_material_basic("M01")
     own = repo.query_occupancy(job.request_id, job.items[0], snapshot, "alternatives")
-    other = repo.query_occupancy(second.request_id, second.items[0], snapshot, "alternatives")
     assert own.slots[0]["available"]
-    assert other.slots == []
-    assert other.checked_slots[0]["conflicts"] == [{"source": "draft", "id": first["draft_id"]}]
+    with pytest.raises(BusinessError) as caught:
+        repo.query_occupancy(second.request_id, second.items[0], snapshot, "alternatives")
+    assert caught.value.code == "DUPLICATE_PUBLICATION"
+    assert caught.value.details["related_drafts"][0]["draft_id"] == first["draft_id"]
 
 
 def test_before_commit_failure_rolls_back_all(repo, job):

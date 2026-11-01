@@ -292,7 +292,7 @@ def execute(
             ctx.save_error = {"code": result.code, "message": result.data["message"]}
     except (BusinessError, sqlite3.Error) as exc:
         error = ctx.repo.database_error(exc) if isinstance(exc, sqlite3.Error) else exc
-        if error.code in ("REQUEST_EXPIRED", "SLOT_EXPIRED", "DUPLICATE_PUBLICATION"):
+        if error.code in ("REQUEST_EXPIRED", "DUPLICATE_PUBLICATION"):
             ctx.input_issue = error.as_dict()
             ctx.related_drafts = (error.details or {}).get("related_drafts", [])
         if error.retryable and attempted:
@@ -309,10 +309,10 @@ def execute(
         if error.code == "REVISION_CONFLICT":
             ctx.refresh_draft()
             result.data["current_draft"] = ctx.draft_state
-        if name == "save_draft" and executed and error.code == "SLOT_CONFLICT":
+        if name == "save_draft" and executed and error.code in ("SLOT_CONFLICT", "SLOT_EXPIRED"):
             ctx.schedule_refresh_required = True
             result.data["recovery_action"] = "query_slots"
-            result.data["message"] = "保存未完成，候选已被占用；请重新查询，不要重复保存旧候选"
+            result.data["message"] = "保存未完成，候选已占用或到期；请重新查询原授权范围"
             if ctx.schedule_requeries >= ctx.budget.limits.schedule_requeries:
                 ctx.forced_status = "incomplete"
                 ctx.technical_error = {"code": "RECOVERY_LIMIT", "message": "保存冲突恢复次数耗尽"}
