@@ -64,6 +64,8 @@ class MockModel:
                 "REQUEST_EXPIRED",
                 "SLOT_EXPIRED",
                 "DUPLICATE_PUBLICATION",
+                "TASK_CANCELLED",
+                "TASK_SUPERSEDED",
             ):
                 return finish("needs_input", "需要用户补充资料或发起独立请求")
             return finish("finish", "工具失败，停止并保留已完成检查")

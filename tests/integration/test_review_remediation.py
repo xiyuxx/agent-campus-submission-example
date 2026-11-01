@@ -243,7 +243,7 @@ def test_duplicate_guard_rechecks_under_two_writers(repo, job):
 
 
 @pytest.mark.parametrize("inactive", ["stale", "rejected", "expired"])
-def test_inactive_publication_does_not_block_new_request(repo, job, tmp_path, inactive):
+def test_inactive_publication_still_belongs_to_original_task(repo, job, tmp_path, inactive):
     first = execute_run(repo, job, tmp_path / "first")
     if inactive == "expired":
         repo.business_clock = lambda: "2026-11-03T12:00:00Z"
@@ -254,8 +254,12 @@ def test_inactive_publication_does_not_block_new_request(repo, job, tmp_path, in
     if inactive == "expired":
         other.items[0].publish_requirement.requested_at = parse_time("2026-11-04T18:00:00+08:00")
     second = execute_run(repo, other, tmp_path / "second")
-    assert second.items[0].draft.save_status == "saved"
-    assert second.items[0].draft.id != first.items[0].draft.id
+    assert second.items[0].error["code"] == "DUPLICATE_PUBLICATION"
+    assert len(repo.list_drafts()) == 1
+    revised = repo.prepare_task("M01", other.items[0].publish_requirement, reopen=True)
+    third = execute_run(repo, revised, tmp_path / "third")
+    assert third.items[0].draft.save_status == "saved"
+    assert third.items[0].draft.id != first.items[0].draft.id
 
 
 @pytest.mark.parametrize(

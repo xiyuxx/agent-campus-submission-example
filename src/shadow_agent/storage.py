@@ -24,6 +24,7 @@ from .contracts import (
     parse_time,
 )
 from .policy import check_rules, confirmation_definitions, effective_rules, semantic_hash
+from .task_storage import TaskStorage
 
 
 def load_catalog(directory: Path) -> Catalog:
@@ -38,7 +39,7 @@ def load_catalog(directory: Path) -> Catalog:
         raise BusinessError("INVALID_CATALOG", "四个资料文件必须完整、可读且为合法 JSON") from exc
 
 
-class Repository:
+class Repository(TaskStorage):
     def __init__(
         self,
         path: Path,
@@ -82,8 +83,8 @@ class Repository:
         connection = self._connect()
         try:
             version = connection.execute("PRAGMA user_version").fetchone()[0]
-            if version != 1:
-                raise BusinessError("SCHEMA_VERSION", "请先 seed/migrate 初始化；不支持此结构版本")
+            if version != 2:
+                raise BusinessError("SCHEMA_VERSION", "请先 seed 或 migrate 初始化/迁移数据库")
             connection.execute("BEGIN IMMEDIATE" if write else "BEGIN")
             yield connection
             try:
@@ -104,11 +105,16 @@ class Repository:
         connection = self._connect()
         try:
             version = connection.execute("PRAGMA user_version").fetchone()[0]
-            if version == 1:
+            if version == 2:
                 return
-            if version != 0:
+            if version not in (0, 1):
                 raise BusinessError("SCHEMA_VERSION", "数据库版本高于本程序支持范围")
-            if connection.execute("SELECT name FROM sqlite_schema WHERE type='table'").fetchone():
+            if (
+                version == 0
+                and connection.execute(
+                    "SELECT name FROM sqlite_schema WHERE type='table'"
+                ).fetchone()
+            ):
                 raise BusinessError("SCHEMA_VERSION", "拒绝覆盖来源未知的非空数据库")
             if sqlite3.sqlite_version_info < (3, 38, 0):
                 raise BusinessError("UNSUPPORTED_SQLITE", "需要支持 STRICT 和 JSON 的 SQLite")
@@ -118,11 +124,40 @@ class Repository:
                 .joinpath("migrations/001_initial.sql")
                 .read_text(encoding="utf-8")
             )
-            connection.executescript(
-                "BEGIN IMMEDIATE;\n" + schema + "\nPRAGMA user_version=1;COMMIT;"
+            connection.execute("BEGIN IMMEDIATE")
+            if version == 1:
+                duplicates = [
+                    dict(x)
+                    for x in connection.execute(
+                        "SELECT material_id,platform,account_id,"
+                        "group_concat(draft_id) AS draft_ids "
+                        "FROM drafts WHERE validity='active' "
+                        "GROUP BY material_id,platform,account_id "
+                        "HAVING count(*)>1"
+                    )
+                ]
+                if duplicates:
+                    raise BusinessError(
+                        "MIGRATION_CONFLICT",
+                        "旧库有多份有效草稿，需人工确认保留方案后迁移",
+                        details={"duplicates": duplicates},
+                    )
+            # execute statements individually: executescript would implicitly commit preflight.
+            if version == 0:
+                for statement in schema.split(";"):
+                    if statement.strip():
+                        connection.execute(statement)
+            migration = (
+                files("shadow_agent").joinpath("migrations/002_tasks.sql").read_text("utf-8")
             )
+            for statement in migration.split(";"):
+                if statement.strip():
+                    connection.execute(statement)
+            self._backfill_tasks(connection)
+            connection.execute("PRAGMA user_version=2")
             if connection.execute("PRAGMA foreign_key_check").fetchall():
                 raise BusinessError("SCHEMA_INVALID", "外键结构检查失败")
+            connection.execute("COMMIT")
         finally:
             if connection.in_transaction:
                 connection.execute("ROLLBACK")
@@ -166,12 +201,19 @@ class Repository:
             ),
         )
 
-    def apply_catalog_snapshot(self, catalog: Catalog, *, update: bool = False) -> dict:
+    def apply_catalog_snapshot(
+        self, catalog: Catalog, *, update: bool = False, expected_revision: int | None = None
+    ) -> dict:
         self.initialize()
         canonical = catalog.canonical()
         source_hash = digest(canonical)
         with self.transaction(write=True) as connection:
             row = connection.execute("SELECT * FROM catalog_meta WHERE singleton_id=1").fetchone()
+            if (
+                expected_revision is not None
+                and (row["revision"] if row else 0) != expected_revision
+            ):
+                raise BusinessError("REVISION_CONFLICT", "资料目录已变化，请重新补充")
             if row and not update:
                 raise BusinessError("CATALOG_EXISTS", "已有资料；更新需显式使用 --update")
             previous = row["revision"] if row else 0
@@ -346,9 +388,9 @@ class Repository:
             connection = self._connect()
             try:
                 version = connection.execute("PRAGMA user_version").fetchone()[0]
-                if version not in (0, 1):
+                if version not in (0, 1, 2):
                     raise BusinessError("SCHEMA_VERSION", "不支持该数据库版本")
-                if version == 1:
+                if version in (1, 2):
                     connection.execute("BEGIN")
                     meta = connection.execute(
                         "SELECT * FROM catalog_meta WHERE singleton_id=1"
@@ -431,47 +473,46 @@ class Repository:
         )
 
     def register_request(self, request: Request) -> Request:
+        with self.transaction(write=True) as connection:
+            return self._register_request(connection, request)
+
+    def _register_request(self, connection, request: Request) -> Request:
         canonical = request.canonical()
         serialized = dumps(canonical)
-        with self.transaction(write=True) as connection:
-            old = connection.execute(
-                "SELECT * FROM requests WHERE request_id=?", (request.request_id,)
-            ).fetchone()
-            if old:
-                if (
-                    old["input_sha256"] != digest(canonical)
-                    or old["canonical_input_json"] != serialized
-                ):
-                    raise BusinessError(
-                        "INPUT_CONFLICT", "相同 request_id 的原始要求不同，请使用新 ID"
-                    )
-                return Request.model_validate_json(old["submitted_input_json"])
+        old = connection.execute(
+            "SELECT * FROM requests WHERE request_id=?", (request.request_id,)
+        ).fetchone()
+        if old:
+            if (
+                old["input_sha256"] != digest(canonical)
+                or old["canonical_input_json"] != serialized
+            ):
+                raise BusinessError("INPUT_CONFLICT", "相同 request_id 的原始要求不同，请使用新 ID")
+            return Request.model_validate_json(old["submitted_input_json"])
+        connection.execute(
+            "INSERT INTO requests VALUES (?,?,?,?,?,?)",
+            (
+                request.request_id,
+                request.schema_version,
+                request.model_dump_json(),
+                serialized,
+                digest(canonical),
+                self.clock(),
+            ),
+        )
+        for item in request.items:
+            value = item.publish_requirement.canonical()
             connection.execute(
-                "INSERT INTO requests VALUES (?,?,?,?,?,?)",
+                "INSERT INTO request_items VALUES (?,?,?,?,?,?)",
                 (
                     request.request_id,
-                    request.schema_version,
-                    request.model_dump_json(),
-                    serialized,
-                    digest(canonical),
-                    self.clock(),
+                    item.material_id,
+                    value["requested_at"],
+                    value["timezone"],
+                    value["constraint"],
+                    None if value["candidate_times"] is None else dumps(value["candidate_times"]),
                 ),
             )
-            for item in request.items:
-                value = item.publish_requirement.canonical()
-                connection.execute(
-                    "INSERT INTO request_items VALUES (?,?,?,?,?,?)",
-                    (
-                        request.request_id,
-                        item.material_id,
-                        value["requested_at"],
-                        value["timezone"],
-                        value["constraint"],
-                        None
-                        if value["candidate_times"] is None
-                        else dumps(value["candidate_times"]),
-                    ),
-                )
         return request
 
     def _basic(self, connection, material_id: str) -> MaterialSnapshot:
@@ -613,6 +654,9 @@ class Repository:
             }
 
     def _guard_publication(self, connection, request_id, item, snapshot) -> None:
+        task = self._task_access(connection, request_id, item, snapshot)
+        if task:
+            return
         related = [
             dict(row)
             for row in connection.execute(
@@ -676,8 +720,7 @@ class Repository:
         if meta["revision"] != snapshot.catalog_revision:
             raise BusinessError("STALE_EVIDENCE", "资料已变，请刷新素材")
         self._guard_publication(connection, request_id, item, snapshot)
-        draft = self._draft(connection, request_id, item.material_id)
-        self_id = draft["draft_id"] if draft else None
+        self_id = self._publication_self(connection, request_id, item, snapshot)
         if query == "requested":
             times, source = [utc(requirement.requested_at)], "requested"
         else:
@@ -935,7 +978,7 @@ class Repository:
                     actual.material.platform,
                     actual.material.account_id,
                     suggested_at,
-                    existing["draft_id"] if existing else None,
+                    self._publication_self(connection, request.request_id, item, actual),
                 ):
                     raise BusinessError("SLOT_CONFLICT", "保存时该时段已被占用，请刷新查询")
                 definitions = confirmation_definitions(item, review, suggested_at)
@@ -948,6 +991,9 @@ class Repository:
                 ):
                     return {"save_status": "reused", "draft": self._inspect(connection, existing)}
                 draft_id = existing["draft_id"] if existing else new_id("D")
+                # Release the previous plan only inside this same transaction. Any
+                # failure (including the new insert or COMMIT) rolls the replacement back.
+                self._replace_task_plan(connection, request, item, actual, draft_id)
                 revision = expected_revision + 1
                 stamp = self.clock()
                 payload = {
@@ -1143,6 +1189,13 @@ class Repository:
             if not row:
                 raise BusinessError("DRAFT_NOT_FOUND", "没有该草稿")
             draft = dict(row)
+            task = self._task_for(
+                connection, draft["material_id"], draft["platform"], draft["account_id"]
+            )
+            if task and (
+                task["status"] != "open" or task["current_request_id"] != draft["request_id"]
+            ):
+                raise BusinessError("TASK_SUPERSEDED", "任务已取消或要求已修改，不能批准旧方案")
             if draft["revision"] != decision.expected_revision:
                 raise BusinessError("REVISION_CONFLICT", "请查看当前修订后再确认")
             state = self._inspect(connection, draft)

@@ -156,6 +156,23 @@ async def run_request(
         task_status=aggregate(results),
         items=results,
     )
+    try:
+        repo.record_task_result(request, result, output)
+    except (BusinessError, sqlite3.Error) as error:
+        public = repo.database_error(error) if isinstance(error, sqlite3.Error) else error
+        result.items[-1].task_status = "failed"
+        result.items[-1].error = public.as_dict()
+        result.task_status = aggregate(result.items)
+        try:
+            trace.emit(
+                "final",
+                material_id=result.items[-1].material_id,
+                budget=contexts[-1].budget,
+                reason="task_record_failed",
+                result=result.items[-1].model_dump(mode="json"),
+            )
+        except OSError:
+            evidence_failed = True
     metadata.update(
         {
             "finished_at": now(),

@@ -18,11 +18,13 @@ from .models.mock import MockModel
 from .result import exit_code, render_summary
 from .service import run_request
 from .storage import Repository, load_catalog
+from .work import add_work_parser, dispatch, interactive, work_exit_code
 
 
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(description="素材审核与发布排期 Agent；仅保存本地草稿")
     commands = root.add_subparsers(dest="command", required=True)
+    add_work_parser(commands)
     seed = commands.add_parser("seed", help="完整导入四类合成资料")
     seed.add_argument("--data", type=Path, default=Path("data"))
     seed.add_argument("--db", type=Path, required=True)
@@ -106,7 +108,7 @@ async def _run(args, request: Request, *, repo=None, output=None):
 
 
 def review_drafts(repo: Repository) -> dict:
-    states = [x for x in repo.list_drafts() if x["validity"] == "active" and x["pending_items"]]
+    states = [x["draft"] for x in repo.task_worklist() if x["state"] == "等你确认"]
     if not states:
         print("当前没有可确认的待办。stale 需要重评估，已确认方案不提供撤回入口。", file=sys.stderr)
         return {"handled": 0}
@@ -169,7 +171,15 @@ def main(argv=None) -> int:
             stream.reconfigure(encoding="utf-8")
     args = parser().parse_args(argv)
     try:
-        if args.command == "seed":
+        if args.command == "work":
+            repo = Repository(args.db, replay_at=args.as_of)
+            result = dispatch(repo, args) if args.action else interactive(repo, args)
+        elif args.command == "migrate":
+            if not args.db.exists():
+                raise BusinessError("INVALID_INPUT", "迁移需要已有数据库；新库请 seed")
+            Repository(args.db).initialize()
+            result = {"schema_version": 2, "migrated": True}
+        elif args.command == "seed":
             catalog = load_catalog(args.data)
             repo = Repository(args.db)
             preview = repo.preview_catalog_snapshot(catalog)
@@ -200,15 +210,19 @@ def main(argv=None) -> int:
         else:
             result = review_drafts(Repository(args.db, replay_at=args.as_of))
         print(dumps(result))
-        return 0
+        return work_exit_code(result) if args.command == "work" else 0
     except BusinessError as error:
-        print(dumps({"error": error.as_dict()}))
+        public = error.as_dict()
+        if error.code == "MIGRATION_CONFLICT":
+            public["details"] = error.details
+        print(dumps({"error": public}))
         print(error.message, file=sys.stderr)
         return (
             2
             if error.code
             in (
                 "INVALID_CATALOG",
+                "INVALID_INPUT",
                 "INPUT_CONFLICT",
                 "CATALOG_EXISTS",
                 "MISSING_API_KEY",
@@ -218,7 +232,7 @@ def main(argv=None) -> int:
             )
             else 1
         )
-    except (ValidationError, ValueError, OSError):
+    except (ValidationError, ValueError, OSError, OverflowError):
         message = "输入/配置格式错误或文件不可读；已有运行目录不能覆盖"
         print(dumps({"error": {"code": "INVALID_INPUT", "message": message}}))
         print(message, file=sys.stderr)

@@ -1,0 +1,43 @@
+{
+  "source": {
+    "base_commit": "9da499cae0c5a329fdadd535b33cc0dabb51d924",
+    "source_sha256": "d032dfd1363714d2eb2abd9217c10f7f3903570b5ee697be85978cf1243b1b93"
+  },
+  "method": "418 unique cases covered by full attempt plus explicit targeted reruns; not a clean single-process full pass",
+  "unique_cases": 418,
+  "final_passed": 418,
+  "final_failures": 0,
+  "skipped": 0,
+  "artifacts": [
+    "full-attempt.xml",
+    "targeted-final.xml",
+    "tasks-final.xml"
+  ],
+  "attempt_history": [
+    {
+      "artifact": "phase2-junit.xml",
+      "tests": 410,
+      "failed": 1,
+      "socket_environment_failures": 0
+    },
+    {
+      "artifact": "phase2-final-junit.xml",
+      "tests": 417,
+      "failed": 92,
+      "socket_environment_failures": 89
+    },
+    {
+      "artifact": "phase2-x-junit.xml",
+      "tests": 328,
+      "failed": 1,
+      "socket_environment_failures": 1
+    },
+    {
+      "artifact": "phase2-last-junit.xml",
+      "tests": 418,
+      "failed": 9,
+      "socket_environment_failures": 9
+    }
+  ],
+  "note": "Windows loopback socket PermissionError/WinError10013 interrupted full runs. Final targeted CLI/time tests 12 passed; task tests 14 passed. Initial implementation failures (old reopen contract / DDL comment mismatch) were fixed, not skipped."
+}

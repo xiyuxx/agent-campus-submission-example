@@ -25,7 +25,7 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
         current = None
         state = None
     pending = [
-        PendingItem(id=f"missing:{x}", kind="input", message=f"请在新请求中补充 {x}")
+        PendingItem(id=f"missing:{x}", kind="input", message=f"请在原发布任务中补充 {x}")
         for x in requirement.missing()
     ]
     if ctx.input_issue:
@@ -93,7 +93,7 @@ def assemble_result(ctx: ItemContext) -> ItemResult:
                 PendingItem(
                     id="request:new_request",
                     kind="input",
-                    message="该方案已拒绝，请以新 request_id 发起独立请求",
+                    message="该方案已拒绝，请在 work 中显式重新安排原任务",
                 )
             )
     options = next(reversed(ctx.slots.values()), None)

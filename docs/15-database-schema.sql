@@ -1,4 +1,4 @@
--- 数据库设计附件；尚未接入应用或作为正式迁移运行。
+-- 初始数据库结构；由 Repository.initialize 与后续迁移共同执行。
 -- 连接先开启 foreign_keys，使用显式事务；执行前检查 STRICT / JSON 支持。
 
 CREATE TABLE catalog_imports (

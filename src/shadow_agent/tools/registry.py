@@ -292,7 +292,12 @@ def execute(
             ctx.save_error = {"code": result.code, "message": result.data["message"]}
     except (BusinessError, sqlite3.Error) as exc:
         error = ctx.repo.database_error(exc) if isinstance(exc, sqlite3.Error) else exc
-        if error.code in ("REQUEST_EXPIRED", "DUPLICATE_PUBLICATION"):
+        if error.code in (
+            "REQUEST_EXPIRED",
+            "DUPLICATE_PUBLICATION",
+            "TASK_CANCELLED",
+            "TASK_SUPERSEDED",
+        ):
             ctx.input_issue = error.as_dict()
             ctx.related_drafts = (error.details or {}).get("related_drafts", [])
         if error.retryable and attempted:

@@ -414,10 +414,10 @@ def test_model_cannot_smuggle_authorization_or_facts_into_save(repo, job, extra)
     assert repo.current_draft(job.request_id, "M01") is None
 
 
-def test_rejected_draft_releases_capacity_for_explicit_new_request(repo, job, tmp_path):
+def test_rejected_draft_releases_capacity_for_explicit_task_reopen(repo, job, tmp_path):
     first = run(repo, job, tmp_path / "first")
     repo.confirm_draft(decision(first.draft, "REJECT", [("change_time", "reject")]))
-    other = job.model_copy(update={"request_id": "NEW-AFTER-REJECT"}, deep=True)
+    other = repo.prepare_task("M01", job.items[0].publish_requirement, reopen=True)
     second = run(repo, other, tmp_path / "second")
     assert second.draft.save_status == "saved"
     assert second.draft.id != first.draft.id
