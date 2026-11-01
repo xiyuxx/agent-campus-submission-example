@@ -26,7 +26,7 @@
 
 ## 验收映射
 
-下列均须实现、测试并有实际运行证据；当前证据链接见 [v7索引](../examples/operator_experience_v7/README.md)，历史 v5/v4 只用于追溯。
+下列均须实现、测试并有实际运行证据；优化实现证据链接见 [v7索引](../examples/operator_experience_v7/README.md)，最新按题目复验见[v8](../examples/acceptance_v8/README.md)。二者业务源码相同；历史 v5/v4 只用于追溯。
 
 | 验收 | 实现与可执行测试 | 当前证据目录（均含实际输入/输出/Trace） |
 | --- | --- | --- |
@@ -39,7 +39,7 @@
 | 更换占用后重跑 | 当前方案重核、修订、旧确认失效；test_decision_improvements | extended-runs/changed_occupancy |
 | 确认与时间 | test_workflow_fixes、test_tasks、test_work_cli | task-runs/approved_future_reuse、expired_confirmation_replay.json |
 | 模型决策循环 | 原生 Agent、DeepSeek；test_provider、test_runtime_limits | 两条以上 live 与 evidence-check.json 的观察/后续动作 |
-| 交付完整性 | README、五份文档、锁依赖、离线 Mock、源码证据校验 | v6测试、安装、清单和评估记录 |
+| 交付完整性 | README、五份文档、锁依赖、离线 Mock、源码证据校验 | v8本地/独立CI完整测试、新安装、清单和评估记录 |
 
 新优化验收还包括：一次补资料后继续、修改成功原子替换、失败保留旧方案、取消释放容量、恢复需明确操作、旧请求不得覆盖新要求、导出再次核验和迁移歧义拒绝。对应 test_tasks 与 test_work_cli。所有运行只使用合成资料；本人试用尚无独立结果。
 
@@ -47,4 +47,4 @@
 
 用户确认以考核和本人试用为主。本轮按素材/补充来源、规则及选定账号时段复核持久化草稿，无关资料更新保持已有修订和确认；运行中的观察仍受全局版本并发校验。预览和导入返回实际失效范围及原因。
 
-work普通交互直接使用电脑本地时区和逐项资料提问，明确绝对时间；原工程JSON入口保留。CSV/JSON只导出当前可交接方案，包含稳定内容版本、导出时间及静态快照提醒，保留旧文件。实际连续样例见operator-runs-final，单次完整测试仍有环境失败，独立CI尚未执行。
+work普通交互直接使用电脑本地时区和逐项资料提问，明确绝对时间；原工程JSON入口保留。CSV/JSON只导出当前可交接方案，包含稳定内容版本、导出时间及静态快照提醒，保留旧文件。实际连续样例见v7/operator-runs-final。本轮本地全新安装及独立Windows CI均完整通过438项测试；最新28条实际程序记录覆盖六项业务验收，含8条live。正式独立数字题号和人工精确用时仍未获得，不以实现通过补造提交信息。

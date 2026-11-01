@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-8b6ec9f0-a163-4b8e-9afb-54cc9e2da3c3",
+  "request_id": "ACCIDENTAL-NEW-ID",
+  "mode": "mock",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "publication:reuse",
+          "kind": "input",
+          "message": "已有发布任务，请在 work 中继续或修改该任务"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-2dcb6aaa-7734-41be-9a29-8f9fde5b92db",
+        "OBS-8794d993-f758-4dab-9df7-1b31beff3705",
+        "OBS-443a79b0-9730-4959-90d2-d6ce7cd45e2f"
+      ],
+      "error": {
+        "code": "DUPLICATE_PUBLICATION",
+        "message": "已有发布任务，请在 work 中继续或修改该任务",
+        "retryable": false
+      },
+      "proposed_plan": null,
+      "related_drafts": [
+        {
+          "draft_id": "D-e28393f9-7db9-47a6-a783-f8825293e23f",
+          "request_id": "REVIEW-normal",
+          "revision": 1,
+          "at_utc": "2026-11-03T10:00:00.000000Z"
+        }
+      ]
+    }
+  ]
+}

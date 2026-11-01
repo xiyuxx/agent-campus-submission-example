@@ -24,16 +24,18 @@ demo离线无需密钥，明确回放合成资料的2026-11-01业务时间；包
 
 | 六项必须验收 | 当前实际输入、输出与Trace |
 | --- | --- |
-| 正常排期 | [正常](examples/operator_experience_v7/current-runs/mock_normal/output.json) |
-| 素材信息缺失 | [缺资料](examples/operator_experience_v7/current-runs/mock_missing/output.json) |
-| 规则风险 | [待确认风险](examples/operator_experience_v7/current-runs/mock_rule_risk/output.json)、[阻断](examples/operator_experience_v7/current-runs/mock_blocked/output.json) |
-| 时段冲突 | [抢槽后重查并待确认](examples/operator_experience_v7/current-runs/mock_save_race/trace.jsonl) |
-| 重复提交 | [复用原草稿](examples/operator_experience_v7/current-runs/mock_duplicate/output.json) |
-| 保存失败 | [失败、未保存提议和数据库快照](examples/operator_experience_v7/current-runs/mock_save_failure/output.json) |
+| 正常排期 | [正常](examples/acceptance_v8/current-runs/mock_normal/output.json) |
+| 素材信息缺失 | [缺资料](examples/acceptance_v8/current-runs/mock_missing/output.json) |
+| 规则风险 | [待确认风险](examples/acceptance_v8/current-runs/mock_rule_risk/output.json)、[阻断](examples/acceptance_v8/current-runs/mock_blocked/output.json) |
+| 时段冲突 | [抢槽后重查并待确认](examples/acceptance_v8/current-runs/mock_save_race/trace.jsonl) |
+| 重复提交 | [复用原草稿](examples/acceptance_v8/current-runs/mock_duplicate/output.json) |
+| 保存失败 | [失败、未保存提议和数据库快照](examples/acceptance_v8/current-runs/mock_save_failure/output.json) |
 
-两条真实模型路径：[正常时段可用](examples/operator_experience_v7/current-runs/live_normal/trace.jsonl)、[冲突与保存抢槽后调整](examples/operator_experience_v7/current-runs/live_save_race/trace.jsonl)。测试、纠错、安装和样本边界统一见 [评估](docs/03-evaluation.md) 与 [当前证据](examples/operator_experience_v7/README.md)。
+两条本轮真实模型路径：[正常时段可用](examples/acceptance_v8/current-runs/live_normal/trace.jsonl)、[冲突与保存抢槽后调整](examples/acceptance_v8/current-runs/live_save_race/trace.jsonl)。[本轮按题目复验](examples/acceptance_v8/README.md)包含六项验收、28条新运行材料及完整测试；运营连续操作和CSV见[v7优化样例](examples/operator_experience_v7/README.md)。
 
-限制：审核仅针对提供的元数据和规则，无视频理解或真实版权核验；本地容量不等于平台预约。改期须明确确认，阻断不能普通确认绕过。CSV/JSON是静态快照，改期/取消后需重新导出并核对版本。模型小样本不证明稳定成功率。本地完整测试仍受Windows回环socket环境限制，独立CI待执行；不能声称一次整套无失败。人工净投入未精确计时，不能声明三小时完成。
+验证：本轮本地全新安装和[独立Windows CI](https://github.com/xiyuxx/agent-campus-submission-example/actions/runs/41320127909)均完整通过438项离线测试，零跳过；59项定向验收也通过。8条新live共36次请求，保存失败有一次结束纠错，实际记录保留。
+
+限制：审核仅针对提供的元数据和规则，无视频理解或真实版权核验；本地容量不等于平台预约。改期须明确确认，阻断不能普通确认绕过。CSV/JSON是静态快照，改期/取消后需重新导出并核对版本。模型小样本不证明稳定成功率。此前Windows回环socket失败按历史保留，本轮通过不表示环境限制已根治。人工净投入未精确计时，不能声明三小时完成。
 
 ## 操作与数据
 
@@ -62,7 +64,7 @@ New-Item -ItemType Directory -Force .tmp | Out-Null
 .\.venv\Scripts\python.exe scripts/check_evidence.py examples/operator_experience_v7 --live-directory examples/operator_experience_v7/current-runs
 ```
 
-已准备 [手动离线CI](.github/workflows/offline-verification.yml)，当前尚未推送/执行；不会调用模型、读取.env或部署。
+[手动离线CI](.github/workflows/offline-verification.yml)已在提交d711311上[运行成功](https://github.com/xiyuxx/agent-campus-submission-example/actions/runs/41320127909)，完整JUnit与安装报告归档于[examples](examples/acceptance_v8/ci/verification.json)。不会调用模型、读取.env或部署。
 
 默认测试离线；安装脚本在全新venv按锁文件安装wheel，并可完整运行测试。验证结果以实际报告为准。业务资料回放不改变真实日志时间。重生成证据使用新目录：
 
@@ -78,7 +80,7 @@ New-Item -ItemType Directory -Force .tmp | Out-Null
 [需求](docs/01-requirements.md) · [方案](docs/02-solution.md) · [评估](docs/03-evaluation.md) · [AI使用](docs/04-ai-usage.md) · [复盘](docs/05-retrospective.md) · [当前体验契约](docs/28-operator-experience.md) · [历史设计索引](docs/history-index.md)
 
 - 题目：素材审核与发布排期 Agent；未获得独立数字题号，不杜撰编号。
-- 仓库：[xiyuxx/agent-campus-submission-example](https://github.com/xiyuxx/agent-campus-submission-example)。前一版本已推送，本轮体验优化按阶段本地提交；最终SHA和推送情况以实际交付回复为准。
+- 仓库：[xiyuxx/agent-campus-submission-example](https://github.com/xiyuxx/agent-campus-submission-example)。体验优化d711311已推送并完成CI；复验材料随后归档提交，最终SHA和推送情况以实际交付回复为准。
 - 精确依赖见requirements.lock；以Windows/Python3.13实测环境为准，不外推其他平台。
 - 用户负责业务修正与取舍，AI辅助实现和验证；本人试用不预写结果。此前4–5小时估算仅涵盖早期47轮交互执行，本次新增阶段另计，人工净工时未精确记录。
 

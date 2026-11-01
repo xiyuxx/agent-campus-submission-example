@@ -1,0 +1,45 @@
+{
+  "tested_commit": "d7113116edfa70b1868b328d165933a2c77c96a1",
+  "source_sha256": "ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b",
+  "single_full_run_passed": true,
+  "ci_executed": true,
+  "ci_url": "https://github.com/xiyuxx/agent-campus-submission-example/actions/runs/41320127909",
+  "suites": [
+    {
+      "junit": "acceptance-tests.xml",
+      "tests": 59,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 43.684
+    },
+    {
+      "junit": "clean-install/full-tests.xml",
+      "tests": 438,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 147.319
+    },
+    {
+      "junit": "ci/full-tests.xml",
+      "tests": 438,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 30.992
+    }
+  ],
+  "new_application_runs": 28,
+  "mock_runs": 20,
+  "live_runs": 8,
+  "model_requests": 36,
+  "total_tokens": 68928,
+  "live_finish_corrections": 1,
+  "limitations": [
+    "Synthetic metadata and injected faults only; no publishing.",
+    "Single live sample per scenario is not a stability estimate.",
+    "Formal numeric topic ID and precise personal effort not supplied.",
+    "Prior Windows socket failures retained, not declared permanently resolved."
+  ]
+}

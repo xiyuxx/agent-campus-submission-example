@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-d0680fd0-7f3d-4922-b66d-79800408710c",
+  "request_id": "REQ-EVIDENCE-tool_failure",
+  "mode": "mock",
+  "task_status": "failed",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "failed",
+      "evidence_ids": [
+        "OBS-6cd9ad94-5b29-4efd-8063-a07b870c78c4",
+        "OBS-8430f682-1329-48c5-ac26-2de47c4dd41a",
+        "OBS-b6b7c5d9-2722-4057-8a03-ca557965b157",
+        "OBS-14e21226-db5b-44f0-95e2-a1b873542bf2",
+        "OBS-b97ac6c4-e348-4f93-a57a-1c2fb4525992"
+      ],
+      "error": {
+        "code": "QUERY_FAILED",
+        "message": "显式注入的时段查询失败",
+        "retryable": false
+      },
+      "proposed_plan": null,
+      "related_drafts": []
+    }
+  ]
+}

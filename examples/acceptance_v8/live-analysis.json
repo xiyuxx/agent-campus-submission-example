@@ -1,0 +1,101 @@
+{
+  "samples": 8,
+  "model_attempts": 36,
+  "tokens": 68928,
+  "records": [
+    {
+      "case": "live_blocked",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "prompt_version": "6.0",
+      "model": "deepseek-flash",
+      "tokens": 5087,
+      "errors": []
+    },
+    {
+      "case": "live_insufficient",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "prompt_version": "6.0",
+      "model": "deepseek-flash",
+      "tokens": 5153,
+      "errors": []
+    },
+    {
+      "case": "live_missing",
+      "model_attempts": 3,
+      "tool_attempts": 2,
+      "prompt_version": "6.0",
+      "model": "deepseek-flash",
+      "tokens": 5160,
+      "errors": []
+    },
+    {
+      "case": "live_normal",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "prompt_version": "6.0",
+      "model": "deepseek-flash",
+      "tokens": 9957,
+      "errors": []
+    },
+    {
+      "case": "live_past",
+      "model_attempts": 4,
+      "tool_attempts": 3,
+      "prompt_version": "6.0",
+      "model": "deepseek-flash",
+      "tokens": 6741,
+      "errors": []
+    },
+    {
+      "case": "live_rule_risk",
+      "model_attempts": 5,
+      "tool_attempts": 4,
+      "prompt_version": "6.0",
+      "model": "deepseek-flash",
+      "tokens": 10232,
+      "errors": []
+    },
+    {
+      "case": "live_save_failure",
+      "model_attempts": 6,
+      "tool_attempts": 4,
+      "prompt_version": "6.0",
+      "model": "deepseek-flash",
+      "tokens": 11141,
+      "errors": [
+        {
+          "budget_remaining": {
+            "model_attempts_left": 11,
+            "seconds_left": 174.316,
+            "tool_attempts_left": 12
+          },
+          "elapsed_ms": 5845,
+          "error": {
+            "code": "INVALID_FINISH",
+            "message": "技术失败不能伪装成资料待确认，请 finish 如实停止",
+            "retryable": false
+          },
+          "event_id": "EV-998e6fdc-2a22-4dbf-ab70-855352033b13",
+          "event_type": "error",
+          "material_id": "M01",
+          "mode": "live",
+          "run_id": "RUN-1158323e-cea5-45a6-ac7f-65cb23342756",
+          "schema_version": "1.0",
+          "step": 10,
+          "timestamp": "2026-11-01T15:08:47.832457Z"
+        }
+      ]
+    },
+    {
+      "case": "live_save_race",
+      "model_attempts": 7,
+      "tool_attempts": 6,
+      "prompt_version": "6.0",
+      "model": "deepseek-flash",
+      "tokens": 15457,
+      "errors": []
+    }
+  ]
+}

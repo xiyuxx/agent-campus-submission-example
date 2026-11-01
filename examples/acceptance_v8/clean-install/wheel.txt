@@ -1,0 +1,13 @@
+Looking in indexes: https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+Processing d:\code\smallshadow
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: small-shadow-agent
+  Building wheel for small-shadow-agent (pyproject.toml): started
+  Building wheel for small-shadow-agent (pyproject.toml): finished with status 'done'
+  Created wheel for small-shadow-agent: filename=small_shadow_agent-0.1.0-py3-none-any.whl size=72921 sha256=f0c9674d6bb0b7e7c63233af53c4290da073b8dafba946c019252690b481a20d
+  Stored in directory: C:\Users\xiyux\AppData\Local\Temp\pip-ephem-wheel-cache-q9wfzegl\wheels\50\26\17\8c387f9a559f91d89fb0ffbd3e92f3fac31209464d315bf74e
+Successfully built small-shadow-agent
+
+[notice] A new release of pip is available: 25.3 -> 26.2.2
+[notice] To update, run: D:\Code\smallShadow\.venv\Scripts\python.exe -m pip install --upgrade pip

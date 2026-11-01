@@ -1,0 +1,1 @@
+{"path": "D:\\Code\\smallShadow\\runtime\\acceptance-v8-install\\venv\\Lib\\site-packages\\shadow_agent\\__init__.py", "source": {"base_commit": "d7113116edfa70b1868b328d165933a2c77c96a1", "source_sha256": "ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b"}}

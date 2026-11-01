@@ -1,0 +1,9 @@
+Processing .\.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: small-shadow-agent
+  Building wheel for small-shadow-agent (pyproject.toml): started
+  Building wheel for small-shadow-agent (pyproject.toml): finished with status 'done'
+  Created wheel for small-shadow-agent: filename=small_shadow_agent-0.1.0-py3-none-any.whl size=72921 sha256=560d552dc6907fcff5b5b4f6fe93df70ec42b8d13269741fc7ae9eef2b4bf4cb
+  Stored in directory: C:\Users\runneradmin\AppData\Local\Temp\pip-ephem-wheel-cache-r5pm8yv0\wheels\22\c0\e3\0d9e052c01da1e60fcbe09300da6c4ad016e505a657917ad64
+Successfully built small-shadow-agent

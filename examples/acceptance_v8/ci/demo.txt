@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-d25acd2c-1b09-4259-bbd2-54434640ad23",
+  "request_id": "REQ-DEMO-NEAREST-V2",
+  "mode": "mock",
+  "task_status": "blocked",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": "2026-11-03T19:00:00+08:00",
+      "confirmation_status": "pending",
+      "pending_items": [
+        {
+          "id": "change_time",
+          "kind": "confirm",
+          "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+        }
+      ],
+      "draft": {
+        "id": "D-2fec373b-693d-455b-9acd-eaaa8c8e6ef1",
+        "revision": 1,
+        "validity": "active",
+        "save_status": "saved",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-e7a39e88-9d5c-4d98-8935-82b3badec774",
+        "OBS-12537fbd-d3f2-4ef4-a591-e80fc328776e",
+        "OBS-6f0c8d4e-69ec-4d60-bb32-5e8fd0b6f1a3",
+        "OBS-97f01e7f-8908-487d-9cf5-139f42d90aaa",
+        "OBS-6d0930e3-16b5-41c6-b33a-69c4dc1f1279",
+        "OBS-126543a5-0e8c-4e80-838f-264caf9763a8"
+      ],
+      "error": null,
+      "proposed_plan": {
+        "suggested_at": "2026-11-03T19:00:00+08:00",
+        "pending_items": [
+          {
+            "id": "change_time",
+            "kind": "confirm",
+            "message": "是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？"
+          }
+        ],
+        "persistence_status": "saved",
+        "validity": "current",
+        "error": null
+      },
+      "related_drafts": []
+    },
+    {
+      "material_id": "M02",
+      "material_version": 1,
+      "review_status": "needs_info",
+      "risk_reasons": [
+        {
+          "rule_id": "R-COPYRIGHT-MISSING",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "copyright_status",
+          "observed_value": null,
+          "source_id": "materials:M02@1",
+          "message": "缺少版权状态，请补查授权资料"
+        },
+        {
+          "rule_id": "R-COVER-MISSING",
+          "version": 1,
+          "severity": "needs_info",
+          "field": "cover_ref",
+          "observed_value": null,
+          "source_id": "materials:M02@1",
+          "message": "示例业务规则要求提供封面引用"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "missing:copyright_status",
+          "kind": "input",
+          "message": "请补充素材 copyright_status 并显式导入"
+        },
+        {
+          "id": "missing:cover_ref",
+          "kind": "input",
+          "message": "请补充素材 cover_ref 并显式导入"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-d631df54-06cd-4e56-a1a9-1c0c29a2ddd7",
+        "OBS-71b79486-f0bf-4de4-82bb-da4ee311c13b"
+      ],
+      "error": null,
+      "proposed_plan": null,
+      "related_drafts": []
+    },
+    {
+      "material_id": "M03",
+      "material_version": 1,
+      "review_status": "blocked",
+      "risk_reasons": [
+        {
+          "rule_id": "R-COPYRIGHT-DENIED",
+          "version": 1,
+          "severity": "blocked",
+          "field": "copyright_status",
+          "observed_value": "unauthorized",
+          "source_id": "materials:M03@1",
+          "message": "未授权素材不得进入排期"
+        }
+      ],
+      "original_requested_at": "2026-11-03T18:00:00+08:00",
+      "constraint": "soft",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "blocked",
+      "evidence_ids": [
+        "OBS-ee0c0848-9408-493b-a828-9b99592b7710",
+        "OBS-a2e93c6f-d5d1-4a05-837b-21c5595e0696"
+      ],
+      "error": null,
+      "proposed_plan": null,
+      "related_drafts": []
+    }
+  ]
+}
+# 素材审核与排期结果：blocked
+
+模式：mock；请求：REQ-DEMO-NEAREST-V2；运行：RUN-d25acd2c-1b09-4259-bbd2-54434640ad23
+
+仅保存本地草稿；未接入真实发布，未预约真实平台时段。
+
+## M01
+
+- 规则预检：passed
+- 原要求：2026-11-03T18:00:00+08:00；约束：hard
+- 当前建议：2026-11-03T19:00:00+08:00
+- 确认状态：pending
+- 草稿保存：saved；ID：D-2fec373b-693d-455b-9acd-eaaa8c8e6ef1；修订：1；有效性：active
+- 本项状态：needs_input
+- 待办（confirm）：change_time / 是否接受 2026-11-03T11:00:00.000000Z 替代原要求 2026-11-03T10:00:00.000000Z？
+- 本次拟议：2026-11-03T19:00:00+08:00；持久化：saved；有效性：current
+
+## M02
+
+- 规则预检：needs_info
+- 原要求：2026-11-03T18:00:00+08:00；约束：hard
+- 当前建议：无有效建议
+- 确认状态：not_required
+- 草稿保存：not_attempted；ID：无；修订：None；有效性：None
+- 本项状态：needs_input
+- 风险：R-COPYRIGHT-MISSING / 缺少版权状态，请补查授权资料
+- 风险：R-COVER-MISSING / 示例业务规则要求提供封面引用
+- 待办（input）：missing:copyright_status / 请补充素材 copyright_status 并显式导入
+- 待办（input）：missing:cover_ref / 请补充素材 cover_ref 并显式导入
+
+## M03
+
+- 规则预检：blocked
+- 原要求：2026-11-03T18:00:00+08:00；约束：soft
+- 当前建议：无有效建议
+- 确认状态：not_required
+- 草稿保存：not_attempted；ID：无；修订：None；有效性：None
+- 本项状态：blocked
+- 风险：R-COPYRIGHT-DENIED / 未授权素材不得进入排期

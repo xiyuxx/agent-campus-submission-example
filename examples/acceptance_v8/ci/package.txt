@@ -1,0 +1,6 @@
+Processing .\runtime\ci-install\wheels\small_shadow_agent-0.1.0-py3-none-any.whl
+Installing collected packages: small-shadow-agent
+Successfully installed small-shadow-agent-0.1.0
+
+[notice] A new release of pip is available: 26.2.1 -> 26.2.2
+[notice] To update, run: D:\a\agent-campus-submission-example\agent-campus-submission-example\runtime\ci-install\venv\Scripts\python.exe -m pip install --upgrade pip

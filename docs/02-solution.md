@@ -48,4 +48,4 @@ _invalid_reason同时支持当前SQLite和拟导入Catalog：比较有效素材/
 
 operator_language只承担用户时间和文案转换；timezone=local表示OS本地展示/输入政策，保存的UTC时刻不改写。按日期本地化，歧义/不存在的夏令时时刻要求明确偏移。中文表单只把明确用户答案写入白名单字段，不改变模型补查/决策职责。
 
-handoff按扩展名导出UTF-8 JSON或带BOM的CSV。版本由可交接内容摘要生成，生成时间不参与版本；相同内容JSON/CSV一致，原附件不覆盖。它是轻量内容标识，没有顺序批次、交付回执或自动撤回。手动GitHub Actions配置以独立Windows runner构建新venv、安装wheel并完整运行离线测试，当前尚未远程执行。
+handoff按扩展名导出UTF-8 JSON或带BOM的CSV。版本由可交接内容摘要生成，生成时间不参与版本；相同内容JSON/CSV一致，原附件不覆盖。它是轻量内容标识，没有顺序批次、交付回执或自动撤回。手动GitHub Actions以独立Windows runner构建新venv、安装wheel并完整运行离线测试；本轮实际438项通过，报告见[v8](../examples/acceptance_v8/README.md)。CI不读取业务密钥、不执行live或发布。

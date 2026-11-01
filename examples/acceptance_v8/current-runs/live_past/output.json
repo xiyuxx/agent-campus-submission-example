@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.1",
+  "run_id": "RUN-09b2d23d-daf8-4f67-b6a2-640310a7f7dd",
+  "request_id": "REVIEW-past",
+  "mode": "live",
+  "task_status": "needs_input",
+  "items": [
+    {
+      "material_id": "M01",
+      "material_version": 2,
+      "review_status": "passed",
+      "risk_reasons": [],
+      "original_requested_at": "2000-01-01T18:00:00+08:00",
+      "constraint": "hard",
+      "suggested_at": null,
+      "confirmation_status": "not_required",
+      "pending_items": [
+        {
+          "id": "schedule:new_time",
+          "kind": "input",
+          "message": "发布时间已经到期，请明确提供新的发布时间；不会自动顺延"
+        }
+      ],
+      "draft": {
+        "id": null,
+        "revision": null,
+        "validity": null,
+        "save_status": "not_attempted",
+        "error": null
+      },
+      "task_status": "needs_input",
+      "evidence_ids": [
+        "OBS-9c8e39cd-c215-489c-98cc-1968445e32b7",
+        "OBS-f44bf28f-86ca-49e9-b0d3-546255bbb6e3",
+        "OBS-a44757c6-1806-43de-900e-53fc159c1011"
+      ],
+      "error": {
+        "code": "REQUEST_EXPIRED",
+        "message": "发布时间已经到期，请明确提供新的发布时间；不会自动顺延",
+        "retryable": false
+      },
+      "proposed_plan": null,
+      "related_drafts": []
+    }
+  ]
+}

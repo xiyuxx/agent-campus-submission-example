@@ -1,10 +1,12 @@
 # 测试、实际结果与限制
 
-当前契约为 [局部失效与运营体验](28-operator-experience.md)，任务生命周期沿用第27号契约。当前证据见 [v7索引](../examples/operator_experience_v7/README.md)，源码SHA256：ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b。旧v6及更早结果仅作历史追溯。
+当前契约为 [局部失效与运营体验](28-operator-experience.md)，任务生命周期沿用第27号契约。最新按题目复验见[v8](../examples/acceptance_v8/README.md)，运营连续样例见 [v7索引](../examples/operator_experience_v7/README.md)，二者业务源码SHA256均为ded21a3afeace5e55ef26572c19918d5ef8a2cab33adf3c3eb4bef719cf7f20b。旧v6及更早结果仅作历史追溯。
 
 ## 离线验证与干净环境
 
-当前438项不同用例均有通过记录，未跳过/xfail；**尚无一次整套无失败的干净环境结果**。本轮新增20项，覆盖依赖影响、确认保持、本地时间/夏令时、中文表单、CSV与版本等。阶段一24项存储/依赖检查通过；阶段二35项相关检查和7项完整CLI通过，后续改为跨本机时区断言后7项再次通过。Ruff及格式检查通过。
+**最新本地全新安装及独立Windows CI均一次完整通过438项测试，零失败、零跳过/xfail。** 本地147.61秒、CI31.04秒；两份原始JUnit与安装9项检查见[v8本地](../examples/acceptance_v8/clean-install/verification.json)、[CI](../examples/acceptance_v8/ci/verification.json)。wheel安装后隔离导入的源码摘要均与当前一致。CI运行提交d711311，运行[41320127909](https://github.com/xiyuxx/agent-campus-submission-example/actions/runs/41320127909)整体success，不读取.env或调用模型。
+
+另59项定向验收全部通过，Ruff及66个Python文件格式检查通过。此前优化新增20项，阶段一24项、阶段二35项和7项CLI的原始结果仍保留。下列为本轮成功之前的历史失败，不能删去，也不能推断本机socket问题已经根治。
 
 实际创建两个全新venv，按锁文件安装当前wheel，隔离导入的源码摘要一致。首次wheel构建、锁依赖安装、pip check、隔离导入、demo与work list等8项检查通过。使用新安装解释器完整运行结果：
 
@@ -16,11 +18,11 @@
 
 按用例核对以上记录，全部438项至少有一次通过，但不能据此把任一整套运行改写为成功。第二个新环境的demo也曾受同类环境错误阻断，记录保留。日志采集首次还遇到混合编码导致采集线程异常，已改为保留不可解码字节的转义表达；最初JUnit完整保留。未修改业务断言、跳过用例或替换事件循环来规避失败。相关原始报告见两个install目录，覆盖汇总见verification.json。
 
-已准备仅手动触发的 [GitHub离线CI](../.github/workflows/offline-verification.yml)，在独立Windows runner构建wheel、安装新venv、完整执行默认测试、核验证据并保留报告。没有模型密钥、真实模型调用或部署步骤。**目前尚未推送或执行，不能声称CI通过。**
+仅手动触发的 [GitHub离线CI](../.github/workflows/offline-verification.yml)已执行；除完整测试外，已核验v7的43条应用证据和两条真实路径。原始报告、run ID、提交SHA、步骤和时间见[v8 CI归档](../examples/acceptance_v8/ci/github-run.json)。CI证明离线工程行为，不替代真实模型评估。
 
 ## 六项必须验收与当前运行材料
 
-当前43次应用运行：35次Mock、8条真实模型，每条都有实际input/output/Trace/run/summary。另有数据库快照、13个任务操作快照、运营中文摘要和实际CSV。Mock与脚本中的接受、补资料、取消均为合成测试动作，不记为本人实际试用。
+最新v8重新执行28条：20次Mock、8条真实模型，每条都有实际input/output/Trace/run/summary及数据库快照。六项逐条映射见[v8](../examples/acceptance_v8/README.md)，另重跑更换占用/确认/工具失败。下表保留同源码v7的43次运行与运营连续记录：35次Mock、8条live，另有13个任务操作快照、中文摘要和CSV。Mock与脚本中的接受、补资料、取消均为合成测试动作，不记为本人实际试用。
 
 | 必须验收 | 实际结果与证据 |
 | --- | --- |
@@ -41,13 +43,13 @@
 
 ## 真实模型的观察与下一动作
 
-本轮显式8条DeepSeek live，提示6.0，requested/returned均deepseek-flash，thinking disabled、temperature=0。共36次请求，API total_tokens累计69037（含缓存，不当作账单金额），每场景仅一次。实际逐例统计见 [分析](../examples/operator_experience_v7/live-analysis.json)。
+最新v8显式8条DeepSeek live，提示6.0，requested/returned均deepseek-flash，thinking disabled、temperature=0。共36次请求，API total_tokens累计68928（含缓存，不当作账单金额），每场景一次。实际逐例统计见[v8分析](../examples/acceptance_v8/live-analysis.json)。此前v7的36次请求/69037 tokens是独立历史执行，不混作最新一轮统计。
 
-- [正常](../examples/operator_experience_v7/current-runs/live_normal/trace.jsonl)：观察18:00可用，模型保存18:00，消费回执后finish；5次模型请求、4次工具。
-- [冲突恢复](../examples/operator_experience_v7/current-runs/live_save_race/trace.jsonl)：观察18:00冲突/19:00可用，选19:00，实际本地保存遭受控SLOT_CONFLICT，模型重查并改选20:00，保存后仍待确认；7次请求、6次工具。
+- [正常](../examples/acceptance_v8/current-runs/live_normal/trace.jsonl)：观察18:00可用，模型保存18:00，消费回执后finish；5次模型请求、4次工具。
+- [冲突恢复](../examples/acceptance_v8/current-runs/live_save_race/trace.jsonl)：观察18:00冲突/19:00可用，选19:00，实际本地保存遭受控SLOT_CONFLICT，模型重查并改选20:00，保存后仍待确认；7次请求、6次工具。
 
-其余路径覆盖缺资料、过期要求、软风险、阻断及保存失败。保存失败模型有一次INVALID_FINISH纠错，原事件保留；不能声称每次首答都正确。新增中文输入、依赖保持和CSV主要由离线测试/实际程序验证，不冒称全部进行过真实模型评估。当前源码、工具配对和观察送达校验见evidence-check.json。
+其余路径覆盖缺资料、过期要求、软风险、阻断及保存失败。v8保存失败模型仍有一次INVALID_FINISH纠错，原事件保留；不能声称每次首答都正确。新增中文输入、依赖保持和CSV主要由离线测试/实际程序验证，不冒称全部进行过真实模型评估。最新源码、工具配对和观察送达校验见v8/evidence-check-initial.json。
 
 ## 边界
 
-只审核元数据、文案与规则，不核验真实视频和版权；只有本地草稿，未预约平台或发布。规则目前全局适用，规则变化仍需相应审核；运行中观察保留全局版本并发校验。导出版本是内容标识，不是顺序批次；静态文件不会自动撤回，无多人交接回执或团队素材表同步。人工净工时未精确计时，旧4–5小时估算不包含新增阶段。当前最大的未完成验证是独立环境一次整套无失败，等待实际CI执行或允许本机回环的运行环境。
+只审核元数据、文案与规则，不核验真实视频和版权；只有本地草稿，未预约平台或发布。规则目前全局适用，规则变化仍需相应审核；运行中观察保留全局版本并发校验。导出版本是内容标识，不是顺序批次；静态文件不会自动撤回，无多人交接回执或团队素材表同步。人工净工时未精确计时，旧4–5小时估算不包含新增阶段。独立环境完整复验现已完成，仍缺本人独立试用、多次模型稳定性与长期并发证据；不能把此次通过外推到这些范围。
