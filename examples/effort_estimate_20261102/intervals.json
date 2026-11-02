@@ -1,0 +1,439 @@
+{
+  "timezone": "UTC",
+  "unit": "epoch_seconds",
+  "notice": "仅公开计算所需时间元数据，不含用户原话、工具输出或模型上下文。",
+  "threads": [
+    {
+      "title": "检查素材审核排期 Agent",
+      "turns": [
+        {
+          "start": 1793584051,
+          "end": 1793584103,
+          "duration_ms": 52335,
+          "status": "completed"
+        },
+        {
+          "start": 1793583866,
+          "end": 1793583982,
+          "duration_ms": 115777,
+          "status": "completed"
+        },
+        {
+          "start": 1793545461,
+          "end": 1793546732,
+          "duration_ms": 1271605,
+          "status": "completed"
+        },
+        {
+          "start": 1793534888,
+          "end": 1793537551,
+          "duration_ms": 2662898,
+          "status": "completed"
+        },
+        {
+          "start": 1793533460,
+          "end": 1793534774,
+          "duration_ms": 1313542,
+          "status": "failed"
+        },
+        {
+          "start": 1793532919,
+          "end": 1793533309,
+          "duration_ms": 390457,
+          "status": "completed"
+        },
+        {
+          "start": 1793531607,
+          "end": 1793531751,
+          "duration_ms": 143261,
+          "status": "completed"
+        },
+        {
+          "start": 1793531307,
+          "end": 1793531354,
+          "duration_ms": 46751,
+          "status": "completed"
+        },
+        {
+          "start": 1793522367,
+          "end": 1793523609,
+          "duration_ms": 1242375,
+          "status": "completed"
+        },
+        {
+          "start": 1793507884,
+          "end": 1793509146,
+          "duration_ms": 1262543,
+          "status": "failed"
+        },
+        {
+          "start": 1793507665,
+          "end": 1793507801,
+          "duration_ms": 135703,
+          "status": "completed"
+        },
+        {
+          "start": 1793507208,
+          "end": 1793507413,
+          "duration_ms": 204919,
+          "status": "completed"
+        },
+        {
+          "start": 1793506617,
+          "end": 1793506849,
+          "duration_ms": 232425,
+          "status": "completed"
+        },
+        {
+          "start": 1793505875,
+          "end": 1793505928,
+          "duration_ms": 52978,
+          "status": "completed"
+        },
+        {
+          "start": 1793505340,
+          "end": 1793505577,
+          "duration_ms": 236837,
+          "status": "completed"
+        },
+        {
+          "start": 1793502539,
+          "end": 1793504308,
+          "duration_ms": 1768550,
+          "status": "completed"
+        },
+        {
+          "start": 1793502160,
+          "end": 1793502481,
+          "duration_ms": 320767,
+          "status": "completed"
+        },
+        {
+          "start": 1793500217,
+          "end": 1793500738,
+          "duration_ms": 521089,
+          "status": "completed"
+        },
+        {
+          "start": 1793499162,
+          "end": 1793499925,
+          "duration_ms": 762766,
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "title": "测试",
+      "turns": [
+        {
+          "start": 1793501254,
+          "end": 1793501308,
+          "duration_ms": 54334,
+          "status": "completed"
+        },
+        {
+          "start": 1793418307,
+          "end": 1793418790,
+          "duration_ms": 483008,
+          "status": "completed"
+        },
+        {
+          "start": 1793411894,
+          "end": 1793412687,
+          "duration_ms": 792599,
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "title": "数据库设计",
+      "turns": [
+        {
+          "start": 1793439749,
+          "end": 1793440467,
+          "duration_ms": 717689,
+          "status": "completed"
+        },
+        {
+          "start": 1793427891,
+          "end": 1793428358,
+          "duration_ms": 466468,
+          "status": "failed"
+        },
+        {
+          "start": 1793427847,
+          "end": 1793427876,
+          "duration_ms": 28579,
+          "status": "completed"
+        },
+        {
+          "start": 1793427424,
+          "end": 1793427464,
+          "duration_ms": 39694,
+          "status": "completed"
+        },
+        {
+          "start": 1793427264,
+          "end": 1793427309,
+          "duration_ms": 45386,
+          "status": "completed"
+        },
+        {
+          "start": 1793420743,
+          "end": 1793421434,
+          "duration_ms": 691815,
+          "status": "completed"
+        },
+        {
+          "start": 1793420536,
+          "end": 1793420595,
+          "duration_ms": 58865,
+          "status": "completed"
+        },
+        {
+          "start": 1793419015,
+          "end": 1793419682,
+          "duration_ms": 666787,
+          "status": "completed"
+        },
+        {
+          "start": 1793351027,
+          "end": 1793354518,
+          "duration_ms": 3491145,
+          "status": "failed"
+        },
+        {
+          "start": 1793350118,
+          "end": 1793351001,
+          "duration_ms": 882984,
+          "status": "completed"
+        },
+        {
+          "start": 1793349766,
+          "end": 1793349924,
+          "duration_ms": 157739,
+          "status": "completed"
+        },
+        {
+          "start": 1793349489,
+          "end": 1793349634,
+          "duration_ms": 144777,
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "title": "Agent循环",
+      "turns": [
+        {
+          "start": 1793438665,
+          "end": 1793439628,
+          "duration_ms": 962974,
+          "status": "completed"
+        },
+        {
+          "start": 1793438494,
+          "end": 1793438551,
+          "duration_ms": 56756,
+          "status": "completed"
+        },
+        {
+          "start": 1793438376,
+          "end": 1793438392,
+          "duration_ms": 15741,
+          "status": "completed"
+        },
+        {
+          "start": 1793435562,
+          "end": 1793435995,
+          "duration_ms": 433173,
+          "status": "completed"
+        },
+        {
+          "start": 1793431664,
+          "end": 1793431718,
+          "duration_ms": 53925,
+          "status": "completed"
+        },
+        {
+          "start": 1793428003,
+          "end": 1793428290,
+          "duration_ms": 287022,
+          "status": "completed"
+        },
+        {
+          "start": 1793415134,
+          "end": 1793416631,
+          "duration_ms": 1497579,
+          "status": "completed"
+        },
+        {
+          "start": 1793414948,
+          "end": 1793414974,
+          "duration_ms": 25772,
+          "status": "completed"
+        },
+        {
+          "start": 1793414449,
+          "end": 1793414559,
+          "duration_ms": 109709,
+          "status": "completed"
+        },
+        {
+          "start": 1793414162,
+          "end": 1793414219,
+          "duration_ms": 56579,
+          "status": "completed"
+        },
+        {
+          "start": 1793413638,
+          "end": 1793413718,
+          "duration_ms": 79717,
+          "status": "completed"
+        },
+        {
+          "start": 1793413090,
+          "end": 1793413294,
+          "duration_ms": 204021,
+          "status": "completed"
+        },
+        {
+          "start": 1793411367,
+          "end": 1793411830,
+          "duration_ms": 462187,
+          "status": "completed"
+        },
+        {
+          "start": 1793351800,
+          "end": 1793353114,
+          "duration_ms": 1314263,
+          "status": "completed"
+        },
+        {
+          "start": 1793351244,
+          "end": 1793351455,
+          "duration_ms": 210618,
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "title": "阅读并梳理实现参考文档",
+      "turns": [
+        {
+          "start": 1793348415,
+          "end": 1793349243,
+          "duration_ms": 828164,
+          "status": "completed"
+        },
+        {
+          "start": 1793348233,
+          "end": 1793348297,
+          "duration_ms": 63716,
+          "status": "completed"
+        },
+        {
+          "start": 1793347612,
+          "end": 1793347730,
+          "duration_ms": 118503,
+          "status": "completed"
+        },
+        {
+          "start": 1793347377,
+          "end": 1793347522,
+          "duration_ms": 145460,
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "title": "前置准备",
+      "turns": [
+        {
+          "start": 1793347051,
+          "end": 1793347223,
+          "duration_ms": 171143,
+          "status": "completed"
+        },
+        {
+          "start": 1793346738,
+          "end": 1793346952,
+          "duration_ms": 214153,
+          "status": "completed"
+        },
+        {
+          "start": 1793346360,
+          "end": 1793346438,
+          "duration_ms": 77697,
+          "status": "completed"
+        },
+        {
+          "start": 1793346026,
+          "end": 1793346145,
+          "duration_ms": 119652,
+          "status": "completed"
+        },
+        {
+          "start": 1793345779,
+          "end": 1793345961,
+          "duration_ms": 182204,
+          "status": "completed"
+        },
+        {
+          "start": 1793345630,
+          "end": 1793345673,
+          "duration_ms": 43045,
+          "status": "failed"
+        },
+        {
+          "start": 1793345441,
+          "end": 1793345495,
+          "duration_ms": 53809,
+          "status": "completed"
+        },
+        {
+          "start": 1793344269,
+          "end": 1793344290,
+          "duration_ms": 20500,
+          "status": "completed"
+        },
+        {
+          "start": 1793343575,
+          "end": 1793343643,
+          "duration_ms": 67648,
+          "status": "completed"
+        },
+        {
+          "start": 1793342702,
+          "end": 1793342741,
+          "duration_ms": 39354,
+          "status": "completed"
+        },
+        {
+          "start": 1793342625,
+          "end": 1793342635,
+          "duration_ms": 9649,
+          "status": "completed"
+        },
+        {
+          "start": 1793342491,
+          "end": 1793342561,
+          "duration_ms": 70245,
+          "status": "completed"
+        },
+        {
+          "start": 1793342017,
+          "end": 1793342194,
+          "duration_ms": 177084,
+          "status": "completed"
+        },
+        {
+          "start": 1793341651,
+          "end": 1793341934,
+          "duration_ms": 282820,
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

@@ -82,6 +82,6 @@ New-Item -ItemType Directory -Force .tmp | Out-Null
 - 题目：素材审核与发布排期 Agent；未获得独立数字题号，不杜撰编号。
 - 仓库：[xiyuxx/agent-campus-submission-example](https://github.com/xiyuxx/agent-campus-submission-example)。体验优化d711311已推送并完成CI；复验材料随后归档提交，最终SHA和推送情况以实际交付回复为准。
 - 精确依赖见requirements.lock；以Windows/Python3.13实测环境为准，不外推其他平台。
-- 用户负责业务修正与取舍，AI辅助实现和验证；本人试用不预写结果。此前4–5小时估算仅涵盖早期47轮交互执行，本次新增阶段另计，人工净工时未精确记录。
+- 用户负责业务修正与取舍，AI辅助实现和验证；本人试用不预写结果。按全部6组对话的67轮已结束交互推估，项目投入约10–12小时，包含讨论、阅读/输入、AI执行和等待；用户确认没有额外处理。精确人工净工时未计时，方法和截止范围见[时间记录](docs/05-retrospective.md#时间记录)。
 
 真实密钥仅存忽略的.env，不提交真实隐私资料或完整试卷。克隆后按 [Git规范](docs/14-git-workflow.md) 启用正常密钥/消息钩子。

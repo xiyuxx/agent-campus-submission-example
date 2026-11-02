@@ -1,0 +1,104 @@
+{
+  "kind": "conversation-based-effort-estimate",
+  "cutoff_local": "2026-11-02 09:48:23",
+  "timezone": "Asia/Shanghai",
+  "workspace": "D:/Code/smallShadow",
+  "scope": {
+    "workspace_threads": 6,
+    "ended_turns": 67,
+    "failed_turns_included": 5,
+    "current_estimation_turn_excluded": true,
+    "raw_conversation_text_published": false,
+    "outside_workspace_threads_excluded": true
+  },
+  "user_confirmation": "用户确认没有对话之外的额外处理；确认于2026-11-02。",
+  "recommended_estimate_hours": [
+    10,
+    12
+  ],
+  "label": "AI辅助项目投入粗估，含讨论、阅读/输入间隔、AI执行和等待；不是精确人工净工时。",
+  "first_request_local": "2026-10-30 14:27:31",
+  "last_completed_response_local": "2026-11-02 09:48:23",
+  "calendar_span_seconds": 242452,
+  "observed_response_union_seconds": 28106,
+  "raw_response_duration_sum_seconds": 29914.328999999998,
+  "sensitivity": [
+    {
+      "gap_minutes": 5,
+      "sessions": 28,
+      "seconds": 33361
+    },
+    {
+      "gap_minutes": 10,
+      "sessions": 20,
+      "seconds": 36702
+    },
+    {
+      "gap_minutes": 15,
+      "sessions": 15,
+      "seconds": 40557
+    },
+    {
+      "gap_minutes": 30,
+      "sessions": 11,
+      "seconds": 45584
+    }
+  ],
+  "daily_response_union_seconds": {
+    "2026-10-30": 7362,
+    "2026-10-31": 7952,
+    "2026-11-01": 12624,
+    "2026-11-02": 168
+  },
+  "threads": [
+    {
+      "title": "检查素材审核排期 Agent",
+      "turns": 20,
+      "closed": 19,
+      "first": "2026-11-01 10:12:42",
+      "last": "2026-11-02 09:48:23",
+      "union_seconds": 12738
+    },
+    {
+      "title": "测试",
+      "turns": 3,
+      "closed": 3,
+      "first": "2026-10-31 09:58:14",
+      "last": "2026-11-01 10:48:28",
+      "union_seconds": 1330
+    },
+    {
+      "title": "数据库设计",
+      "turns": 12,
+      "closed": 12,
+      "first": "2026-10-30 16:38:09",
+      "last": "2026-10-31 17:54:27",
+      "union_seconds": 7393
+    },
+    {
+      "title": "Agent循环",
+      "turns": 15,
+      "closed": 15,
+      "first": "2026-10-30 17:07:24",
+      "last": "2026-10-31 17:40:28",
+      "union_seconds": 5772
+    },
+    {
+      "title": "阅读并梳理实现参考文档",
+      "turns": 4,
+      "closed": 4,
+      "first": "2026-10-30 16:02:57",
+      "last": "2026-10-30 16:34:03",
+      "union_seconds": 1155
+    },
+    {
+      "title": "前置准备",
+      "turns": 14,
+      "closed": 14,
+      "first": "2026-10-30 14:27:31",
+      "last": "2026-10-30 16:00:23",
+      "union_seconds": 1530
+    }
+  ],
+  "method": "合并所有已结束轮次的startedAt/completedAt区间以去重；失败轮次计入。将全局去重区间之间不超过10或15分钟的间隔作为阅读/讨论/输入的代理估计，长间隔不计；得到36702至40557秒，约10小时12分至11小时16分，粗略报告10至12小时。短间隔也可能包含离开或其他活动，不能当精确人工计时。"
+}
